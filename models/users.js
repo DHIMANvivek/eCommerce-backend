@@ -91,7 +91,7 @@ let userSchema = new mongoose.Schema({
             size: {String},
             color: {String},
             qty: {Number}, 
-            price: {number}
+            price: {Number}
         }
     ],
     active: {

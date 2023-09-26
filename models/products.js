@@ -1,5 +1,4 @@
-const mongoose = required('mongoose');
-
+const mongoose = require('mongoose');
 const productSchema = mongoose.Schema({
 
   sellerID: {
