@@ -1,22 +1,121 @@
-const mongoose = require('mongoose');
+const mongoose = required('mongoose');
+
 const productSchema = mongoose.Schema({
-  sku: { type: String, required: true, },
-  name: { type: String, required: true, },
-  price: { type: Number, required: true, default: 0, min: 0, },
-  oldPrice: { type: Number, default: 0, min: 0, },
-  image: [String],
-  sizes: [String],
-  colors: [String],
-  description: { type: String },
-  stockQuantity: { type: Number, required: true, min: 0, },
-  orderQuantity: [Number],
-  info: { productCode: String, category: String, subTitle: String, brand: String, weight: String, composition: String, tags: [String], },
-  available: { type: Boolean, default: true, },
-  reviews: [{
-    username: String, rating: { type: Number, min: 0, max: 5, },
-    comment: String, date: Date,
+
+  sellerID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users',
+    required: true,
+  },
+
+  sku: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  subTitle: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  
+  assets: [{
+    color: {
+      type: String,
+      required: true
+    },
+    photo: [{
+      type: String,
+      min: 3, 
+      required: true
+    }]
   }],
-  sellerID: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true, },
+
+  info: {
+    code: {
+      type: String,
+      trim: true
+    },
+    category: [{
+      type: String,
+      required: true
+    }],
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'unisex'],
+      required: true
+    },
+    brand: {
+      type: String,
+      required: true
+    },
+    weight: {
+      type: Number,
+      required: true
+    },
+    composition: {
+      type: String,
+      required: true,
+    },
+    tags: [{
+      type: String,
+      required: true
+    }],
+    orderQuantity: [{
+      type: Number,
+      required: true,
+    }],
+  },
+
+  price: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0,
+  },
+  discount: {
+    type: Number,
+    default: 0
+  },
+
+  stockQuantity: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+
+  reviews: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'users',
+      required: true,
+    },
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+    },
+    comment: {
+      type: String,
+    },
+    date: {
+      type: Date,
+      default: Date.now
+    }
+  }],
 },
-  { timestamps: true, autoIndex: true });
-module.exports = mongoose.model('Product', productSchema);
+  {
+    timestamps: true,
+    autoIndex: true
+  }
+);
+
+
+module.exports = mongoose.model('products', productSchema);

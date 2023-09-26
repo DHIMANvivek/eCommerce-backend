@@ -1,36 +1,107 @@
 const mongoose = require('mongoose');
-let userSchema = new mongoose.Schema({ 
-    _id: mongoose.Schema.Types.ObjectId,
-    name: {
+let userSchema = new mongoose.Schema({
+
+    email: {
         type: String,
         trim: true,
-        default: '',
+        required: true,
+        lowercase: true,
+        unique: true
     },
-    email:{
-           type: String,
+    name: {
+        firstname: {
+            type: String,
             trim: true,
-            required: true,
-            lowercase: true,
-            unique: true
+            default: '',
+        },
+        lastname: {
+            type: String,
+            trim: true,
+            default: '',
+        },
     },
     password: {
-         type: String,
-            required: true,
-            minlength: 8
+        type: String,
+        required: true,
+        minlength: 8
     },
-     role: {
+    mobile: {
+        type: Number,
+        trim: true,
+        minLength: [10],
+        maxLength: [10]
+    },
+    info: {
+        gender: {
             type: String,
-            enum: ['PURCHASER', 'SELLER'],
-            default: 'PURCHASER'
+            enum: ["male", "female", "other"]
         },
-    active: {
-            type: Boolean,
-            default: true
+        dob: {
+            type: Date,
+            required: true
         },
+        address: [
+            {
+                location: {
+                    type: String,
+                    trim: true,
+                    lowercase: true
+                },
+                city: {
+                    type: String,
+                    trim: true,
+                    lowercase: true
+                },
+                pincode: {
+                    type: Number,
+                    trim: true,
+                    required: ['true', "Please enter a valid pincode"]
+                },
+                state: {
+                    type: String,
+                    trim: true,
+                    lowercase: true
+                },
+                country: {
+                    type: String,
+                    trim: true,
+                    lowercase: true,
+                    default: "India"
+                }
+            }
+        ],
     },
+    photo: {
+        type: String,
+        trim: true
+    },
+    role: {
+        type: String,
+        required: true,
+        enum: ['user', 'seller', 'admin'],
+        default: 'user'
+    },
+    cart: [
+        {
+            productID: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'products',
+                required: true,
+            },
+            size: {String},
+            color: {String},
+            qty: {Number}, 
+            price: {number}
+        }
+    ],
+    active: {
+        type: Boolean,
+        default: true
+    },
+},
     {
         timestamps: true,
         autoIndex: true,
-});
+    });
 
 module.exports = mongoose.model('users', userSchema);
