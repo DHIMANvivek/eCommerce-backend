@@ -10,23 +10,29 @@ const sellerSchema = mongoose.Schema({
         type: String
     },
     categories: [{
-        type: String
+        type: String,
+        unique: true
     }],
     brands: [{
-        type: String
+        type: String,
+        unique: true
     }],
     size: [{
-        type: String
+        type: String,
+        unique: true
     }],
     tags: [{
-        type: String
+        type: String,
+        unique: true
     }],
     colors: [{
         name:{
-            type: String
+            type: String,
+            unique: true
         },
         hexCode: {
-            type: String
+            type: String,
+            unique: true
         }
     }],
     payment: {

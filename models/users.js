@@ -40,8 +40,8 @@ let userSchema = new mongoose.Schema({
             type: Date,
             required: true
         },
-        address: [
-            {
+        address: {
+            type: [{
                 location: {
                     type: String,
                     trim: true,
@@ -68,8 +68,15 @@ let userSchema = new mongoose.Schema({
                     lowercase: true,
                     default: "India"
                 }
+            }],
+            validate:  {
+                validator: function (address) {
+                    return address.length <= 3;
+                },
+                message: 'You can only add a maximum of 3 addresses.'
             }
-        ],
+        }
+        
     },
     photo: {
         type: String,
