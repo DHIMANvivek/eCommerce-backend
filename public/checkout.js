@@ -12,7 +12,7 @@ document
 
 var emailAddress = '';
 async function initialize() {
-  const response = await fetch("http://localhost:5000/create-payment-intent", {
+  const response = await fetch("https://e-commerce-backend-7tt3-i7ilppj5a-dhimanvivek.vercel.app/create-payment-intent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) }),
