@@ -1,10 +1,15 @@
 'use strict';
 const secretKey = "secretKey";
+const express = require("express");
+const app = express();
 const user = require('../../models/users');
 const product = require('../../models/products');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const stripe = require("stripe")('sk_test_51NvsyeSENcdZfgNiy559a6dtaofzqfn00MVNCrPe4kQWAZNZulhdDmJePJTZvSSzzu4xnkTjHIjmWPVdzTW1L6oc00oI29MAG4');
+
+app.use(express.static("public"));
 module.exports = {
 
     signup: async (req, res) => {
@@ -92,6 +97,32 @@ module.exports = {
         //     console.log(error)
         // }
     },
+    // createPaymentIntent: async (req, res) => {
+    //     const { items } = req.body;
+    //     const itemsString = JSON.stringify(items);
+    //     const descriptionString = itemsString;
+    //     const descriptionArray = JSON.parse(descriptionString);
+    //     //  const description = descriptionArray.map((item) => {
+    //     //       return item.name;
+    //     //  });
+    //     console.log(descriptionArray[0].name);
+    //     // Create a PaymentIntent with the order amount and currency
+    //     const paymentIntent = await stripe.paymentIntents.create({
+    //         amount: 20,
+    //         currency: "inr",
+    //         description: JSON.stringify(descriptionArray),
+    //         metadata: {
+    //             items: JSON.stringify(descriptionArray),
+    //         },
+    //         automatic_payment_methods: {
+    //             enabled: true,
+    //         },
+    //     });
+    //     console.log(JSON.parse(paymentIntent.description)[0].id, "paymentIntent")
 
+    //     res.send({
+    //         clientSecret: paymentIntent.client_secret,
+    //     });
+    // }
 
 }
