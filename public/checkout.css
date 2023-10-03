@@ -15,6 +15,13 @@
 }
 
 
+.container{
+    width: 70% !important;
+    max-width: 1000px !important;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
 
 
 section {
@@ -379,3 +386,11 @@ button:disabled {
     min-width: initial;
   }
 }
+
+.custom {
+  width: 30% !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+

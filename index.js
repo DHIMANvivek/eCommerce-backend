@@ -51,12 +51,12 @@ app.post('/webhook', express.raw({type: 'application/json'}), (request, response
 
 
 
-
+// parseFloat(items[0].price * 100)
 app.post("/create-payment-intent", async (req, res) => {
   const { items } = req.body;
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: parseFloat(items[0].price * 100),
+    amount: 123,
     currency: "inr",
     description: JSON.stringify(items),
     metadata: {

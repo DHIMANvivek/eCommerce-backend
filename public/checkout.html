@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
     <title>Accept a payment</title>
-    <script src="https://js.stripe.com/v3/" defer></script>
-    <script src="./checkout.js" defer></script>
-    <style src="checkout.css"></style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="./checkout.js"></script>
+    <script src="https://js.stripe.com/v3/fingerprinted/js/trusted-types-checker-239db17d86d6320632b024ca9e43ba9c.js"></script>
+    <style src="./checkout.css"></style>
 </head>
 <body>
-    <form id="payment-form">
+    <form id="payment-form" class="container">
+                <!-- gpay
+        <div id="payment-request-button" class="custom">
+  A Stripe Element will be inserted here.
+       </div> -->
         <h3 style="align-items: center; text-align: center;">Place Your Order</h3>
         <div id="link-authentication-element">
             <!-- Stripe.js injects the Link Authentication Element -->
         </div>
-        gpay
-        <div id="payment-request-button">
-  <!-- A Stripe Element will be inserted here. -->
-       </div>
         <div id="shipping-address-element">
             <!-- Stripe.js injects the Shipping Address Element -->
         </div>
