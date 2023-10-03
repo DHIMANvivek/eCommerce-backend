@@ -77,6 +77,10 @@ app.use(routes);
 
 
 
+
+
+app.use(require('./DEMO'));
+
 let port = 5000;
 app.listen(5000, (err) => {
     if (err)
