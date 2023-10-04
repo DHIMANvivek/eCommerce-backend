@@ -67,6 +67,12 @@ let userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+
+    Lead:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'leads',
+     
+    }
 },
     {
         timestamps: true,
