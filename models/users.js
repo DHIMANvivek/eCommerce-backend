@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const bcrypt=require('bcryptjs');
+const bcrypt = require('bcryptjs');
+const address = require('./address');
+
 let userSchema = new mongoose.Schema({
 
     email: {
@@ -39,79 +41,9 @@ let userSchema = new mongoose.Schema({
         },
         dob: {
             type: Date,
-        
         },
         address: {
-            type: [{
-                firstname:{
-                    type: String,
-                    trim: true,
-                    required:true,
-                    lowercase: true
-                },
-                lastname:{
-                    type: String,
-                    trim: true,
-                    lowercase: true
-                },
-
-                apartment:{
-                    type: String,
-                    trim: true,
-                    required:true,
-                    lowercase: true
-                },
-
-                area:{
-                    type: String,
-                    trim: true,
-                    required:true,
-                    lowercase: true
-                },
-
-                landmark:{
-                    type: String,
-                    trim: true,
-                     required:true,
-                    lowercase: true
-                },
-
-               
-                pincode: {
-                    type: Number,
-                    trim: true,
-                    required: ['true', "Please enter a valid pincode"]
-                },
-
-                town_city:{
-                    type: String,
-                    trim: true,
-                    required:true,
-                    lowercase: true
-                },
-                state: {
-                    type: String,
-                    trim: true,
-                    required:true,
-                    lowercase: true
-                },
-
-                country: {
-                    type: String,
-                    trim: true,
-                    lowercase: true,
-                    default: "India"
-                },
-                defaultAddress:{
-                    type:Boolean,
-                    default:false
-                },
-                
-               
-              
-              
-              
-            }],
+            type: [address],
             validate:  {
                 validator: function (address) {
                     return address.length <= 3;
@@ -131,8 +63,6 @@ let userSchema = new mongoose.Schema({
         enum: ['user', 'seller', 'admin'],
         default: 'user'
     },
-   
-  
     active: {
         type: Boolean,
         default: true
@@ -143,16 +73,12 @@ let userSchema = new mongoose.Schema({
         autoIndex: true,
     });
 
-
-    userSchema.pre("save",function (next){
-       
+    userSchema.pre("save", function (next){
         if(this.password ){
             this.password= bcrypt.hashSync(this.password); 
            
         }
-       
         next();
-    })
+    });
     
-
 module.exports = mongoose.model('users', userSchema);
