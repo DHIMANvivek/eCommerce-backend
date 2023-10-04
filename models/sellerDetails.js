@@ -58,9 +58,7 @@ const sellerSchema = mongoose.Schema({
             type: String,
             required: true
         },
-        TIN: {
-            type: String
-        }
+      
     }
 },
     {

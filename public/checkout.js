@@ -12,11 +12,17 @@ document
 
 var emailAddress = '';
 async function initialize() {
-  const response = await fetch("http://localhost:5000/create-payment-intent", {
+  const response = await fetch("https://e-commerce-backend-7tt3-i7ilppj5a-dhimanvivek.vercel.app/create-payment-intent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) }),
   });
+
+//   const inr = JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) });
+// const inrObject = JSON.parse(inr);
+// const price = inrObject.items[0].price;
+
+// console.log(price, "price"); 
 
   const { clientSecret } = await response.json();
   console.log("Client Secret:", clientSecret);
@@ -34,67 +40,61 @@ const appearance = {
   },
   //  labels: 'floating',
 };
-  elements = stripe.elements({ clientSecret , appearance });
 // const elements = stripe.elements();
-const paymentRequest = stripe.paymentRequest({
-  country: 'US',
-  currency: 'usd',
-  total: {
-    label: 'Demo total',
-    amount: 1099,
-  },
-  requestPayerName: true,
-  requestPayerEmail: true,
-});
+elements = stripe.elements({ clientSecret , appearance });
+// const paymentRequest = stripe.paymentRequest({
+//   country: 'IN',
+//   currency: 'inr',
+//   total: {
+//     label: 'Demo total',
+//     amount: 123,
+//   },
+//   requestPayerName: true,
+//   requestPayerEmail: true,
+// });
 
-const prButton = elements.create('paymentRequestButton', {
-  paymentRequest,
-});
+// const prButton = elements.create('paymentRequestButton', {
+//   paymentRequest,
+// });
 
-(async () => {
-  // Check the availability of the Payment Request API first.
-  const result = await paymentRequest.canMakePayment();
-  if (result) {
-    prButton.mount('#payment-request-button');
-  } else {
-    document.getElementById('payment-request-button').style.display = 'none';
-  }
-})();
+// (async () => {
+//   console.log("Before calling paymentRequest.canMakePayment()");
+//   const result = await paymentRequest.canMakePayment();
+//   console.log("After calling paymentRequest.canMakePayment()");
+  
+//   if (result) {
+//     prButton.mount('#payment-request-button');
+//   } else {
+//     document.getElementById('payment-request-button').style.display = 'none';
+//     console.error("Error: Payment request cannot be made.");
+//   }
+// })();
 
-paymentRequest.on('paymentmethod', async (ev) => {
-  // Confirm the PaymentIntent without handling potential next actions (yet).
-  const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
-    clientSecret,
-    {payment_method: ev.paymentMethod.id},
-    {handleActions: false}
-  );
+// paymentRequest.on('paymentmethod', async (ev) => {
+//   const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
+//     clientSecret,
+//     {payment_method: ev.paymentMethod.id},
+//     {handleActions: false}
+//   );
 
-  if (confirmError) {
-    // Report to the browser that the payment failed, prompting it to
-    // re-show the payment interface, or show an error message and close
-    // the payment interface.
-    ev.complete('fail');
-  } else {
-    // Report to the browser that the confirmation was successful, prompting
-    // it to close the browser payment method collection interface.
-    ev.complete('success');
-    // Check if the PaymentIntent requires any actions and, if so, let Stripe.js
-    // handle the flow. If using an API version older than "2019-02-11"
-    // instead check for: `paymentIntent.status === "requires_source_action"`.
-    if (paymentIntent.status === "requires_action") {
-      // Let Stripe.js handle the rest of the payment flow.
-      const {error} = await stripe.confirmCardPayment(clientSecret);
-      if (error) {
-        // The payment failed -- ask your customer for a new payment method.
-      } else {
-        // The payment has succeeded -- show a success message to your customer.
-      }
-    } else {
-      // The payment has succeeded -- show a success message to your customer.
-    }
-  }
-});
+//   if (confirmError) {
+//     ev.complete('fail');
+//   } else {
+//     ev.complete('success');
+//     if (paymentIntent.status === "requires_action") {
+//       const {error} = await stripe.confirmCardPayment(clientSecret);
+//       if (error) {
+
+//       } else {
+
+//       }
+//     } else {
+
+//     }
+//   }
+// });
   // elements = stripe.elements({ clientSecret , appearance });
+  
   const linkAuthenticationElement = elements.create("linkAuthentication");
   linkAuthenticationElement.mount("#link-authentication-element");
 

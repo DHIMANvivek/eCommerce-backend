@@ -25,7 +25,8 @@ const productSchema = mongoose.Schema({
     required: true
   },
   
-  assets: [{
+  assets: [
+    {
     color: {
       type: String,
       required: true
@@ -90,25 +91,7 @@ const productSchema = mongoose.Schema({
     min: 0,
   },
 
-  reviews: [{
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'users',
-      required: true,
-    },
-    rating: {
-      type: Number,
-      min: 0,
-      max: 5,
-    },
-    comment: {
-      type: String,
-    },
-    date: {
-      type: Date,
-      default: Date.now
-    }
-  }],
+
 },
   {
     timestamps: true,

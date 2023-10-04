@@ -1,3 +1,4 @@
+const mongoose=require('mongoose')
 const orderSchema = mongoose.Schema(
     {
         buyerId: {
@@ -8,13 +9,13 @@ const orderSchema = mongoose.Schema(
 
         product: [{
 
-            productInfo: {
+            productId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'products',
                 required: true,
-            },
+            },   
 
-            orderInfo: {
+            productInfo: {
                 qty: {
                     type: Number,
                     required: true,
@@ -33,18 +34,115 @@ const orderSchema = mongoose.Schema(
                         enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
                         default: 'pending',
                     },
-                    payment: {
-                        type: String,
-                        enum: ['confirmed', 'pending', 'cancelled', 'refund'],
-                        default: 'pending'
-                    }
+                  
                 },
             }
         }],
+
+        // NEW FIELDS
+        orderAmount: {
+            type: Number,
+           required:true
+          },
+
+          orderDate:{
+            type:Date,
+            required:true,
+            default:new Date()
+          },
+          address: {
+           
+                firstname:{
+                    type: String,
+                    trim: true,
+                    required:true,
+                    lowercase: true
+                },
+                lastname:{
+                    type: String,
+                    trim: true,
+                    lowercase: true
+                },
+
+                apartment:{
+                    type: String,
+                    trim: true,
+                    required:true,
+                    lowercase: true
+                },
+
+                area:{
+                    type: String,
+                    trim: true,
+                    required:true,
+                    lowercase: true
+                },
+
+                landmark:{
+                    type: String,
+                    trim: true,
+                     required:true,
+                    lowercase: true
+                },
+
+               
+                pincode: {
+                    type: Number,
+                    trim: true,
+                    required: ['true', "Please enter a valid pincode"]
+                },
+
+                town_city:{
+                    type: String,
+                    trim: true,
+                    required:true,
+                    lowercase: true
+                },
+                state: {
+                    type: String,
+                    trim: true,
+                    required:true,
+                    lowercase: true
+                },
+
+                country: {
+                    type: String,
+                    trim: true,
+                    lowercase: true,
+                    default: "India"
+                },
+                defaultAddress:{
+                    type:Boolean,
+                    default:false
+                },
+
+               
+        
+            
+        },
+
+        payment_status: {
+            type: String,
+            enum: ['confirmed', 'pending', 'cancelled', 'refund'],
+            default: 'pending'
+        }
+
+           
+        
     },
     {
         timestamps: true,
     }
 );
+
+
+
+
+orderSchema.pre('save', function (next) {
+    this.orderAmount = this.product.reduce((totalAmount, product) => {
+      return totalAmount + product.productInfo.amount;
+    }, 0);
+    next();
+  });
 
 module.exports = mongoose.model('orders', orderSchema);
