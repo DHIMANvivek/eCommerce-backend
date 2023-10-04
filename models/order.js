@@ -34,11 +34,7 @@ const orderSchema = mongoose.Schema(
                         enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
                         default: 'pending',
                     },
-                    payment_status: {
-                        type: String,
-                        enum: ['confirmed', 'pending', 'cancelled', 'refund'],
-                        default: 'pending'
-                    }
+                  
                 },
             }
         }],
@@ -123,16 +119,15 @@ const orderSchema = mongoose.Schema(
                
         
             
+        },
+
+        payment_status: {
+            type: String,
+            enum: ['confirmed', 'pending', 'cancelled', 'refund'],
+            default: 'pending'
         }
 
-
-            /* order 
-            
-                paymentstatus:[pending,sucess]
-                paymentmethod:[enum:[gpay,card,upi,cod]]
-                orderstatus:[]
-
-            */ 
+           
         
     },
     {

@@ -131,31 +131,8 @@ let userSchema = new mongoose.Schema({
         enum: ['user', 'seller', 'admin'],
         default: 'user'
     },
-    cart: [
-        {
-            productID: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'products',
-                required: true,
-            },
-            size: {String},
-            color: {String},
-            qty: {Number}, 
-            price: {Number}
-        }
-    ],
-    wishlist: [
-        {
-            productID: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'products',
-                required: true,
-            },
-        }
-    ],
-    notifications: [
-        
-    ],
+   
+  
     active: {
         type: Boolean,
         default: true
