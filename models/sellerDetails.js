@@ -6,9 +6,6 @@ const sellerSchema = mongoose.Schema({
         ref: 'users',
         required: true,
     },
-    organization: {
-        type: String
-    },
     categories: [{
         type: String,
         unique: true

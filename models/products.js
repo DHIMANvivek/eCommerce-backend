@@ -6,7 +6,6 @@ const productSchema = mongoose.Schema({
     ref: 'users',
     required: true,
   },
-
   sku: {
     type: String,
     required: true,
@@ -52,6 +51,10 @@ const productSchema = mongoose.Schema({
       enum: ['male', 'female', 'unisex'],
       required: true
     },
+    size : [{
+      type: String,
+      required: true
+    }],
     brand: {
       type: String,
       required: true

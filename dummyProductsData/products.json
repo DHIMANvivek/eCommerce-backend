@@ -1,0 +1,700 @@
+[
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-kurti001",
+        "name": "Straight Kurti",
+        "subTitle": "Pink Ethnic Motifs Printed Kurti",
+        "description" : "Elegant Pink Kurti with Ethnic Print Accents.",
+        "assets" : [{
+            "color" : "Pink",
+            "photo" : [
+                "https://cdn.filestackcontent.com/sDXAYkXdQMS5IsTt4qm1",
+                "https://cdn.filestackcontent.com/E4njQCSUSm22bgde5aAB",
+                "https://cdn.filestackcontent.com/FTQctPzSwiaB71NSfbeE"
+            ]},{
+                "color": "Turquoise blue",
+                "photo" : [
+                    "https://cdn.filestackcontent.com/Qu74JwigSO2SeQETSUME",
+                    "https://cdn.filestackcontent.com/O9DvZ7QLS0GWi11GbwW2",
+                    "https://cdn.filestackcontent.com/u8IqPxcOQ6C8OSGIcYT5"
+                ]
+            }, {
+                "color" : "Magenta",
+                "photo" : [
+                    "https://cdn.filestackcontent.com/6AvpCMvdRiQIWq798GH4",
+                    "https://cdn.filestackcontent.com/392dtApAQjyfNce6iWUW",
+                    "https://cdn.filestackcontent.com/pipHXwyQgGBU5KNfWMyg"
+                ]
+            }
+        ], 
+        "info" : {
+            "code" : "kurti001",
+            "category": "kurti",
+            "gender" : "female",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Anubhutee",
+            "weight" : 400,
+            "composition" : "Viscose Rayon",
+            "tags" : [
+                "floral", "short", "kurti"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 712,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "Loved it . Nothing good you can get on this price. Quality is superb.",
+            "date": "2022-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-kurti002",
+        "name": "A-line Kurti",
+        "subTitle": "Floral Printed Pure Cotton A-line Kurti",
+        "description" : "Discover timeless elegance in this Floral Printed Pure Cotton A-line Kurti.",
+        "assets" : [{
+            "color" : "Black",
+            "photo" : [
+                "https://cdn.filestackcontent.com/2kwEhyRQXtW4eaXmHYUg",
+                "https://cdn.filestackcontent.com/CWXayKMuQ8ei67hDF4Yp",
+                "https://cdn.filestackcontent.com/H47hbgxxTc6l5y3UCkQw"
+            ]}
+        ], 
+        "info" : {
+            "code" : "kurti002",
+            "category": "kurti",
+            "gender" : "female",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Nayo",
+            "weight" : 350,
+            "composition" : "Pure Cotton",
+            "tags" : [
+                "round neck", "floral", "kurti"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200
+            ]
+        },
+        "price" : 850,
+        "discount" : 10,
+        "stockQuantity" : 100,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 3,
+            "comment" : "Product is awesome but Little bit tight for me.",
+            "date": "2022-02-12"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-kurti003",
+        "name": "Floral Embroidered Kurti",
+        "subTitle": "Women White Floral Embroidered Thread Kurti",
+        "description" : "Women White Floral Embroidered Thread Work Pure Cotton Thread Work Pleated Kurti",
+        "assets" : [{
+            "color" : "White",
+            "photo" : [
+                "https://cdn.filestackcontent.com/hKBIZnoRTSNKre0SfbTo",
+                "https://cdn.filestackcontent.com/RnjxGomlQzhnj5cCXotA",
+                "https://cdn.filestackcontent.com/brrSC0ezQfOh5S6JLBZF"
+            ]}
+        ], 
+        "info" : {
+            "code" : "kurti003",
+            "category": "kurti",
+            "gender" : "female",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Sangria",
+            "weight" : 400,
+            "composition" : "Pure Cotton",
+            "tags" : [
+                "embroidered", "thread", "kurti", "floral", "festive"
+            ],
+            "orderQuantity" : [
+                50, 100, 150
+            ]
+        },
+        "price" : 789,
+        "discount" : 0,
+        "stockQuantity" : 300,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 3,
+            "comment" : "The fabric is soft and comfortable, and the color is even more beautiful in person. The fit is true to size and the top has a nice flowy feel to it. The detailing on the sleeves adds a fun and stylish touch to the overall look.",
+            "date": "2022-04-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-kurti004",
+        "name": "Floral Printed Kurti",
+        "subTitle": "Floral Printed Pure Cotton Kurti",
+        "description" : "Elevate your fashion with the charm of this Floral Printed Pure Cotton Kurti.",
+        "assets" : [{
+            "color" : "Blue",
+            "photo" : [
+                "https://cdn.filestackcontent.com/2kwP63FaRqmSoqQFlWFD",
+                "https://cdn.filestackcontent.com/WQDDaxVQnOhVg7pphkJU",
+                "https://cdn.filestackcontent.com/vZ5bOfNgQUycKAce4GGI"
+            ]},{
+                "color": "Green",
+                "photo" : [
+                    "https://cdn.filestackcontent.com/Qu74JwigSO2SeQETSUME",
+                    "https://cdn.filestackcontent.com/O9DvZ7QLS0GWi11GbwW2",
+                    "https://cdn.filestackcontent.com/u8IqPxcOQ6C8OSGIcYT5"
+                ]
+            }
+        ], 
+        "info" : {
+            "code" : "kurti004",
+            "category": "kurti",
+            "gender" : "female",
+            "brand" : "Rain & Rainbow",
+            "weight" : 300,
+            "composition" : "Pure Cotton",
+            "tags" : [
+                "floral", "short", "kurti", "printed", "cotton"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1035,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "Loved it.",
+            "date": "2022-01-01"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-kurti005",
+        "name": "Mandarin Collar Kurti",
+        "subTitle": "Floral Printed Mandarin Collar Pure Cotton Kurti",
+        "description" : "Step out in style with our Floral Printed Mandarin Collar Kurti, crafted in pure cotton.",
+        "assets" : [{
+            "color" : "Peach",
+            "photo" : [
+                "https://cdn.filestackcontent.com/tW4c4HZR8qWIgwC3Zlc8",
+                "https://cdn.filestackcontent.com/pifsvZbQpKMZyIRevalg",
+                "https://cdn.filestackcontent.com/c5sPBBTShKj8UIzzZYYZ"
+            ]},{
+                "color": "Purple",
+                "photo" : [
+                    "https://cdn.filestackcontent.com/c43SbUMzSdKpDqIXNkMw",
+                    "https://cdn.filestackcontent.com/ZHqHc2aoQQSkG2PjW3Hh",
+                    "https://cdn.filestackcontent.com/DCUmKYanRo61fVzLgksn"
+                ]
+            }
+        ], 
+        "info" : {
+            "code" : "kurti005",
+            "category": "kurti",
+            "gender" : "female",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Rain & Rainbow",
+            "weight" : 300,
+            "composition" : "Pure Cotton",
+            "tags" : [
+                "floral", "short", "kurti", "printed", "cotton"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200
+            ]
+        },
+        "price" : 1396,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "Loved it.",
+            "date": "2022-01-01"
+        },
+        {
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 5,
+            "comment" : "Loved it and fits like a glove.",
+            "date": "2022-09-01"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt-001",
+        "name": "Oversized Overweight Shirt",
+        "subTitle": "Bottle Green Utility Heavyweight Shirt",
+        "description" : "Stay effortlessly stylish in our Bottle Green Heavyweight Utility Shirt.",
+        "assets" : [{
+            "color" : "Bottle Green",
+            "photo" : [
+                "https://cdn.filestackcontent.com/3D8gDfb2SaGHF08zXkYl",
+                "https://cdn.filestackcontent.com/e8X4fF7lSjezmbm5YC94",
+                "https://cdn.filestackcontent.com/iyRlS1PXQAGImjVDJO1u"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt001",
+            "category": "shirt",
+            "gender" : "male",
+            "size" : ["XS", "S", "M", "L", "XL", "XXL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 250,
+            "composition" : "100% cotton",
+            "tags" : [
+                "oversized", "shirt", "aesthetic"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1199,
+        "discount" : 0,
+        "stockQuantity" : 100,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "This shirt is my go-to for outdoor activities. It's warm, durable, and the colors haven't faded after multiple washes.",
+            "date": "2021-02-02"
+        },
+        {
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 5,
+            "comment" : "It's a staple in my wardrobe and goes with everything. Comfortable and versatile.",
+            "date": "2021-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt-002",
+        "name": "Flannel Oversized Shirt",
+        "subTitle": "Green Plaid Flannel Oversized Shirt",
+        "description" : "Wrap yourself in comfort with our Green Plaid Flannel Oversized Shirt.",
+        "assets" : [{
+            "color" : "Beige",
+            "photo" : [
+                "https://cdn.filestackcontent.com/DDNM5jchRomMoaNoEpUN",
+                "https://cdn.filestackcontent.com/c4BjVMfAQpSe5u7U76XH",
+                "https://cdn.filestackcontent.com/5hQ1VxIVQzmwVwfZvnGy"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt002",
+            "category": "shirt",
+            "gender" : "male",
+            "size" : ["XS", "S", "M", "L", "XL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 500,
+            "composition" : "100% cotton",
+            "tags" : [
+                "oversized", "shirt", "aesthetic", "flannel"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1199,
+        "discount" : 0,
+        "stockQuantity" : 100,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "The quality is top notch, little bigger in size than I expected, still it looks supercool. Medium size of this product is almost similar to H&M’s Relaxed Large fit.",
+            "date": "2021-02-02"
+        },
+        {
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 5,
+            "comment" : "The quality n looks are V good, ALSO the colour on website is little yellowish/sand colour looking due to light but in reality its much greenish.U can def go for it! 🙂",
+            "date": "2021-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt-003",
+        "name": "Mickey Shirt",
+        "subTitle": "Oh boy! Mickey Shirt",
+        "description" : "Oh girl! Get playful with our Mickey Shirt.",
+        "assets" : [{
+            "color" : "Cream",
+            "photo" : [
+                "https://cdn.filestackcontent.com/mYK2amVpRhKq143MoPRW",
+                "https://cdn.filestackcontent.com/Z2S0OrTQQqx2fWnk3JAI",
+                "https://cdn.filestackcontent.com/goQfLeHgT7qtF857gObk"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt003",
+            "category": "shirt",
+            "gender" : "female",
+            "size" : ["XS", "S", "M", "L"],
+            "brand" : "Bonkers Corner",
+            "weight" : 240,
+            "composition" : "100% cotton",
+            "tags" : [
+                "oversized", "shirt", "aesthetic", "cool", "mickey"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1299,
+        "discount" : 0,
+        "stockQuantity" : 100,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "This shirt is fun and vibrant, perfect for a beach getaway.",
+            "date": "2021-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-tshirt-001",
+        "name": "Official Marvel Merchandise",
+        "subTitle": "Hulk Graphic Printed Oversized T-shirt",
+        "description" : "Men's Green The Incredible Hulk Graphic Printed Oversized T-shirt",
+        "assets" : [{
+            "color" : "Black",
+            "photo" : [
+                "https://cdn.filestackcontent.com/XyQdeUFxRBkXFpZxPZAY",
+                "https://cdn.filestackcontent.com/8s1fBxN2RsKQWYUXoKH0",
+                "https://cdn.filestackcontent.com/ySS5GLx2Se2W6albxmnS"
+            ]},
+            {
+                "color" : "White",
+                "photo" : [
+                    "https://cdn.filestackcontent.com/ayqBusTSyvTSAe4J8TwA",
+                    "https://cdn.filestackcontent.com/RpBoDqxHQJeaNoRkBL3Q",
+                    "https://cdn.filestackcontent.com/nx1i24iQBi8p261wPLg5"
+                ]
+            },
+            {
+                "color" : "Green",
+                "photo" : [
+                    "https://cdn.filestackcontent.com/HhqNkGP1QAuM0R65lmzX",
+                    "https://cdn.filestackcontent.com/iZw7PclyTNW2qE2SnX7u",
+                    "https://cdn.filestackcontent.com/XmD94b8yRX6Avv9NczrL"
+                ]
+            }
+        ], 
+        "info" : {
+            "code" : "tshirt004",
+            "category": "tshirt",
+            "gender" : "male",
+            "size" : ["XS", "S", "M", "L", "XXL", "XXXL"],
+            "brand" : "Bewakoof",
+            "weight" : 300,
+            "composition" : "100% cotton",
+            "tags" : [
+                "oversized", "tshirt", "hulk"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 649,
+        "discount" : 0,
+        "stockQuantity" : 100,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "bought these black t-shirts many times because most of the time i travel abroad and i just love these black t-shirt and the quality",
+            "date": "2021-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-tshirt002",
+        "name": "Looney Tunes Merchandise",
+        "subTitle": "Striped Oversized T-shirt",
+        "description" : "Women's White Lola Striped Oversized T-shirt",
+        "assets" : [{
+            "color" : "White",
+            "photo" : [
+                "https://cdn.filestackcontent.com/f9SQFyRRlS4jXBsUmk72",
+                "https://cdn.filestackcontent.com/E0JV5mZfS6S3Bs48Z8td",
+                "https://cdn.filestackcontent.com/i5TUwxH4RvOgf3EEGxS6"
+            ]}
+        ], 
+        "info" : {
+            "code" : "tshirt002",
+            "category": "tshirt",
+            "gender" : "female",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Bewakoof",
+            "weight" : 300,
+            "composition" : "Cotton",
+            "tags" : [
+                "oversized", "looney tunes", "cool"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 599,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "Loved the fit and design!",
+            "date": "2023-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-tshirt003",
+        "name": "Naruto Oversized Tshirt",
+        "subTitle": "Gaara-Naruto Tee (T-shirt) For Men",
+        "description" : "Embrace your ninja spirit with our Gaara-Naruto Oversized T-shirt for Men.",
+        "assets" : [{
+            "color" : "Beige",
+            "photo" : [
+                "https://cdn.filestackcontent.com/4jb7OL6gTImZzd1eRvj9",
+                "https://cdn.filestackcontent.com/OjtEQl2yT0an57UtgrLk",
+                "https://cdn.filestackcontent.com/xzrAECm3S5SjUPOqoAtV"
+            ]}
+        ], 
+        "info" : {
+            "code" : "tshirt003",
+            "category": "tshirt",
+            "gender" : "male",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Burger Bae",
+            "weight" : 300,
+            "composition" : "Cotton blend",
+            "tags" : [
+                "oversized", "naruto"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 699,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "Graphic tees are a fun way to show off your interests. I get compliments on my favorite band tee all the time!!",
+            "date": "2023-09-04"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-tshirt004",
+        "name": " Pikachu Oversized T-shirt",
+        "subTitle": "Thunderbolt Pikachu Oversized T-shirt",
+        "description" : "Electrify your style with our Thunderbolt Pikachu Oversized T-shirt.",
+        "assets" : [{
+            "color" : "Black",
+            "photo" : [
+                "https://cdn.filestackcontent.com/7B1UonnWRyrC8dUyrJ8w",
+                "https://cdn.filestackcontent.com/PDEvDxrBTaOEUVV9YDUQ",
+                "https://cdn.filestackcontent.com/jLBOCqf6S2mj87dKPoLw"
+            ]}
+        ], 
+        "info" : {
+            "code" : "tshirt004",
+            "category": "tshirt",
+            "gender" : "male",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 400,
+            "composition" : "100% cotton",
+            "tags" : [
+                "pikachu", "oversized", "tshirt"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 799,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "Loved it . Nothing good you can get on this price. Quality is superb.",
+            "date": "2022-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt004",
+        "name": "Heavyweight Shirt",
+        "subTitle": "Grey Utility Heavyweight Shirt",
+        "description" : "Elevate your wardrobe with our Grey Utility Heavyweight Shirt.",
+        "assets" : [{
+            "color" : "Grey",
+            "photo" : [
+                "https://cdn.filestackcontent.com/nonIJ9yLSFChNj9ZN5bn",
+                "https://cdn.filestackcontent.com/HRfPpRTHQ0GSNS3koveH",
+                "https://cdn.filestackcontent.com/V7cfJiu6QQCXjqXEx8a8"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt004",
+            "category": "shirt",
+            "gender" : "male",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 400,
+            "composition" : "100% Cotton",
+            "tags" : [
+                "oversized", "shirt", "aesthetic"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1190,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "This shirt = vacation vibes! This shirt is fun and vibrant, perfect for a beach getaway.",
+            "date": "2022-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt005",
+        "name": "Plaid Oversized Shirt",
+        "subTitle": "Navy Blue B1 Plaid Oversized Shirt",
+        "description" : "Stay effortlessly stylish in our Navy Blue B1 Plaid Oversized Shirt.",
+        "assets" : [{
+            "color" : "Navy Blue",
+            "photo" : [
+                "https://cdn.filestackcontent.com/NxCu27heRkeEGASH3cX3",
+                "https://cdn.filestackcontent.com/lsRXhdU6QYutcA71rMHw",
+                "https://cdn.filestackcontent.com/D7nVbrZRQIGvY9uflOfA"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt005",
+            "category": "shirt",
+            "gender" : "female",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 350,
+            "composition" : "100% premium cotton",
+            "tags" : [
+                "oversized", "plaid", "shirt", "baggy"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200
+            ]
+        },
+        "price" : 999,
+        "discount" : 10,
+        "stockQuantity" : 300,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 3,
+            "comment" : "Product is awesome but Little bit tight for me.",
+            "date": "2022-02-12"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt006",
+        "name": "Regular Fit Shirt",
+        "subTitle": "Dark Green Regular Fit Shirt",
+        "description" : "Elevate your look with our Dark Green Regular Fit Shirt.",
+        "assets" : [{
+            "color" : "Dark Green",
+            "photo" : [
+                "https://cdn.filestackcontent.com/D36aKstCRW2qAPxTS0JK",
+                "https://cdn.filestackcontent.com/ZBbVp2bmSLeQyBCgKVW8",
+                "https://cdn.filestackcontent.com/xje3en4mSs6BhbI9KBte"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt006",
+            "category": "shirt",
+            "gender" : "male",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 400,
+            "composition" : "100% cotton",
+            "tags" : [
+                "regular", "shirt", "fit"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1199,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "I wear a lot of casual button-up shirts, and this one quickly became a favorite. The fit is relaxed, and it's perfect for a day at the office or a night out with friends.",
+            "date": "2022-02-02"
+        }]
+    },
+    {
+        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sku": "sku-shirt007",
+        "name": "Plaid Regular Fit Shirt",
+        "subTitle": "Midnight Tan Plaid Regular Fit Shirt",
+        "description" : "Upgrade your style with our Midnight Tan Plaid Regular Fit Shirt.",
+        "assets" : [{
+            "color" : "Brown",
+            "photo" : [
+                "https://cdn.filestackcontent.com/bznMYscT7uGlMNmm2TBK",
+                "https://cdn.filestackcontent.com/OUPJ6OPRtOywi2TJZSEA",
+                "https://cdn.filestackcontent.com/imxT5GcwS2TzvB2KGGWe"
+            ]}
+        ], 
+        "info" : {
+            "code" : "shirt007",
+            "category": "shirt",
+            "gender" : "male",
+            "size" : ["S", "M", "L", "XL"],
+            "brand" : "Bonkers Corner",
+            "weight" : 400,
+            "composition" : "100% cotton",
+            "tags" : [
+                "regular", "shirt", "fit", "plaid"
+            ],
+            "orderQuantity" : [
+                50, 100, 150, 200, 250
+            ]
+        },
+        "price" : 1199,
+        "discount" : 0,
+        "stockQuantity" : 200,
+        "reviews" : [{
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "I wear a lot of casual button-up shirts, and this one quickly became a favorite. The fit is relaxed, and it's perfect for a day at the office or a night out with friends.",
+            "date": "2022-02-02"
+        },
+        {
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "I'm all about comfort, and this regular-fit shirt doesn't disappoint. The fabric feels great, and it's roomy without being too baggy.",
+            "date": "2022-02-02"
+        },
+        {
+            "userId" : "6513a7af4e2d06d1e0e44660",
+            "rating" : 4,
+            "comment" : "I recently purchased this regular-fit shirt for a wedding, and it was a hit! The fabric is soft, and it stayed wrinkle-free throughout the event.",
+            "date": "2022-02-02"
+        }]
+    }
+    
+]
