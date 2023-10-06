@@ -1,46 +1,54 @@
-const usersModel=require('../models/users');
-const LeadModel=require('../models/lead');
-async function Signup(req,res){
+const usersModel = require('../models/users');
+const leadModel = require('../models/lead');
+
+async function signup(req, res) {
     try {
-        const user= await usersModel.findOne({email:req.body.email});
-        if(user){
+        const user = await usersModel.findOne({ email: req.body.email });
+        if (user) {
             throw ('User already exist');
         }
 
-        const leadFound=await LeadModel.findOne({email:req.body.email});
-        
-        const userCreated=await usersModel(req.body);
+        const leadFound = await leadModel.findOne({ email: req.body.email });
 
-        if(leadFound){
-            userCreated.Lead=leadFound;
+        const userCreated = await usersModel(req.body);
+
+        if (leadFound) {
+            userCreated.Lead = leadFound;
         }
 
         await userCreated.save();
-        res.status(200).json({success:true});
-        
+        res.status(200).json({ success: true });
+
     } catch (error) {
         res.status(500).json(error);
     }
-  
+
 }
-
-
-async function Login(req,res){
+async function login(req, res) {
     try {
-        const userFind=await usersModel.find({_id:req.body._id});
-        if(!userFind){
-            throw ('User Does not present');
+        const input = req.body;
+        const userFound = await usersModel.find({
+            email : input.email
+        })
+        if (userFound){
+            res.status(200).json({
+                message : "Login Successful"
+            })
         }
-
-        
-        res.status(200).json({sucess:true});
-
+        else {
+            res.status(201).json({
+                message: "Login Unsuccessful"
+            })
+        }
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({
+            message : "Error in login controller",
+            error
+        });
     }
 }
 
-module.exports={
-    Signup,
-    Login
+module.exports = {
+    signup,
+    login
 }
