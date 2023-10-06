@@ -1,6 +1,6 @@
 const usersModel = require('../models/users');
 const leadModel = require('../models/lead');
-
+const {verifyToken}=require('../Helpers/jwt');
 async function signup(req, res) {
     try {
         const user= await usersModel.findOne({email:req.body.email});

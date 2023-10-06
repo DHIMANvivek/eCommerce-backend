@@ -66,7 +66,7 @@ let userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        enum: ['user', 'seller', 'admin'],
+        enum: ['user', 'seller', 'admin`7ux'],
         default: 'user'
     },
     active: {
