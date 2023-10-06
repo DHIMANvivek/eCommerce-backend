@@ -6,5 +6,5 @@ console.log('authController is ',authController);
 
 router.post('/signup',authController.signup)
 router.post('/login',authController.login)
-
+router.post('/forget',authController.forgotPassword)
 module.exports = router;

@@ -63,8 +63,34 @@ async function login(req, res) {
         } 
     }
 }
+async function forgotPassword(req, res) {
+    const input = req.body;
+    const user = await usersModel.findOne({ email : input.email},
+    {
+        'password' : 1,
+        'forgetPassword':1
+    });
 
+    if(user.forgetPassword){
+        throw ('You already have requested for the password.')
+    }
+
+
+    console.log("input mail ",input.email);
+    usersModel.updateOne({
+        email : input.email
+    },
+    {
+        $set : {
+            'forgetPassword' : true
+        }
+    })
+
+    res.json(user);
+
+}
 module.exports = {
     signup,
-    login
+    login,
+    forgotPassword
 }

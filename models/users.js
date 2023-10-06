@@ -57,7 +57,6 @@ let userSchema = new mongoose.Schema({
                 message: 'You can only add a maximum of 3 addresses.'
             }
         }
-        
     },
     photo: {
         type: String,
