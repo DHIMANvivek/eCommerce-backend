@@ -1,6 +1,8 @@
 const usersModel = require('../models/users');
 const leadModel = require('../models/lead');
-const {verifyToken}=require('../Helpers/jwt');
+const { createToken } = require('../helpers/jwt')
+const bcryptjs=require('bcryptjs');
+
 async function signup(req, res) {
     try {
         const user= await usersModel.findOne({email:req.body.email});
@@ -15,9 +17,12 @@ async function signup(req, res) {
         if (leadFound) {
             userCreated.Lead = leadFound;
         }
-
+        
         await userCreated.save();
-        res.status(200).json({ success: true });
+
+        const token=createToken(userCreated._id,userCreated.role);
+        
+        res.status(200).json({ token,message:'signup sucess'});
 
     } catch (error) {
     
@@ -33,24 +38,29 @@ async function signup(req, res) {
 async function login(req, res) {
     try {
         const input = req.body;
-        const userFound = await usersModel.find({
-            email : input.email
+        const userFound = await usersModel.findOne({
+            email: input.email
         })
-        if (userFound){
-            res.status(200).json({
-                message : "Login Successful"
-            })
+        if (!userFound) {
+            throw ({ message: 'User not found!' })
         }
-        else {
-            res.status(201).json({
-                message: "Login Unsuccessful"
-            })
+          const compare = await bcryptjs.compare(input.password, userFound.password);
+         if (!compare) {
+            throw ({ message: 'Password not matched!' })
         }
+
+        const tokenData={email:userFound.email, role:userFound.role}
+        const token = createToken(tokenData);
+         res.status(200).json({
+            message: "Login Successful",
+            token
+        })
     } catch (error) {
-        res.status(500).json({
-            message : "Error in login controller",
-            error
-        });
+       
+        if (error.message){
+            res.status(500).json(error);
+            return;
+        } 
     }
 }
 
