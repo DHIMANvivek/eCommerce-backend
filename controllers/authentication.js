@@ -3,9 +3,9 @@ const leadModel = require('../models/lead');
 
 async function signup(req, res) {
     try {
-        const user = await usersModel.findOne({ email: req.body.email });
-        if (user) {
-            throw ('User already exist');
+        const user= await usersModel.findOne({email:req.body.email});
+        if(user){
+            throw ({message:'User already exist'});
         }
 
         const leadFound = await leadModel.findOne({ email: req.body.email });
@@ -20,6 +20,12 @@ async function signup(req, res) {
         res.status(200).json({ success: true });
 
     } catch (error) {
+    
+        if(error.message){
+            res.status(500).json(error);
+            return;
+        }
+
         res.status(500).json(error);
     }
 

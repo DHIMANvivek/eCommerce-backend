@@ -9,7 +9,8 @@ let userSchema = new mongoose.Schema({
         trim: true,
         required: true,
         lowercase: true,
-        unique: true
+        unique: true,
+        match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
     },
     name: {
         firstname: {
@@ -26,7 +27,12 @@ let userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: 8
+        minlength: 8,
+        // match: ^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]).{8,32}$,
+        required:function validate(){
+            if(this.provider=='direct') return true;
+            
+        }
     },
     mobile: {
         type: Number,
@@ -67,6 +73,12 @@ let userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    provider:{
+        type: String,
+        enum: ['GOOGLE', 'direct'],
+        required:true,
+        default:'direct',
+    },
 
     Lead:{
         type: mongoose.Schema.Types.ObjectId,
@@ -80,7 +92,7 @@ let userSchema = new mongoose.Schema({
     });
 
     userSchema.pre("save", function (next){
-        if(this.password ){
+        if(this.password){
             this.password= bcrypt.hashSync(this.password); 
            
         }
