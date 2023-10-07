@@ -2,6 +2,8 @@ const usersModel = require('../models/users');
 const leadModel = require('../models/lead');
 const { createToken } = require('../helpers/jwt')
 const bcryptjs=require('bcryptjs');
+const passwordModel = require('../models/forgetPassword')
+const mailer = require('../helpers/nodemailer')
 
 async function signup(req, res) {
     try {
@@ -64,30 +66,56 @@ async function login(req, res) {
     }
 }
 async function forgotPassword(req, res) {
-    const input = req.body;
-    const user = await usersModel.findOne({ email : input.email},
-    {
-        'password' : 1,
-        'forgetPassword':1
-    });
 
-    if(user.forgetPassword){
-        throw ('You already have requested for the password.')
-    }
-
-
-    console.log("input mail ",input.email);
-    usersModel.updateOne({
-        email : input.email
-    },
-    {
-        $set : {
-            'forgetPassword' : true
+    try {
+        const input = req.body;
+        const user = await usersModel.findOne({ email : input.email},
+        {
+            'password' : 1,
+        });
+    
+        if (!user){
+            throw {message: "User doesn't exist in db."}
         }
-    })
+        const hasRequested = await passwordModel.findOne({
+            UserId : user._id
+        })
+        if (hasRequested){
+            throw({message : "You have already requested for Password Change. Kindly check your mail."})
+        }
+        requester = await passwordModel.create({
+            UserId : user._id,
+        })
+        const tokenData = {
+            email : user.email,
+            password : user.password
+        }
+        const passwordToken =  createToken(tokenData);
 
-    res.json(user);
+        const mailData = {
+            email : user.email,
+            subject : "Change Your Password",
+            
+        }
+        const mailSent = sendMail
+        res.json(passwordToken);
+    
+    } catch (error) {
+        
+    }
+   
 
+
+
+ 
+
+}
+
+
+
+async function updatePassword(req,res){
+    //  DOCUMENT CHECK IN FORGETSCHEMA IF NOT EXIST THORW ERROR 
+    // TOKEN DOCUMENT => PURANA PASSWORD == NEW PASSWORD
 }
 module.exports = {
     signup,

@@ -1,27 +1,25 @@
 const jwt = require("jsonwebtoken")
 require('dotenv').config()
 
+function verifyToken(token) {
+    try {
+
+        console.log("token is ", token);
+        // return token;
+        const data = token.split(' ')[1];
+        if (!data) {
+            throw ({ message: 'token not found' });
+        }
 
 
- function verifyToken(token){
-try {
+        const details = jwt.verify(data, process.env.secretKtey);
+        return details;
 
-    console.log("token is ",token);
-    // return token;
-    const data = token.split(' ')[1];
-    if(!data){
-        throw ({message:'token not found'});
+
+    } catch (error) {
+        throw error;
     }
-
-
-    const details = jwt.verify(data, process.env.secretKtey);
-    return details;
-        
-
-} catch (error) {
-    throw error;
 }
- }
 
 function createToken(tokenData) {
     try {
