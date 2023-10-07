@@ -24,6 +24,9 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(require('./config/routes'))
 
+
+app.use(require('./DEMO/index'));
+
 app.listen(process.env.port, (err) => {
     if (err)
         console.log(err);
