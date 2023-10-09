@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
-const leadSchema = mongoose.Schema({
+const passwordSchema = mongoose.Schema({
 
-    UserId:{
+    UserId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         required: true,
     },
 
 },
-{
-    timestamps: true,
-    autoindex: true
-}
+    {
+        timestamps: true,
+        autoindex: true
+    }
 );
-
-module.exports = mongoose.model('forgetPassword', leadSchema);
+passwordSchema.index({ createdAt: 1 }, { expireAfterSeconds: 300 });
+module.exports = mongoose.model('forgetPassword', passwordSchema);

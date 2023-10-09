@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router();
-const authController = require('../../../controllers/authentication')
+const authController = require('../../../controllers/authentication');
+const JwtVerify = require('../../../middlewares/jwtVerify');
 
-console.log('authController is ',authController);
+router.post('/signup', authController.signup)
+router.post('/login', authController.login)
+router.post('/forget', authController.forgotPassword)
+router.post('/update', JwtVerify, authController.updatePassword)
 
-router.post('/signup',authController.signup)
-router.post('/login',authController.login)
-router.post('/forget',authController.forgotPassword)
 module.exports = router;

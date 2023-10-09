@@ -1,8 +1,9 @@
 const nodemailer = require("nodemailer")
 // const html=
-const html=require('./INDEX');
+const html = require('./INDEX');
 async function sendMail(data) {
     try {
+        console.log("nodemailer data", data);
         const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -14,10 +15,10 @@ async function sendMail(data) {
             from: 'testnodemailerapis@gmail.com',
             to: data.email,
             subject: data.subject,
-            html :html
+            html: html
         }
         console.log("you are inside nodemailer function");
-       await transport.sendMail(details, (error) => {
+        await transport.sendMail(details, (error) => {
             if (error) {
                 console.log("Some error in using nodemailer", error);
             }
@@ -28,7 +29,7 @@ async function sendMail(data) {
         })
 
         console.log("END OF FILE")
-        
+
     }
     catch (error) {
         console.log("Some error in nodemailer: ", error);

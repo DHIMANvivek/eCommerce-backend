@@ -1,18 +1,18 @@
-const {verifyToken}=require('../helpers/jwt');
+const { verifyToken } = require('../helpers/jwt');
 
-
-async function JwtVerify(req,res,next){
-    console.log("inside jwtverify");
+async function JwtVerify(req, res, next) {
     try {
-        console.log("INSIDE TRY ");
-       const data= verifyToken(req.headers.token)
- } catch (error) {
-       
+        const data = verifyToken(req.headers.token)
+        // console.log("jwt verify data", data);
+        req.tokenData = data;
+        next();
+    } catch (error) {
+        console.log('ERROR IS ', error);
         res.status(500).json(error);
 
     }
 }
 
 
-module.exports=JwtVerify
+module.exports = JwtVerify
 

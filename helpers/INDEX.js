@@ -1,8 +1,8 @@
-let token='https://onecompiler.com/javascript/3zpreuyf2';
+let token = 'https://onecompiler.com/javascript/3zpreuyf2';
 
-let html=
+let html =
 
-`
+  `
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,13 +12,15 @@ let html=
 
   <body>
     <p>
-      I'm a big, blue, <strong>strong</strong> paragraph
+      I m a big, blue, <strong>strong</strong> paragraph
     </p>
 
-    <a href=${token}></a>
+  <a href=${token}> Forget Password</a>
+
+   
   </body>
 </html>
 `
 
 
-module.exports=html
+module.exports = html

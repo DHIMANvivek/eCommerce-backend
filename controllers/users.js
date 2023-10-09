@@ -2,7 +2,7 @@ const usersModel = require('../models/users');
 const mongoose = require('mongoose');
 async function getDetails(req, res) {
     try {
-        req.body._id = '6517a56ff7a1a1d39676a406';
+        req.body._id = '651fdc60a055f39416501e50';
         const basicDetails = await usersModel.findById(req.body._id);
         res.status(500).json(basicDetails)
     } catch (error) {
@@ -12,10 +12,12 @@ async function getDetails(req, res) {
 
 async function updateDetails(req, res) {
     try {
-        req.body._id = '6522209865ffad571dae84d4';
+        req.body._id = '651fdc60a055f39416501e50';
         const basicDetails = await usersModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
+        console.log(basicDetails, "basicccc");
         res.status(500).json(basicDetails)
     } catch (error) {
+        console.log(error, "errrorrr");
         res.status(500).json(error);
     }
 }
@@ -64,7 +66,7 @@ async function updateAddress(req, res) {
 async function addAddress(req,res){
     try {
         const addressAdded=await usersModel.findOneAndUpdate(
-            { _id:  new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660')},
+            { _id:  new mongoose.Types.ObjectId('651fdc60a055f39416501e50')},
            {$push: { 'info.address': req.body}},
            {new:true}
             
