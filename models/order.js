@@ -10,11 +10,14 @@ const orderSchema = mongoose.Schema(
         },
 
         product: [{
-            productId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'products',
-                required: true,
-            },
+            // productId: {
+            //     type: mongoose.Schema.Types.ObjectId,
+            //     ref: 'products',
+            //     required: true,
+            // },
+
+            //  one order has limitedprodcut or split the products in one order like 15 products split in 3 product
+           
             productInfo: {
                 qty: {
                     type: Number,
@@ -24,6 +27,10 @@ const orderSchema = mongoose.Schema(
                     type: String,
                     required: true,
                 },
+                productSku:{
+
+                },
+                //  name , photo, category, color , sku, shipment  status,qty,price
                 amount: {
                     type: Number,
                     required: true,
