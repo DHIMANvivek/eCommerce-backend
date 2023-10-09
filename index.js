@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(require('./config/routes'))
 
 
-app.use(require('./DEMO/index'));
+// app.use(require('./DEMO/index'));
 
 app.listen(process.env.port, (err) => {
     if (err)
@@ -33,10 +33,10 @@ app.listen(process.env.port, (err) => {
     else
         console.log(`listening to port ${process.env.port}`);
 })
-const routes = require('./routes/route');
-app.use(routes);
+// const routes = require('./routes/route');
+// app.use(routes);
 
-app.use(require('./DEMO'));
+// app.use(require('./DEMO'));
 
 // let port = 5000;
 // app.listen(5000, (err) => {

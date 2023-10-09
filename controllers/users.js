@@ -25,9 +25,12 @@ async function updateDetails(req, res) {
 
 async function getAddress(req, res) {
     try {
-        req.body._id = '6517a56ff7a1a1d39676a406';
+
+        console.log("address called");
+        req.body._id = '6513a7af4e2d06d1e0e44660';
+
         const basicDetails = await usersModel.findById(req.body._id, 'info.address');
-        res.status(500).json(basicDetails)
+        res.status(200).json(basicDetails)
     }
     catch (error) {
         res.status(500).json(error);
@@ -38,22 +41,23 @@ async function getAddress(req, res) {
 //  PENDING
 async function updateAddress(req, res) {
     try {
-       const result=await usersModel.findOne(
-            { _id:  new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660'),
-            'info.address[0]': { $elemMatch: { _id: new mongoose.Types.ObjectId('652390e5f04fae193297dffb') } }
-       }
-        )
+    //    const result=await usersModel.findOne(
+    //         { _id:  new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660'),
+    //         'info.address[0]': { $elemMatch: { _id: new mongoose.Types.ObjectId('652390e5f04fae193297dffb') } }
+    //    }
+    //     )
 
        
-        // const lasresult=await usersModel.findOneAndUpdate(
-        //     { _id: new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660'), 'info.address': { $elemMatch: { _id: new mongoose.Types.ObjectId('65238a30b17ee1be93586276') } } }, // Find the user by ID and matching address ID
+        const lasresult=await usersModel.findOneAndUpdate(
+            { _id: new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660'), 
+        'info.address': { $elemMatch: { _id: new mongoose.Types.ObjectId('65238a30b17ee1be93586276') } } }, // Find the user by ID and matching address ID
         //     {
         //       $set: {
         //         'info.address.$': req.body, // Update the matching address
         //       },
         //     },
         //     { new: true } // Return the updated document
-        //   )
+          )
 
         res.json(result);
     } catch (error) {

@@ -59,14 +59,14 @@ let userSchema = new mongoose.Schema({
             }
         }
     },
-    photo: {
+   photo: {
         type: String,
         trim: true
-    },
+    }, 
     role: {
         type: String,
         required: true,
-        enum: ['user', 'seller', 'admin`7ux'],
+        enum: ['user', 'seller', 'admin'],
         default: 'user'
     },
     active: {
