@@ -6,10 +6,6 @@ async function getDetails(req, res) {
         const basicDetails = await usersModel.findById(req.body._id);
         res.status(500).json(basicDetails)
     } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
         res.status(500).json(error);
     }
 }
@@ -20,10 +16,6 @@ async function updateDetails(req, res) {
         const basicDetails = await usersModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
         res.status(500).json(basicDetails)
     } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
         res.status(500).json(error);
     }
 }
@@ -36,10 +28,6 @@ async function getAddress(req, res) {
         res.status(500).json(basicDetails)
     }
     catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
         res.status(500).json(error);
     }
 }
