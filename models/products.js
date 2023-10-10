@@ -24,15 +24,19 @@ const productSchema = mongoose.Schema({
     required: true
   },
   
-  assets: [
-    {
+  assets: [{
     color: {
       type: String,
       required: true
     },
+    stockQuantity: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
     photo: [{
       type: String,
-      min: 3, 
+      min: 2, 
       required: true
     }]
   }],
@@ -81,12 +85,7 @@ const productSchema = mongoose.Schema({
     required: true,
     default: 0,
     min: 0,
-  },
-  stockQuantity: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
+  }
 },
   {
     timestamps: true,

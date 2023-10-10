@@ -9,25 +9,15 @@ const orderSchema = mongoose.Schema(
             required: true,
         },
 
-
-
-
         product: [
-            
-            
-            
-            
-            
             {
-            // productId: {
-            //     type: mongoose.Schema.Types.ObjectId,
-            //     ref: 'products',
-            //     required: true,
-            // },
+                productId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'products',
+                    required: true,
+                },
 
-            //  one order has limitedprodcut or split the products in one order like 15 products split in 3 product
-           
-            productInfo: {
+                //  one order has limitedprodcut or split the products in one order like 15 products split in 3 product
                 qty: {
                     type: Number,
                     required: true,
@@ -36,8 +26,9 @@ const orderSchema = mongoose.Schema(
                     type: String,
                     required: true,
                 },
-                productSku:{
-
+                productSku: {
+                    type: String,
+                    required: true,
                 },
                 //  name , photo, category, color , sku, shipment  status,qty,price
                 amount: {
@@ -50,10 +41,13 @@ const orderSchema = mongoose.Schema(
                         enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
                         default: 'pending',
                     },
-
                 },
+                productName: {
+                    type: String,
+                    required: true
+                }
             }
-        }],
+        ],
         orderAmount: {
             type: Number,
             required: true

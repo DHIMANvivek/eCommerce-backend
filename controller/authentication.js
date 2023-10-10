@@ -1,9 +1,38 @@
-const usersModel = require('../../models/users');
-const leadModel = require('../../models/lead');
-const { createToken } = require('../../helpers/jwt')
+const usersModel = require('../models/users');
+const leadModel = require('../models/lead');
+const { createToken } = require('../helpers/jwt')
 const bcryptjs = require('bcryptjs');
-const passwordModel = require('../../models/forgetPassword')
-const mailer = require('../../helpers/nodemailer')
+const passwordModel = require('../models/forgetPassword')
+const mailer = require('../helpers/nodemailer')
+
+async function login(req, res) {
+    try {
+        const input = req.body;
+        const userFound = await usersModel.findOne({
+            email: input.email
+        })
+        if (!userFound) {
+            throw ({ message: 'User not found!' })
+        }
+        const compare = await bcryptjs.compare(input.password, userFound.password);
+        if (!compare) {
+            throw ({ message: 'Password not matched!' })
+        }
+
+        const tokenData = { email: userFound.email, role: userFound.role }
+        const token = createToken(tokenData);
+
+        res.status(200).json({
+            message: "Login Successful",
+            token
+        })
+    } catch (error) {
+        if (error.message) {
+            res.status(500).json(error);
+            return;
+        }
+    }
+}
 
 async function signup(req, res) {
     try {
@@ -37,34 +66,7 @@ async function signup(req, res) {
     }
 
 }
-async function login(req, res) {
-    try {
-        const input = req.body;
-        const userFound = await usersModel.findOne({
-            email: input.email
-        })
-        if (!userFound) {
-            throw ({ message: 'User not found!' })
-        }
-        const compare = await bcryptjs.compare(input.password, userFound.password);
-        if (!compare) {
-            throw ({ message: 'Password not matched!' })
-        }
 
-        const tokenData = { email: userFound.email, role: userFound.role }
-        const token = createToken(tokenData);
-
-        res.status(200).json({
-            message: "Login Successful",
-            token
-        })
-    } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
-    }
-}
 async function forgotPassword(req, res) {
 
     try {
@@ -165,6 +167,7 @@ async function updatePassword(req, res) {
     }
 
 }
+
 module.exports = {
     signup,
     login,

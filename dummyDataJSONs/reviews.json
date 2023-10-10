@@ -1,0 +1,209 @@
+[
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f4d'"
+        ,
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "Loved it . Nothing good you can get on this price. Quality is superb.",
+                "date": "2022-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f4e'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 3,
+                "comment": "Product is awesome but Little bit tight for me.",
+                "date": "2022-02-12"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f4f'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 3,
+                "comment": "The fabric is soft and comfortable, and the color is even more beautiful in person. The fit is true to size and the top has a nice flowy feel to it. The detailing on the sleeves adds a fun and stylish touch to the overall look.",
+                "date": "2022-04-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f50'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "Loved it.",
+                "date": "2022-01-01"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f51'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "Loved it.",
+                "date": "2022-01-01"
+            },
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 5,
+                "comment": "Loved it and fits like a glove.",
+                "date": "2022-09-01"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f52'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "This shirt is my go-to for outdoor activities. It's warm, durable, and the colors haven't faded after multiple washes.",
+                "date": "2021-02-02"
+            },
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 5,
+                "comment": "It's a staple in my wardrobe and goes with everything. Comfortable and versatile.",
+                "date": "2021-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f53'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "The quality is top notch, little bigger in size than I expected, still it looks supercool. Medium size of this product is almost similar to H&M’s Relaxed Large fit.",
+                "date": "2021-02-02"
+            },
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 5,
+                "comment": "The quality n looks are V good, ALSO the colour on website is little yellowish/sand colour looking due to light but in reality its much greenish.U can def go for it! 🙂",
+                "date": "2021-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f54'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "This shirt is fun and vibrant, perfect for a beach getaway.",
+                "date": "2021-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f55'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "bought these black t-shirts many times because most of the time i travel abroad and i just love these black t-shirt and the quality",
+                "date": "2021-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f56'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "Loved the fit and design!",
+                "date": "2023-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f57'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "Graphic tees are a fun way to show off your interests. I get compliments on my favorite band tee all the time!!",
+                "date": "2023-09-04"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f58'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "Loved it. Nothing good you can get on this price. Quality is superb.",
+                "date": "2022-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f59'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "This shirt = vacation vibes! This shirt is fun and vibrant, perfect for a beach getaway.",
+                "date": "2022-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f5a'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 3,
+                "comment": "Product is awesome but Little bit tight for me.",
+                "date": "2022-02-12"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f5b'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "I wear a lot of casual button-up shirts, and this one quickly became a favorite. The fit is relaxed, and it's perfect for a day at the office or a night out with friends.",
+                "date": "2022-02-02"
+            }
+        ]
+    },
+    {
+        "productID": "ObjectId: '6524ed2fee2f9f1b75c99f5c'",
+        "reviews": [
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "I wear a lot of casual button-up shirts, and this one quickly became a favorite. The fit is relaxed, and it's perfect for a day at the office or a night out with friends.",
+                "date": "2022-02-02"
+            },
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "I'm all about comfort, and this regular-fit shirt doesn't disappoint. The fabric feels great, and it's roomy without being too baggy.",
+                "date": "2022-02-02"
+            },
+            {
+                "userId": "6513a7af4e2d06d1e0e44660",
+                "rating": 4,
+                "comment": "I recently purchased this regular-fit shirt for a wedding, and it was a hit! The fabric is soft, and it stayed wrinkle-free throughout the event.",
+                "date": "2022-02-02"
+            }
+        ]
+    }
+]

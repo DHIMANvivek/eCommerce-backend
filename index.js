@@ -22,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
-const routes = require('./routes/route');
+const routes = require('./config/routes');
 app.use(routes);
 
 // app.listen(process.env.port, (err) => {
