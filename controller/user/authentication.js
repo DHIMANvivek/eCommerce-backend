@@ -1,9 +1,9 @@
-const usersModel = require('../models/users');
-const leadModel = require('../models/lead');
-const { createToken } = require('../helpers/jwt')
+const usersModel = require('../../models/users');
+const leadModel = require('../../models/lead');
+const { createToken } = require('../../helpers/jwt')
 const bcryptjs = require('bcryptjs');
-const passwordModel = require('../models/forgetPassword')
-const mailer = require('../helpers/nodemailer')
+const passwordModel = require('../../models/forgetPassword')
+const mailer = require('../../helpers/nodemailer')
 
 async function signup(req, res) {
     try {

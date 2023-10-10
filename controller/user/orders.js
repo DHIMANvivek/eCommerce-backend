@@ -1,4 +1,4 @@
-const ordersModel = require('../models/order');
+const ordersModel = require('../../models/order');
 
 // get particular user orders
 async function getOrders(req,res){

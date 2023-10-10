@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const userController = require('../../../controllers/users')
+const userController = require('../../controller/user/users')
 
 router.get('/getDetails',userController.getDetails)
 router.post('/updateDetails',userController.updateDetails)
