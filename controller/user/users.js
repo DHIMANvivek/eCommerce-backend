@@ -84,11 +84,53 @@ async function addAddress(req,res){
 }
 
 
+async function deleteAddress(req, res) {
+    try {
+        const deletedAddress = await usersModel.findOneAndUpdate(
+            { _id: new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660') },
+            { $pull: { 'info.address': { _id: '652390e5f04fae193297dffb' } } },
+            { new: true }
+
+
+        )
+
+
+        res.status(200).json(deleteAddress);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
+
+async function defaultAddress(req, res) {
+    try {
+        // const setDea
+
+        // const getParticularOrder = await usersModel.aggregate([{ $match: { _id: new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660") } },{$unwind:"$info.address"}
+        //     ,{$match:{"info.address._id":new mongoose.Types.ObjectId("6523923d3c0e1d3980d0d576")}}]);
+
+        // getParticularOrder.email="AbhiSHEK 22 3@gmail.com";
+        // await getParticularOrder.save();
+        // console.log("order is ", getParticularOrder)
+        // res.status(200).json(getParticularOrder)
+
+        const updateParticularAddress=await usersModel.updateOne({_id:new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660")},{$set:{email:'Abhishekl23@gmail.com'}})
+        res.status(200).json(updateParticularAddress)
+    } catch (error) {
+        console.log("errtor is ", error)
+        res.status(500).json(error)
+    }
+}
+
+
+
 module.exports = {
     getDetails,
     updateDetails,
     getAddress,
     updateAddress,
-    addAddress
+    addAddress,
+    deleteAddress,
+    defaultAddress
 
 }

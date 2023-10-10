@@ -7,4 +7,6 @@ router.post('/updateDetails',userController.updateDetails)
 router.get('/getAddress',userController.getAddress)
 router.post('/updateAddress',userController.updateAddress)
 router.post('/addAddress',userController.addAddress)
+router.get('/deleteAddress',userController.deleteAddress)
+router.get('/defaultAddress',userController.defaultAddress)
 module.exports = router;
