@@ -8,12 +8,40 @@ const { OAuth2Client } = require('google-auth-library');
 async function login(req, res) {
     try {
         const input = req.body;
+        if (input.token) {
+            const googleOathClient = new OAuth2Client();
+            const googleToken = await googleOathClient.verifyIdToken({
+                idToken: req.body.token.credential
+            });
+            input.email = googleToken.getPayload().email;
+            input.provider = 'GOOGLE';
+        }
         const userFound = await usersModel.findOne({
             email: input.email
         })
         if (!userFound) {
             throw ({ message: 'User not found!' })
         }
+
+
+
+        if(userFound.provider=='GOOGLE' && input.token){
+            const tokenData = { email: userFound.email, role: userFound.role }
+            const token = createToken(tokenData);
+            res.status(200).json({message:'login sucece',token});
+            return;
+        }
+
+        if(userFound.provider=='GOOGLE'){
+            throw ({ message: 'You are not a direct user' });
+         }
+
+
+        if(userFound.provider=='direct' && input.token){
+            throw ({ message: 'Try to login by entering email and password' });
+         }
+
+
         const compare = await bcryptjs.compare(input.password, userFound.password);
         if (!compare) {
             throw ({ message: 'Password not matched!' })
@@ -37,16 +65,15 @@ async function login(req, res) {
 async function signup(req, res) {
     try {
 
-        if(req.body.token){
-        const googleOathClient = new OAuth2Client();
-        const ticket = await googleOathClient.verifyIdToken({
-            idToken: req.body.token.credential,
-            audience: req.body.token.clientId
-        });
-        req.body.email=ticket.getPayload().email;
-        req.body.provider='GOOGLE';
-         }
-    
+        if (req.body.token) {
+            const googleOathClient = new OAuth2Client();
+            const ticket = await googleOathClient.verifyIdToken({
+                idToken: req.body.token.credential
+            });
+            req.body.email = ticket.getPayload().email;
+            req.body.provider = 'GOOGLE';
+        }
+
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
             throw ({ message: 'User already exists!' });
@@ -64,7 +91,7 @@ async function signup(req, res) {
 
         const tokenData = {
             email: userCreated.email,
-            role:  userCreated.role
+            role: userCreated.role
         }
         const token = createToken(tokenData);
 
@@ -86,13 +113,12 @@ async function forgotPassword(req, res) {
 
     try {
         const input = req.body;
-        console.log(input, "forget input");
         const user = await usersModel.findOne({ email: input.email },
             {
                 'email': 1,
                 'password': 1,
             });
-        console.log("user found or not", user);
+
         if (!user) {
             throw { message: "User doesn't exist in db." }
         }
@@ -111,13 +137,13 @@ async function forgotPassword(req, res) {
             id: user._id
         }
         const passwordToken = createToken(tokenData);
-        console.log(user.email, "user email");
+
         const mailData = {
             email: user.email,
             subject: "Change Your Password",
         }
-        const mailSent = await mailer(mailData)
-        res.json({ passwordToken, message: "hihihi" });
+        const mailSent = await mailer(mailData, passwordToken)
+        res.json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {
         if (error.message) {
@@ -130,8 +156,6 @@ async function forgotPassword(req, res) {
 }
 
 async function updatePassword(req, res) {
-    //  DOCUMENT CHECK IN FORGETSCHEMA IF NOT EXIST THORW ERROR 
-    // TOKEN DOCUMENT => PURANA PASSWORD == NEW PASSWORD
     try {
         const input = req.body;
         const tokenData = req.tokenData;
@@ -168,9 +192,6 @@ async function updatePassword(req, res) {
                 message: "Password Changed Successfully!"
             })
         }
-
-
-
     }
     catch (error) {
         if (error.message) {

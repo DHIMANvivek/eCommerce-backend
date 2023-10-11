@@ -1,9 +1,24 @@
-let token = 'https://onecompiler.com/javascript/3zpreuyf2';
+function ForgetTemplate(token) {
+  let html =
+    `<!DOCTYPE html>
+<html>
+ 
+  <body>
+    <p>
+      Click on this link below to change your password.
+    </p>
 
-let html =
+  <a href=http://localhost:4200/auth/forgetPassword/${token}> Forget Password</a>
+  </body>
+</html>
+`
+  return html;
 
-  `
-<!DOCTYPE html>
+}
+
+function SignupTemplate(email) {
+  let html =
+    `<!DOCTYPE html>
 <html>
   <head>
     <title>Playing with Inline Styles</title>
@@ -15,12 +30,15 @@ let html =
       I m a big, blue, <strong>strong</strong> paragraph
     </p>
 
-  <a href=${token}> Forget Password</a>
-
-   
+  vfjvjfvif
   </body>
 </html>
 `
 
 
-module.exports = html
+  return html;
+}
+
+
+
+module.exports = { ForgetTemplate, SignupTemplate }

@@ -30,6 +30,7 @@
     "google-auth-library": "^9.1.0",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.3",
+    "ngx-cookie-service": "^16.0.1",
     "nodemailer": "^6.9.5",
     "nodemon": "^3.0.1",
     "stripe": "^13.8.0",

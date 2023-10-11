@@ -32,8 +32,8 @@ app.use(routes);
 //         console.log(`listening to port ${process.env.port}`);
 // })
 
-let port = 5000;
-app.listen(5000, (err) => {
+let port = 1000;
+app.listen(1000, (err) => {
   if (err)
     console.log(err);
   else
