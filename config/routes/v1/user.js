@@ -3,7 +3,7 @@ const router = express.Router();
 
 const JwtVerify = require('../../../middlewares/jwtVerify');
 const userController = require('../../../controller/user')
-const authController = require('./../../../controller/authentication');
+const authController = require('../../../controller/authentication');
 
 // Authentication
 router.post('/login', authController.login);
