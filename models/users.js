@@ -52,7 +52,6 @@ let userSchema = new mongoose.Schema({
             type: [address],
             validate:  {
                 validator: function (address) {
-                    console.log("address, ", address);
                     return address.length <= 3;
                 },
                 message: 'You can only add a maximum of 3 addresses.'
