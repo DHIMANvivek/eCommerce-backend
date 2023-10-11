@@ -4,7 +4,7 @@ const { createToken } = require('../helpers/jwt')
 const bcryptjs = require('bcryptjs');
 const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
-
+const { OAuth2Client } = require('google-auth-library');
 async function login(req, res) {
     try {
         const input = req.body;
@@ -36,6 +36,17 @@ async function login(req, res) {
 
 async function signup(req, res) {
     try {
+
+        if(req.body.token){
+        const googleOathClient = new OAuth2Client();
+        const ticket = await googleOathClient.verifyIdToken({
+            idToken: req.body.token.credential,
+            audience: req.body.token.clientId
+        });
+        req.body.email=ticket.getPayload().email;
+        req.body.provider='GOOGLE';
+         }
+    
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
             throw ({ message: 'User already exists!' });
@@ -51,12 +62,16 @@ async function signup(req, res) {
 
         await userCreated.save();
 
-        const token = createToken(userCreated._id, userCreated.role);
+        const tokenData = {
+            email: userCreated.email,
+            role:  userCreated.role
+        }
+        const token = createToken(tokenData);
 
         res.status(200).json({ token, message: 'signup sucess' });
 
     } catch (error) {
-
+        console.log("EROR IS ", error)
         if (error.message) {
             res.status(500).json(error);
             return;

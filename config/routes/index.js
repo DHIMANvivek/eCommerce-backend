@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.use('/user', require('./v1/user'));
 router.use('/admin', require('./v1/admin'));
-router.use('/products', require('./v1/products'));
+// router.use('/products', require('./v1/products'));
 router.use('/orders', require('./v1/orders'));
 
 router.use(function (req, res) {
