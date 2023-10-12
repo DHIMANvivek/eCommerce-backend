@@ -14,23 +14,13 @@ const sellerSchema = mongoose.Schema({
         type: String,
         unique: true
     }],
-    size: [{
+    sizes: [{
         type: String,
         unique: true
     }],
     tags: [{
         type: String,
         unique: true
-    }],
-    colors: [{
-        name:{
-            type: String,
-            unique: true
-        },
-        hexCode: {
-            type: String,
-            unique: true
-        }
     }],
     payment: {
         account_info: {
@@ -55,7 +45,7 @@ const sellerSchema = mongoose.Schema({
             type: String,
             required: true
         },
-      
+
     }
 },
     {
@@ -63,4 +53,4 @@ const sellerSchema = mongoose.Schema({
         autoIndex: true
     });
 
-module.export = mongoose.model('sellerDetails', sellerSchema)
+module.exports = mongoose.model('sellerdetails', sellerSchema);

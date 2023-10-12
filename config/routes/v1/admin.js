@@ -3,8 +3,14 @@ const router = express.Router();
 
 const adminController = require('../../../controller/admin')
 
+// Product 
+router.post('/addProduct', adminController.addProduct);
+router.get('/fetchProducts', adminController.fetchProducts);
+// router.delete('/deleteProduct', adminController.deleteProduct);
 
-router.use('/addProduct', adminController.addProduct);
-router.use('/fetchProductFeatures', adminController.featureProductDetails);
+// Product Features
+router.get('/fetchProductFeatures', adminController.fetchProductDetails);
+router.post('/updateProductFeature', adminController.updateProductDetails);
+router.post('/deleteProductFeature', adminController.updateProductDetails);
 
 module.exports = router;

@@ -1,0 +1,59 @@
+[{
+    "sellerID": "6513a7af4e2d06d1e0e44660",
+
+    "categories": [
+        "kurti", "shirt", "tshirt"
+    ],
+    "brands": [
+        "Anubhutee",
+        "Nayo",
+        "Sangria",
+        "Rain & Rainbow",
+        "Bonkers Corner",
+        "Bewakoof",
+        "Burger Bae"
+    ],
+    "sizes": [
+        "XS", 
+        "S",
+        "M",
+        "L",
+        "XL"
+    ],
+    "tags": [
+            "floral",
+            "short",
+            "kurti",
+            "round neck",
+            "embroidered",
+            "thread",
+            "printed",
+            "oversized",
+            "shirt",
+            "aesthetic",
+            "cotton",
+            "oversized",
+            "flannel",
+            "cool",
+            "hulk",
+            "looney tunes",
+            "naruto",
+            "pikachu",
+            "plaid",
+            "baggy",
+            "regular",
+            "fit"
+    ],
+    "orderQuantity": [
+        50, 100, 150, 200, 250
+    ],
+    "payment": {
+        "account_info": {
+            "bankName": "Punjab National Bank",
+            "accountHolder": "Abhishek Rana",
+            "accountNumber": 39238765008,
+            "IFSC": "PUNB0092610"
+        },
+        "GST": "03AAALM3011B1Z2"
+    }
+}]
