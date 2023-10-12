@@ -8,6 +8,7 @@ const { OAuth2Client } = require('google-auth-library');
 async function login(req, res) {
     try {
         const input = req.body;
+        console.log("lOGIN CALLED ",input);
         if (input.token) {
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
@@ -24,7 +25,7 @@ async function login(req, res) {
         }
 
 
-
+        // PURE GOOGLE LOGIN
         if(userFound.provider=='GOOGLE' && input.token){
             const tokenData = { email: userFound.email, role: userFound.role }
             const token = createToken(tokenData);
@@ -32,16 +33,18 @@ async function login(req, res) {
             return;
         }
 
+        // GOOGLE USER TRYING TO LOGIN MANUALLY.
         if(userFound.provider=='GOOGLE'){
-            throw ({ message: 'You are not a direct user' });
+            throw ({ message: 'Try login with Google, you already have account registered with it.' });
          }
 
-
+        // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
         if(userFound.provider=='direct' && input.token){
-            throw ({ message: 'Try to login by entering email and password' });
+            throw ({ message: 'Try to login manually.' });
          }
 
 
+        // PURE MANUAL LOGIN
         const compare = await bcryptjs.compare(input.password, userFound.password);
         if (!compare) {
             throw ({ message: 'Password not matched!' })
@@ -94,7 +97,7 @@ async function signup(req, res) {
             role: userCreated.role
         }
         const token = createToken(tokenData);
-
+        console.log("called");
         res.status(200).json({ token, message: 'signup sucess' });
 
     } catch (error) {
@@ -117,8 +120,13 @@ async function forgotPassword(req, res) {
             {
                 'email': 1,
                 'password': 1,
-            });
+                'provider':1,
+             });
 
+            if(user.provider=='GOOGLE'){
+                return res.status(500).json({message:'You cannot change your password as you are google user'});
+            }
+        
         if (!user) {
             throw { message: "User doesn't exist in db." }
         }
@@ -132,8 +140,6 @@ async function forgotPassword(req, res) {
             UserId: user._id,
         })
         const tokenData = {
-            email: user.email,
-            password: user.password,
             id: user._id
         }
         const passwordToken = createToken(tokenData);
@@ -143,7 +149,7 @@ async function forgotPassword(req, res) {
             subject: "Change Your Password",
         }
         const mailSent = await mailer(mailData, passwordToken)
-        res.json({ passwordToken, message: "Mail Sent Successfully" });
+        res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {
         if (error.message) {
@@ -169,31 +175,45 @@ async function updatePassword(req, res) {
         }
 
         const user = await usersModel.findById(tokenData.id)
-        const compare = await bcryptjs.compare(input.password, tokenData.password)
-
+        console.log(user, "userrrrr");
+        console.log(input.password, "input pass", user.password, "user pass")
+        const compare = await bcryptjs.compare(input.password, user.password)
+        console.log(" COMPARE ANSWER IS ",compare);
         if (compare) {
             return res.status(400).json({
                 message: 'Cannot set same password as before'
             })
         }
 
-        if (tokenData.password === user.password) {
-            await usersModel.updateOne({
-                email: user.email
-            }, {
-                $set: { 'password': await bcryptjs.hash(input.password, 10) }
-            })
+        const delUser = await passwordModel.deleteOne({
+            UserId: tokenData.id
+        })
+        // if (tokenData.password === user.password) {
+        //     await usersModel.updateOne({
+        //         email: user.email
+        //     }, {
+        //         $set: { 'password': await bcryptjs.hash(input.password, 10) }
+        //     })
 
-            await passwordModel.deleteOne({
-                UserId: tokenData.id
-            })
+        //     await passwordModel.deleteOne({
+        //         UserId: tokenData.id
+        //     })
 
-            return res.status(200).json({
-                message: "Password Changed Successfully!"
-            })
-        }
+        //     return res.status(200).json({
+        //         message: "Password Changed Successfully!"
+        //     })
+        // }
+
+        await usersModel.updateOne({
+                    email: user.email
+                }, {
+                    $set: { 'password': await bcryptjs.hash(input.password, 10) }
+                })
+        res.status(200).json({message:'password changed success'})
+
     }
     catch (error) {
+        console.log("error is ",error)
         if (error.message) {
             res.status(500).json(error);
             return;

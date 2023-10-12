@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-
+const AdminVerify=require('../../middlewares/adminVerify');
 router.use('/user', require('./v1/user'));
-router.use('/admin', require('./v1/admin'));
+router.use('/admin',AdminVerify, require('./v1/admin'));
 // router.use('/products', require('./v1/products'));
 router.use('/orders', require('./v1/orders'));
 

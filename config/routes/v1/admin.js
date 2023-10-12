@@ -4,7 +4,7 @@ const router = express.Router();
 const adminController = require('../../../controller/admin')
 
 // Product 
-router.post('/addProduct', adminController.addProduct);
+router.post('/addProduct',adminController.addProduct);
 router.get('/fetchProducts', adminController.fetchProducts);
 // router.delete('/deleteProduct', adminController.deleteProduct);
 

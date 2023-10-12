@@ -2,7 +2,7 @@ const usersModel = require('../models/users');
 
 async function getDetails(req, res) {
     try {
-        req.body._id = '651fdc60a055f39416501e50';
+        req.body._id = '6513a7af4e2d06d1e0e44660';
         const basicDetails = await usersModel.findById(req.body._id);
         res.status(200).json(basicDetails)
     } catch (error) {
@@ -12,7 +12,7 @@ async function getDetails(req, res) {
 
 async function updateDetails(req, res) {
     try {
-        req.body._id = '651fdc60a055f39416501e50';
+        req.body._id = '6513a7af4e2d06d1e0e44660';
         const basicDetails = await usersModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
         res.status(200).json(basicDetails)
     } catch (error) {

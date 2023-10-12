@@ -8,17 +8,17 @@ async function JwtVerify(req, res, next) {
         }
         else{
             data = verifyToken(req.body.tokenData)
-        }
-        console.log("jwt verify data", data);
+         }
+       
         req.tokenData = data;
         next();
     } catch (error) {
-        console.log('ERROR IS  bhhj', error);
+       
         res.status(500).json(error);
 
     }
 }
 
 
-module.exports = JwtVerify
+module.exports = JwtVerify;
 
