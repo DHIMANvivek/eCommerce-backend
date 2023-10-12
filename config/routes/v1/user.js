@@ -10,6 +10,7 @@ router.post('/login', authController.login);
 router.post('/signup', authController.signup);
 router.post('/forget', authController.forgotPassword);
 router.post('/update', JwtVerify, authController.updatePassword);
+router.post('/changePassword', JwtVerify, authController.changePassword)
 
 // User Account
 router.get('/getDetails', userController.getDetails)

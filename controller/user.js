@@ -4,6 +4,7 @@ async function getDetails(req, res) {
     try {
         req.body._id = '6513a7af4e2d06d1e0e44660';
         const basicDetails = await usersModel.findById(req.body._id);
+        console.log("baic details ",basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
         res.status(500).json(error);
@@ -14,6 +15,7 @@ async function updateDetails(req, res) {
     try {
         req.body._id = '6513a7af4e2d06d1e0e44660';
         const basicDetails = await usersModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
+       
         res.status(200).json(basicDetails)
     } catch (error) {
         res.status(500).json(error);

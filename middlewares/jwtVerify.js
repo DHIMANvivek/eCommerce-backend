@@ -3,8 +3,8 @@ const { verifyToken } = require('../helpers/jwt');
 async function JwtVerify(req, res, next) {
     try {
         let data;
-        if (req.headers.token ){
-            data = verifyToken(req.headers.token.split(' ')[1])
+        if (req.headers.authorization ){
+            data = verifyToken(req.headers.authorization.split(' ')[1])
         }
         else{
             data = verifyToken(req.body.tokenData)

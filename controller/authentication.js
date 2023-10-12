@@ -50,7 +50,7 @@ async function login(req, res) {
             throw ({ message: 'Password not matched!' })
         }
 
-        const tokenData = { email: userFound.email, role: userFound.role }
+        const tokenData = {id: userFound._id, role: userFound.role }
         const token = createToken(tokenData);
 
         res.status(200).json({
@@ -93,7 +93,7 @@ async function signup(req, res) {
         await userCreated.save();
 
         const tokenData = {
-            email: userCreated.email,
+            id: userCreated._id,
             role: userCreated.role
         }
         const token = createToken(tokenData);
@@ -224,9 +224,21 @@ async function updatePassword(req, res) {
 
 }
 
+async function changePassword(req, res) {
+    try {
+        const input = req.body;
+        console.log(input, "changePassword");
+        console.log('TOKEN DATA ',req.tokenData);
+    }
+    catch {
+
+    }
+}
+
 module.exports = {
     signup,
     login,
     forgotPassword,
-    updatePassword
+    updatePassword,
+    changePassword
 }

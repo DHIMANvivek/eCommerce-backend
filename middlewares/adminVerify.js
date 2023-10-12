@@ -15,9 +15,12 @@ async function AdminVerify(req, res, next) {
        
         // console.log("Req object is ",request);
          console.log("data coming is ",data);
-         res.status(200).json(data);
-         return;
+         if(data.role=='user') {
+            throw ({message:'You are not eligible for this route'});
+         }
+        
         req.tokenData = data;
+        res.status(200).json("welcome");
         next();
     } catch (error) {
        
