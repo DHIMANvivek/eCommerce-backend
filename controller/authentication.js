@@ -171,7 +171,7 @@ async function updatePassword(req, res) {
         })
 
         if (!requesterFound) {
-            throw ({ message: "You cannot change password." })
+            throw ({ message: "Please request for reset password." })
         }
 
         const user = await usersModel.findById(tokenData.id)
@@ -227,11 +227,36 @@ async function updatePassword(req, res) {
 async function changePassword(req, res) {
     try {
         const input = req.body;
-        console.log(input, "changePassword");
-        console.log('TOKEN DATA ',req.tokenData);
+        const user = await usersModel.findById(req.tokenData.id)
+      
+        const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
+   
+        if (compareOldPassword){
+            const updatePassword = await usersModel.findByIdAndUpdate({
+                _id : user.id
+            },{
+                password : await bcryptjs.hash(input.newPassword, 10)
+            })
+            console.log("updated successfully");
+            return res.status(200).json({
+                message : "You have changed your password successfully!"
+            })
+        }
+        return res.status(201).json({
+            message : "Your old password is incorrect!"
+        })
     }
-    catch {
-
+    catch (error) {
+        // if (error.message) {
+        //     res.status(500).json(error);
+        //     return;
+        // }
+        // res.status(500).json({
+        //     message : "Your old password is incorrect!"
+        // });
+        res.status(500).json({
+            message : "Your old password is incorrect."
+        })
     }
 }
 
