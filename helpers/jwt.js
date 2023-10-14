@@ -3,20 +3,14 @@ require('dotenv').config()
 
 function verifyToken(token) {
     try {
+        const data = token;
 
-        console.log(token, "helper tken");
-        // const data = token.split(' ')[1] || req.body.tokenData;
-        const data = token
         if (!data) {
             throw ({ message: 'token not found' });
         }
-
-
         const details = jwt.verify(data, process.env.secretKey);
-        
         return details;
-
-
+        
     } catch (error) {
         throw error;
     }

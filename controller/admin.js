@@ -17,47 +17,48 @@ async function addProduct(req, res) {
     }
 }
 
-async function fetchProducts(req, res){
+async function fetchProducts(req, res) {
     const sellerID = req.headers.sellerid;
 
-    try{
+    try {
         console.log(sellerID);
         const response = await products.find(
-            {'sellerID': sellerID},
+            { 'sellerID': sellerID },
             {
-                'sku': 1, 
-                "name": 1, 
+                'sku': 1,
+                "name": 1,
                 "assets.stockQuantity": 1,
-                "assets.photo": 1, 
-                'price': 1, 
-                'info.category': 1, 
+                "assets.photo": 1,
+                'price': 1,
+                'info.category': 1,
                 'info.brand': 1
             }
         );
-        console.log(response);
+
         res.json(response);
-    }catch(err){
+    } catch (err) {
 
     }
 }
 
 async function fetchProductDetails(req, res) {
-    const sellerID = req.headers.sellerid;
+    const sellerID = req.tokenData.id;
     
     try {
         const response = await sellerInfo.findOne(
             {
-                'sellerID': sellerID 
+                'sellerID': sellerID
             },
             {
-                categories: 1, 
-                brands: 1, 
-                sizes: 1, 
-                tags: 1, 
+                categories: 1,
+                brands: 1,
+                sizes: 1,
+                tags: 1,
                 orderQuantity: 1
             });
+        
         if (response) {
-           return res.status(200).json(response);     
+            return res.status(200).json(response);
         }
         throw "404";
     } catch (err) {
@@ -70,11 +71,11 @@ async function updateProductDetails(req, res) {
     const sellerID = req.headers.sellerid;
     const field = req.body.field;
     const data = req.body.data;
-    
+
     try {
-        const response = await sellerInfo.updateOne({'sellerID': sellerID}, { $set: { [field]:  data}});
+        const response = await sellerInfo.updateOne({ 'sellerID': sellerID }, { $set: { [field]: data } });
         if (response) {
-           return res.status(200).json(response);     
+            return res.status(200).json(response);
         }
         throw "404";
     } catch (err) {
