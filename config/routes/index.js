@@ -17,11 +17,14 @@ router.get('/checkUser', (req, res)=>{
     try{
         if(token){
             const data = verifyToken(token.split(' ')[1]);
-            return res.json({role: data.role});
+            if(data.role!='admin'){
+                throw({message:'You are not eligible'})
+            }
+            return res.json("sucess");
         }
-        throw "Token not Found";
-    }catch(err){
-        return res.status(404).json({messgae: err});
+        throw{message: 'Please login or signup first'};
+    }catch(error){
+        return res.status(404).json(error);
     }
 })
 

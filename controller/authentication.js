@@ -7,6 +7,7 @@ const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
 async function login(req, res) {
     try {
+        console.log('LOGIN CALLEDD--------');
         const input = req.body;
         if (input.token) {
             console.log("login google");
@@ -17,8 +18,8 @@ async function login(req, res) {
             input.email = googleToken.getPayload().email;
             input.provider = 'GOOGLE';
             req.body.name = {
-                firstname : ticket.getPayload().given_name,
-                lastname : ticket.getPayload().family_name
+                firstname : googleToken.getPayload().given_name,
+                lastname : googleToken.getPayload().family_name
             }
 
             // const firstName = req.body.name.firstname; 
@@ -67,6 +68,7 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
+        console.log("ERROR IS ",error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -76,6 +78,7 @@ async function login(req, res) {
 
 async function signup(req, res) {
     try {
+        console.log('SINGUP CALLEDD--------');
         if (req.body.token) {
             const googleOathClient = new OAuth2Client();
             const ticket = await googleOathClient.verifyIdToken({

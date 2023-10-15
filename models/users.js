@@ -26,7 +26,6 @@ let userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
         minlength: 8,
         // match: ^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]).{8,32}$,
         required:function validate(){
