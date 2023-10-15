@@ -8,20 +8,29 @@ const { OAuth2Client } = require('google-auth-library');
 async function login(req, res) {
     try {
         const input = req.body;
-        console.log("lOGIN CALLED ",input);
         if (input.token) {
+            console.log("login google");
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
                 idToken: req.body.token.credential
             });
             input.email = googleToken.getPayload().email;
             input.provider = 'GOOGLE';
+            req.body.name = {
+                firstname : ticket.getPayload().given_name,
+                lastname : ticket.getPayload().family_name
+            }
+
+            // const firstName = req.body.name.firstname; 
         }
+        
         const userFound = await usersModel.findOne({
             email: input.email
         })
+        const firstName = userFound.name.firstname
+       
         if (!userFound) {
-            throw ({ message: 'User not found!' })
+            throw ({ message: 'User not found! Kindly sign in.' })
         }
 
 
@@ -29,7 +38,7 @@ async function login(req, res) {
         if(userFound.provider=='GOOGLE' && input.token){
             const tokenData = { email: userFound.email, role: userFound.role }
             const token = createToken(tokenData);
-            res.status(200).json({message:'login sucece',token});
+            res.status(200).json({message:'login sucece',token, firstName});
             return;
         }
 
@@ -47,7 +56,7 @@ async function login(req, res) {
         // PURE MANUAL LOGIN
         const compare = await bcryptjs.compare(input.password, userFound.password);
         if (!compare) {
-            throw ({ message: 'Password not matched!' })
+            throw ({ message: 'Incorrect Password!' })
         }
 
         const tokenData = {id: userFound._id, role: userFound.role }
@@ -55,7 +64,7 @@ async function login(req, res) {
 
         res.status(200).json({
             message: "Login Successful",
-            token
+            token, firstName
         })
     } catch (error) {
         if (error.message) {
@@ -67,41 +76,50 @@ async function login(req, res) {
 
 async function signup(req, res) {
     try {
-
         if (req.body.token) {
             const googleOathClient = new OAuth2Client();
             const ticket = await googleOathClient.verifyIdToken({
                 idToken: req.body.token.credential
             });
+
             req.body.email = ticket.getPayload().email;
             req.body.provider = 'GOOGLE';
+            req.body.name = {
+                firstname : ticket.getPayload().given_name,
+                lastname : ticket.getPayload().family_name
+            }
         }
+        const firstName = req.body.name.firstname; 
 
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
-            throw ({ message: 'User already exists!' });
+            throw ({ message: 'User already exists! Try to login.' });
         }
 
         const leadFound = await leadModel.findOne({ email: req.body.email });
-
         const userCreated = await usersModel(req.body);
-
+      
         if (leadFound) {
             userCreated.Lead = leadFound;
         }
 
         await userCreated.save();
 
+        const mailData = {
+            email: req.body.email,
+            subject: "We're Thrilled to Have You, Welcome to Trade Vogue!",
+        }
+        const mailSent = await mailer(mailData)
+
         const tokenData = {
             id: userCreated._id,
             role: userCreated.role
         }
         const token = createToken(tokenData);
-        console.log("called");
-        res.status(200).json({ token, message: 'signup sucess' });
+        res.status(200).json({ token, message: 'Signup Successful!' , firstName });
 
     } catch (error) {
-        console.log("EROR IS ", error)
+        console.log("Error in Signup", error)
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -146,7 +164,7 @@ async function forgotPassword(req, res) {
 
         const mailData = {
             email: user.email,
-            subject: "Change Your Password",
+            subject: "Password Reset",
         }
         const mailSent = await mailer(mailData, passwordToken)
         res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
