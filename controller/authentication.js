@@ -18,40 +18,40 @@ async function login(req, res) {
             input.email = googleToken.getPayload().email;
             input.provider = 'GOOGLE';
             req.body.name = {
-                firstname : googleToken.getPayload().given_name,
-                lastname : googleToken.getPayload().family_name
+                firstname: googleToken.getPayload().given_name,
+                lastname: googleToken.getPayload().family_name
             }
 
             // const firstName = req.body.name.firstname; 
         }
-        
+
         const userFound = await usersModel.findOne({
             email: input.email
         })
         const firstName = userFound.name.firstname
-       
+
         if (!userFound) {
             throw ({ message: 'User not found! Kindly sign in.' })
         }
 
 
         // PURE GOOGLE LOGIN
-        if(userFound.provider=='GOOGLE' && input.token){
+        if (userFound.provider == 'GOOGLE' && input.token) {
             const tokenData = { email: userFound.email, role: userFound.role }
             const token = createToken(tokenData);
-            res.status(200).json({message:'login sucece',token, firstName});
+            res.status(200).json({ message: 'login sucece', token, firstName });
             return;
         }
 
         // GOOGLE USER TRYING TO LOGIN MANUALLY.
-        if(userFound.provider=='GOOGLE'){
+        if (userFound.provider == 'GOOGLE') {
             throw ({ message: 'Try login with Google, you already have account registered with it.' });
-         }
+        }
 
         // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
-        if(userFound.provider=='direct' && input.token){
+        if (userFound.provider == 'direct' && input.token) {
             throw ({ message: 'Try to login manually.' });
-         }
+        }
 
 
         // PURE MANUAL LOGIN
@@ -60,7 +60,7 @@ async function login(req, res) {
             throw ({ message: 'Incorrect Password!' })
         }
 
-        const tokenData = {id: userFound._id, role: userFound.role }
+        const tokenData = { id: userFound._id, role: userFound.role }
         const token = createToken(tokenData);
 
         res.status(200).json({
@@ -88,11 +88,11 @@ async function signup(req, res) {
             req.body.email = ticket.getPayload().email;
             req.body.provider = 'GOOGLE';
             req.body.name = {
-                firstname : ticket.getPayload().given_name,
-                lastname : ticket.getPayload().family_name
+                firstname: ticket.getPayload().given_name,
+                lastname: ticket.getPayload().family_name
             }
         }
-        const firstName = req.body.name.firstname; 
+        const firstName = req.body.name.firstname;
 
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
@@ -101,7 +101,7 @@ async function signup(req, res) {
 
         const leadFound = await leadModel.findOne({ email: req.body.email });
         const userCreated = await usersModel(req.body);
-      
+
         if (leadFound) {
             userCreated.Lead = leadFound;
         }
@@ -119,7 +119,7 @@ async function signup(req, res) {
             role: userCreated.role
         }
         const token = createToken(tokenData);
-        res.status(200).json({ token, message: 'Signup Successful!' , firstName });
+        res.status(200).json({ token, message: 'Signup Successful!', firstName });
 
     } catch (error) {
         console.log("Error in Signup", error)
@@ -141,16 +141,16 @@ async function forgotPassword(req, res) {
             {
                 'email': 1,
                 'password': 1,
-                'provider':1,
-             });
+                'provider': 1,
+            });
 
-            if(user.provider=='GOOGLE'){
-                return res.status(500).json({message:'You cannot change your password as you are google user'});
-            }
-        
         if (!user) {
-            throw { message: "User doesn't exist in db." }
+            throw { message: "This email doesn't exist." }
         }
+        if (user.provider == 'GOOGLE') {
+            return res.status(500).json({ message: 'You cannot change your password as you are a Google user.' });
+        }
+
         const hasRequested = await passwordModel.findOne({
             UserId: user._id
         })
@@ -173,6 +173,7 @@ async function forgotPassword(req, res) {
         res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {
+        console.log(error, "reqqq password");
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -186,55 +187,53 @@ async function updatePassword(req, res) {
     try {
         const input = req.body;
         const tokenData = req.tokenData;
+        console.log(tokenData, "tokenData");
+        console.log(input, "input");
 
         const requesterFound = await passwordModel.findOne({
             UserId: tokenData.id
         })
+        console.log(requesterFound, "requesterrrr");
+        const currentTime = new Date();
+        console.log(currentTime);
+        const fiveMinutesAgo = new Date(currentTime - 5 * 60 * 1000);
+        console.log(requesterFound.createdAt, "createdAttt");
 
         if (!requesterFound) {
             throw ({ message: "Please request for reset password." })
         }
 
-        const user = await usersModel.findById(tokenData.id)
-        console.log(user, "userrrrr");
-        console.log(input.password, "input pass", user.password, "user pass")
-        const compare = await bcryptjs.compare(input.password, user.password)
-        console.log(" COMPARE ANSWER IS ",compare);
-        if (compare) {
-            return res.status(400).json({
-                message: 'Cannot set same password as before'
-            })
-        }
+        if (requesterFound.createdAt < fiveMinutesAgo) {
 
-        const delUser = await passwordModel.deleteOne({
-            UserId: tokenData.id
-        })
-        // if (tokenData.password === user.password) {
-        //     await usersModel.updateOne({
-        //         email: user.email
-        //     }, {
-        //         $set: { 'password': await bcryptjs.hash(input.password, 10) }
-        //     })
-
-        //     await passwordModel.deleteOne({
-        //         UserId: tokenData.id
-        //     })
-
-        //     return res.status(200).json({
-        //         message: "Password Changed Successfully!"
-        //     })
-        // }
-
-        await usersModel.updateOne({
-                    email: user.email
-                }, {
-                    $set: { 'password': await bcryptjs.hash(input.password, 10) }
+            const user = await usersModel.findById(tokenData.id)
+            console.log(user, "userrrrr");
+            console.log(input.password, "input pass", user.password, "user pass")
+            const compare = await bcryptjs.compare(input.password, user.password)
+            console.log(" COMPARE ANSWER IS ", compare);
+            if (compare) {
+                return res.status(400).json({
+                    message: 'Cannot set same password as before'
                 })
-        res.status(200).json({message:'password changed success'})
+            }
+            await usersModel.updateOne({
+                email: user.email
+            }, {
+                $set: { 'password': await bcryptjs.hash(input.password, 10) }
+            })
+            res.status(200).json({ message: 'password changed success' })
+        }
+        else {
+            console.log("more");
+        }
+        // const delUser = await passwordModel.deleteOne({
+        //     UserId: tokenData.id
+        // })
+      
+
 
     }
     catch (error) {
-        console.log("error is ",error)
+        console.log("error is ", error)
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -249,22 +248,22 @@ async function changePassword(req, res) {
     try {
         const input = req.body;
         const user = await usersModel.findById(req.tokenData.id)
-      
+
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
-   
-        if (compareOldPassword){
+
+        if (compareOldPassword) {
             const updatePassword = await usersModel.findByIdAndUpdate({
-                _id : user.id
-            },{
-                password : await bcryptjs.hash(input.newPassword, 10)
+                _id: user.id
+            }, {
+                password: await bcryptjs.hash(input.newPassword, 10)
             })
             console.log("updated successfully");
             return res.status(200).json({
-                message : "You have changed your password successfully!"
+                message: "You have changed your password successfully!"
             })
         }
         return res.status(201).json({
-            message : "Your old password is incorrect!"
+            message: "Your old password is incorrect!"
         })
     }
     catch (error) {
@@ -276,7 +275,7 @@ async function changePassword(req, res) {
         //     message : "Your old password is incorrect!"
         // });
         res.status(500).json({
-            message : "Your old password is incorrect."
+            message: "Your old password is incorrect."
         })
     }
 }
@@ -288,3 +287,19 @@ module.exports = {
     updatePassword,
     changePassword
 }
+
+  // if (tokenData.password === user.password) {
+        //     await usersModel.updateOne({
+        //         email: user.email
+        //     }, {
+        //         $set: { 'password': await bcryptjs.hash(input.password, 10) }
+        //     })
+
+        //     await passwordModel.deleteOne({
+        //         UserId: tokenData.id
+        //     })
+
+        //     return res.status(200).json({
+        //         message: "Password Changed Successfully!"
+        //     })
+        // }

@@ -14,5 +14,4 @@ const passwordSchema = mongoose.Schema({
         autoindex: true
     }
 );
-// passwordSchema.index({ createdAt: 1 }, { expireAfterSeconds: 300 });
 module.exports = mongoose.model('forgetPassword', passwordSchema);

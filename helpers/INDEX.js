@@ -83,6 +83,7 @@ function SignupTemplate(email) {
     }
     .outer-div{
       background-color : #f5f6f7;
+      padding-block : 30px;
     }
     td {
       padding: 8px;
@@ -92,6 +93,9 @@ function SignupTemplate(email) {
     td.header {
       border-block-end : 1px solid #f5f6f7;
     }
+    tr, td {
+      background-color: #ffffff;
+    }
 
   </style>
 </head>
@@ -100,7 +104,7 @@ function SignupTemplate(email) {
 <table >
   <tr>
     <td class="header" colspan="2">
-      <h1>Welcome to our community!
+      <h1>Welcome to Trade Vogue!
       
     </td>
   </tr>
