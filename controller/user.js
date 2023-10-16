@@ -1,4 +1,7 @@
 const usersModel = require('../models/users');
+const users = require('../models/users');
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function getDetails(req, res) {
     try {
@@ -111,6 +114,19 @@ async function getOrders(req, res) {
     }
 }
 
+async function getAdminDetails(req, res) {
+    try {
+        const response = await users.find({ role: 'admin' });
+        if (response) {
+            return res.status(200).json(response);
+        }
+        throw "404";
+    }catch(err){
+        console.log(err);
+        return res.status(404).send();
+    }
+}
+
 module.exports = {
     getDetails,
     updateDetails,
@@ -119,5 +135,6 @@ module.exports = {
     deleteAddress,
     updateAddress,
     createPaymentIntent,
-    getOrders
+    getOrders,
+    getAdminDetails
 }

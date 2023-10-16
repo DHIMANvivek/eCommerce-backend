@@ -20,5 +20,6 @@ router.post('/addAddress', userController.addAddress)
 router.get('/deleteAddress', userController.deleteAddress)
 router.get('/updateAdress', userController.updateAddress)
 router.post('/create-payment-intent', userController.createPaymentIntent);
+router.get('/getAdminDetails', userController.getAdminDetails);
 
 module.exports = router;

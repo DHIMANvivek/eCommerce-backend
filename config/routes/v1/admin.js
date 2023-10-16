@@ -12,5 +12,6 @@ router.get('/fetchProducts', adminController.fetchProducts);
 router.get('/fetchProductFeatures', adminController.fetchProductDetails);
 router.post('/updateProductFeature', adminController.updateProductDetails);
 router.post('/deleteProductFeature', adminController.updateProductDetails);
-
+router.post('/updateDetails', adminController.updateDetails);
+router.get('/getAdminDetails', adminController.getAdminDetails);
 module.exports = router;

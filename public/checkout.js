@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var emailAddress = '';
   async function initialize() {
-    const response = await fetch("http://localhost:5000/api/purchaser/create-payment-intent", {
+    const response = await fetch("http://localhost:1000/user/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) }),
