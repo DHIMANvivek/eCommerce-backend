@@ -1,7 +1,7 @@
 const Users = require('../models/users');
 const Reviews = require('../models/reviews');
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const mongoose = require('mongoose');
 
 async function getDetails(req, res) {
     try {
@@ -39,15 +39,19 @@ async function getAddress(req, res) {
 async function addAddress(req, res) {
     try {
         const addressAdded = await Users.findOneAndUpdate(
-            { _id: new mongoose.Types.ObjectId('651fdc60a055f39416501e50') },
+            { _id: new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660') },
             { $push: { 'info.address': req.body } },
             { new: true }
 
         )
 
         if (!addressAdded) throw ({ message: 'Address not updated' })
-        res.status(200).json(addressAdded);
+        const lastIndex=addressAdded.info.address.length;
+    console.log("last index is ",lastIndex);
+        console.log('ADDED ADDRESS IS ',addressAdded.info.address[lastIndex-1]);
+        res.status(200).json(addressAdded.info.address[lastIndex-1]);
     } catch (error) {
+        console.log('ERROR IS ',error);
         res.status(500).json(error)
     }
 }
