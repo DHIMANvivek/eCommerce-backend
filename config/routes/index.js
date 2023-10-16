@@ -6,9 +6,8 @@ const { verifyToken } = require('../../helpers/jwt');
 
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
-// router.use('/products', require('./v1/products'));
+router.use('/products', require('./v1/products'));
 router.use('/orders', require('./v1/orders'));
-
 
 // Check Type of user (Used for purpose of Authguard)
 router.get('/checkUser', (req, res)=>{

@@ -1,12 +1,12 @@
-const usersModel = require('../models/users');
-const users = require('../models/users');
+const Users = require('../models/users');
+const Reviews = require('../models/reviews');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function getDetails(req, res) {
     try {
         req.body._id = '6513a7af4e2d06d1e0e44660';
-        const basicDetails = await usersModel.findById(req.body._id);
+        const basicDetails = await Users.findById(req.body._id);
         console.log("baic details ",basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
@@ -17,7 +17,7 @@ async function getDetails(req, res) {
 async function updateDetails(req, res) {
     try {
         req.body._id = '6513a7af4e2d06d1e0e44660';
-        const basicDetails = await usersModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
+        const basicDetails = await Users.findByIdAndUpdate(req.body._id, req.body, { new: true });
        
         res.status(200).json(basicDetails)
     } catch (error) {
@@ -28,7 +28,7 @@ async function updateDetails(req, res) {
 async function getAddress(req, res) {
     try {
         req.body._id = '6513a7af4e2d06d1e0e44660';
-        const Addresses = await usersModel.findById(req.body._id, 'info.address');
+        const Addresses = await Users.findById(req.body._id, 'info.address');
         res.status(200).json(Addresses)
     }
     catch (error) {
@@ -38,7 +38,7 @@ async function getAddress(req, res) {
 
 async function addAddress(req, res) {
     try {
-        const addressAdded = await usersModel.findOneAndUpdate(
+        const addressAdded = await Users.findOneAndUpdate(
             { _id: new mongoose.Types.ObjectId('651fdc60a055f39416501e50') },
             { $push: { 'info.address': req.body } },
             { new: true }
@@ -54,7 +54,7 @@ async function addAddress(req, res) {
 
 async function deleteAddress(req, res) {
     try {
-        const deletedAddress = await usersModel.findOneAndUpdate(
+        const deletedAddress = await Users.findOneAndUpdate(
             { _id: new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660') },
             { $pull: { 'info.address': { _id: '652390e5f04fae193297dffb' } } },
             { new: true }
@@ -71,7 +71,7 @@ async function deleteAddress(req, res) {
 
 async function updateAddress(req, res) {
     try {
-        const updateParticularAddress = await usersModel.updateOne({ _id: new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660") }, { $set: { email: 'Abhishekl23@gmail.com' } })
+        const updateParticularAddress = await Users.updateOne({ _id: new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660") }, { $set: { email: 'Abhishekl23@gmail.com' } })
         res.status(200).json(updateParticularAddress)
     } catch (error) {
         res.status(500).json(error)
@@ -116,7 +116,7 @@ async function getOrders(req, res) {
 
 async function getAdminDetails(req, res) {
     try {
-        const response = await users.find({ role: 'admin' });
+        const response = await Users.find({ role: 'admin' });
         if (response) {
             return res.status(200).json(response);
         }
@@ -125,6 +125,28 @@ async function getAdminDetails(req, res) {
         console.log(err);
         return res.status(404).send();
     }
+}
+
+
+// incomplete
+async function addReview(req, res){
+    try {
+        let input = req.body;
+        console.log(req.body);
+
+        await Reviews.insertOne(input);
+    } catch (error) {
+        if (error.message) {
+            res.status(500).json(error);
+            return;
+        }
+        res.status(500).json(error);
+    }
+}
+
+async function putReviews(req, res){
+    console.log(req.body);
+    Reviews.insertMany(req.body);
 }
 
 module.exports = {
@@ -136,5 +158,7 @@ module.exports = {
     updateAddress,
     createPaymentIntent,
     getOrders,
-    getAdminDetails
+    getAdminDetails,
+    addReview,
+    putReviews
 }

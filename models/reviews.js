@@ -28,3 +28,5 @@ const reviewSchema = mongoose.Schema({
         }
     ]
 });
+
+module.exports = mongoose.model('reviews', reviewSchema)

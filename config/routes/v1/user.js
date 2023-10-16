@@ -22,4 +22,8 @@ router.get('/updateAdress', userController.updateAddress)
 router.post('/create-payment-intent', userController.createPaymentIntent);
 router.get('/getAdminDetails', userController.getAdminDetails);
 
+
+//temp
+router.post('/r', userController.putReviews);
+
 module.exports = router;

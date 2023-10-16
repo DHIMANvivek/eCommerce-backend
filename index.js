@@ -33,7 +33,7 @@ app.use(routes);
 // })
 
 let port = 1000;
-app.listen(1000, (err) => {
+app.listen(port, (err) => {
   if (err)
     console.log(err);
   else
