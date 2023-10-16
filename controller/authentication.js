@@ -68,7 +68,7 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        console.log("ERROR IS ",error);
+        console.log("ERROR IS ", error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -194,19 +194,25 @@ async function updatePassword(req, res) {
             UserId: tokenData.id
         })
         console.log(requesterFound, "requesterrrr");
-        const currentTime = new Date();
-        console.log(currentTime);
-        const fiveMinutesAgo = new Date(currentTime - 5 * 60 * 1000);
-        console.log(requesterFound.createdAt, "createdAttt");
+
+
+        let currentTime = new Date().getTime();
+        console.log(currentTime, "currentTime");
+
+        let requesterTime = requesterFound.createdAt.getTime();
+        console.log(requesterTime, 'stored');
+
+        const checkTime = (currentTime - requesterTime) / 60000;
+        console.log(checkTime, "checktime");
 
         if (!requesterFound) {
             throw ({ message: "Please request for reset password." })
         }
 
-        if (requesterFound.createdAt < fiveMinutesAgo) {
+        if (checkTime < 5) {
 
             const user = await usersModel.findById(tokenData.id)
-            console.log(user, "userrrrr");
+
             console.log(input.password, "input pass", user.password, "user pass")
             const compare = await bcryptjs.compare(input.password, user.password)
             console.log(" COMPARE ANSWER IS ", compare);
@@ -220,16 +226,14 @@ async function updatePassword(req, res) {
             }, {
                 $set: { 'password': await bcryptjs.hash(input.password, 10) }
             })
-            res.status(200).json({ message: 'password changed success' })
+            res.status(200).json({ message: 'Password Changed Successfully!' })
+            const delUser = await passwordModel.deleteOne({
+                UserId: tokenData.id
+            })
         }
-        else {
-            console.log("more");
-        }
-        // const delUser = await passwordModel.deleteOne({
-        //     UserId: tokenData.id
-        // })
-      
-
+        return res.status(400).json({
+            message: "Please request for Reset Password again."
+        })
 
     }
     catch (error) {
@@ -288,18 +292,18 @@ module.exports = {
     changePassword
 }
 
-  // if (tokenData.password === user.password) {
-        //     await usersModel.updateOne({
-        //         email: user.email
-        //     }, {
-        //         $set: { 'password': await bcryptjs.hash(input.password, 10) }
-        //     })
+// if (tokenData.password === user.password) {
+//     await usersModel.updateOne({
+//         email: user.email
+//     }, {
+//         $set: { 'password': await bcryptjs.hash(input.password, 10) }
+//     })
 
-        //     await passwordModel.deleteOne({
-        //         UserId: tokenData.id
-        //     })
+//     await passwordModel.deleteOne({
+//         UserId: tokenData.id
+//     })
 
-        //     return res.status(200).json({
-        //         message: "Password Changed Successfully!"
-        //     })
-        // }
+//     return res.status(200).json({
+//         message: "Password Changed Successfully!"
+//     })
+// }

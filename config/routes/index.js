@@ -27,6 +27,11 @@ router.get('/checkUser', (req, res)=>{
     }
 })
 
+//send subscribe mail 
+router.post('sendMail', (req, res)=>{
+    const input = req.body.email;
+    
+})
 
 
 router.use(function (req, res) {
