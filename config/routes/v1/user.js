@@ -13,11 +13,12 @@ router.post('/update', JwtVerify, authController.updatePassword);
 router.post('/changePassword', JwtVerify, authController.changePassword)
 
 // User Account
-router.get('/getDetails', userController.getDetails)
+// router.use(JwtVerify)
+router.get('/getDetails',JwtVerify,userController.getDetails)
 router.post('/updateDetails', userController.updateDetails)
-router.get('/getAddress', userController.getAddress)
+router.get('/getAddress',JwtVerify,userController.getAddress)
 router.post('/addAddress', userController.addAddress)
-router.get('/deleteAddress', userController.deleteAddress)
+router.post('/deleteAddress', userController.deleteAddress)
 router.get('/updateAdress', userController.updateAddress)
 // router.post('/create-payment-intent', userController.createPaymentIntent);
 router.get('/getAdminDetails', userController.getAdminDetails);
