@@ -36,20 +36,34 @@ async function fetchProductDetails(req, res) {
     }
 }
 
-
-
-
 // exploring, searching and filtering
 async function fetchProducts(req, res) {
     try {
-        //pagination, fixed limit to showing only 9 product at a time
-        let limit = 8;
+        // Pagination, fixed limit to showing only 8 product at a time
+        let limit = req.query.limit || 8;
         let page = req.query.page || 1;
         let skip = (page - 1) * limit;
         delete req.query.page;
+        delete req.query.limit;
 
-        //aggregation pipe array
+        // Search
+        let search = req.query.search || '';
+        delete req.query.search;
+
+        // aggregation pipe array
         aggregationPipe = [
+            {
+                $match: {
+                    $or: [
+                        { "info.category": { $regex: search, $options: 'i' } },
+                        { "info.brand": { $regex: search, $options: 'i' } },
+                        { "info.composition": { $regex: search, $options: 'i' } },
+                        { "info.tags": { $regex: search, $options: 'i' } },
+                        { "name": { $regex: search, $options: 'i' } },
+                        { "sku": { $regex: search, $options: 'i' } },
+                    ]
+                }
+            },
             {
                 $project: {
                     subTitle: 0,

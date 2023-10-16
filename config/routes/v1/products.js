@@ -6,6 +6,6 @@ const productsController = require('./../../../controller/products')
 router.get('/all', productsController.fetchAll);
 router.get('/fetch', productsController.fetchProducts);
 router.get('/fetchProduct', productsController.fetchProductDetails);
-router.get('/unique', productsController.fetchUniqueCategories);
+router.get('/uniqueFields', productsController.fetchUniqueCategories);
 
 module.exports = router;
