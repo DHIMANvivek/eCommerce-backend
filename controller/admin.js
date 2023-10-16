@@ -150,9 +150,6 @@ async function getAdminDetails(req, res) {
 }
 
 
-
-
-
 module.exports = {
     addProduct,
     fetchProducts,
