@@ -129,98 +129,82 @@ async function fetchProducts(req, res) {
     }
 }
 
-async function fetchUniqueCategories(req, res){
+async function fetchUniqueCategories(req, res) {
     const products = await Products.find({});
-    console.log('INSIDE FETCH UNIQUE');
-   function getData(products) {
+    console.log(products, "all products");
 
+    let filterObject={
+        size: [],
+        color: [],
+        category: [],
+        price: [],
+        brand: [],
+        tags: [],
+        gender: []
+    }
+    const uniqueData = {
+        'male': filterObject,
+        'female': filterObject
+    }
 
-        //    products.map((originalData)=>{
-            // console.log('ORINGAL DATA IS ',originalData);
-            const filterObj = {
-              size: [],
-              color: [],
-              category: [],
-              price: [],
-              brand: [],
-              tags: []
-            };
-        
-            products.forEach((data) => {
-            
-              
-              
-              for (let filter in (filterObj)) {
-                // console.log('filter is ',filter,filter in data);
-                
-                // console.log('FILTER IS ',filter ," filteranswe is ",(filter in data.assets));
-                // const target = filter in data ? data : data.info;
-                if(filter in data){
-                    target=data;
+    function getData(products, uniqueData) {
+
+       let filterObject;
+
+        products.forEach((data) => {
+
+            if (data.info.gender == 'male') {
+                console.log("male");
+                filterObject = uniqueData.male;
+            }
+            else {
+                console.log("female");
+                filterObject = uniqueData.female;
+            }
+            for (let filter in (filterObject)) {
+
+                if (filter in data) {
+                    target = data;
                 }
 
-               
-                // else if(filter in data.assets){
-                //     target=data.assets;
-                //     console.log('target is ',target);
-                // }
-
-                else{
-                    target=data.info;
+                else {
+                    target = data.info;
                 }
-            
+
                 const value = target[filter];
-          
+
                 if (Array.isArray(value)) {
-             
-                  
-                  for (let v of value) {
-              
-                    
-                    const arr = filterObj[filter];
-                   
-                    if (!arr.includes(v)) {
-                      arr.push(v);
+
+
+                    for (let v of value) {
+
+
+                        const arr = filterObject[filter];
+
+                        if (!arr.includes(v)) {
+                            arr.push(v);
+                        }
+
                     }
-    
-    
-                    // console.log("arr is ",arr, " vi s ",v )
-                  }
                 }
                 else {
-                  const arr = filterObj[filter];
-                  if (!arr.includes(value)) {
-                    arr.push(value);
-                  }
+                    const arr = filterObject[filter];
+                    if (!arr.includes(value)) {
+                        arr.push(value);
+                    }
                 }
-              }
-            });
-        
-            // Object.keys(filterObj).forEach(el => {
-            
-            //   if (filterObj[el].length > 3) {
-               
-            //   }
-            // });
-    
-        
-         
-            let result=filterObj;
-            // resolve(result);
-    
-        //   })  
-        
+            }
+            return uniqueData;
+        });
 
-        return result;
-    
-        // return promise;
-      }
+        return uniqueData;
+    }
 
-    const data=  getData(products);
-      console.log('data is ',data);
-      res.status(200).json({message:"sucess"});
+    const data = getData(products, uniqueData);
+    console.log('data is ', data);
+    res.status(200).json({ message: "sucess", uniqueData });
+
 }
-
 module.exports = {
     fetchAll,
     fetchProducts,

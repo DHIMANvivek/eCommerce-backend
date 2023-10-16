@@ -19,7 +19,7 @@ router.get('/getAddress', userController.getAddress)
 router.post('/addAddress', userController.addAddress)
 router.get('/deleteAddress', userController.deleteAddress)
 router.get('/updateAdress', userController.updateAddress)
-router.post('/create-payment-intent', userController.createPaymentIntent);
+// router.post('/create-payment-intent', userController.createPaymentIntent);
 router.get('/getAdminDetails', userController.getAdminDetails);
 
 
