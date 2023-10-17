@@ -5,7 +5,7 @@ const adminController = require('../../../controller/admin')
 
 // Product 
 router.post('/addProduct',adminController.addProduct);
-router.get('/fetchProducts', adminController.fetchProducts);
+router.post('/fetchProducts', adminController.fetchProducts);
 // router.delete('/deleteProduct', adminController.deleteProduct);
 
 // Product Features

@@ -53,10 +53,11 @@ const productSchema = mongoose.Schema({
     },
     gender: {
       type: String,
+      lowercase: true, 
       enum: ['male', 'female', 'unisex'],
       required: true
     },
-    size : [{
+    size: [{
       type: String,
       required: true
     }],

@@ -1,10 +1,19 @@
 const express = require("express");
 const webpush = require("web-push");
-// const bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 const path = require("path");
 const crypto = require("crypto");
 require("dotenv").config();
 const app = express();
+app.use(bodyParser.json({limit: '50mb'}));
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: '35mb',
+    parameterLimit: 50000,
+  }),
+);
 
 const cors = require('cors');
 app.use(cors());
@@ -21,6 +30,7 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
+
 app.use(express.json());
 const routes = require('./config/routes');
 app.use(routes);

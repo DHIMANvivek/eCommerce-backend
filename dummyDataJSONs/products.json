@@ -1,7 +1,7 @@
 [{
     "type": "bulk",
     "data": [{
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-kurti001",
         "name": "Straight Kurti",
         "subTitle": "Pink Ethnic Motifs Printed Kurti",
@@ -65,7 +65,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-kurti002",
         "name": "A-line Kurti",
         "subTitle": "Floral Printed Pure Cotton A-line Kurti",
@@ -110,7 +110,7 @@
         "discount": 10
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-kurti003",
         "name": "Floral Embroidered Kurti",
         "subTitle": "Women White Floral Embroidered Thread Kurti",
@@ -156,7 +156,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-kurti004",
         "name": "Floral Printed Kurti",
         "subTitle": "Floral Printed Pure Cotton Kurti",
@@ -207,7 +207,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-kurti005",
         "name": "Mandarin Collar Kurti",
         "subTitle": "Floral Printed Mandarin Collar Pure Cotton Kurti",
@@ -261,7 +261,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt-001",
         "name": "Oversized Overweight Shirt",
         "subTitle": "Bottle Green Utility Heavyweight Shirt",
@@ -309,7 +309,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt-002",
         "name": "Flannel Oversized Shirt",
         "subTitle": "Green Plaid Flannel Oversized Shirt",
@@ -357,7 +357,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt-003",
         "name": "Mickey Shirt",
         "subTitle": "Oh boy! Mickey Shirt",
@@ -405,7 +405,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-tshirt-001",
         "name": "Official Marvel Merchandise",
         "subTitle": "Hulk Graphic Printed Oversized T-shirt",
@@ -471,7 +471,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-tshirt002",
         "name": "Looney Tunes Merchandise",
         "subTitle": "Striped Oversized T-shirt",
@@ -517,7 +517,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-tshirt003",
         "name": "Naruto Oversized Tshirt",
         "subTitle": "Gaara-Naruto Tee (T-shirt) For Men",
@@ -562,7 +562,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-tshirt004",
         "name": " Pikachu Oversized T-shirt",
         "subTitle": "Thunderbolt Pikachu Oversized T-shirt",
@@ -608,7 +608,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt004",
         "name": "Heavyweight Shirt",
         "subTitle": "Grey Utility Heavyweight Shirt",
@@ -654,7 +654,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt005",
         "name": "Plaid Oversized Shirt",
         "subTitle": "Navy Blue B1 Plaid Oversized Shirt",
@@ -700,7 +700,7 @@
         "discount": 10
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt006",
         "name": "Regular Fit Shirt",
         "subTitle": "Dark Green Regular Fit Shirt",
@@ -746,7 +746,7 @@
         "discount": 0
     },
     {
-        "sellerID": "6513a7af4e2d06d1e0e44660",
+        "sellerID": "65290f187ced75bd3e892c65",
         "sku": "sku-shirt007",
         "name": "Plaid Regular Fit Shirt",
         "subTitle": "Midnight Tan Plaid Regular Fit Shirt",
