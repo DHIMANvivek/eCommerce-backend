@@ -40,6 +40,9 @@ async function fetchProductDetails(req, res) {
 async function fetchProducts(req, res) {
     try {
         // Pagination, fixed limit to showing only 8 product at a time
+
+        req.query = req.query ? req.query : req.body;
+        
         let limit = req.query.limit || 8;
         let page = req.query.page || 1;
         let skip = (page - 1) * limit;

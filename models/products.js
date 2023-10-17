@@ -35,6 +35,10 @@ const productSchema = mongoose.Schema({
       required: true,
       min: 0,
     },
+    unitSold: {
+      type: Number,
+      default: 0
+    },
     photo: [{
       type: String,
       min: 2, 
@@ -87,6 +91,10 @@ const productSchema = mongoose.Schema({
     required: true,
     default: 0,
     min: 0,
+  },
+  active: {
+    type: Boolean,
+    default: true
   }
 },
   {

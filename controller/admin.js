@@ -1,6 +1,7 @@
 const users = require('../models/users');
 const products = require('../models/products');
 const sellerInfo = require('../models/sellerDetails');
+const reviewsController = require('../controller/reviews');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -35,27 +36,57 @@ async function fetchProducts(req, res) {
     const sellerID = req.tokenData.id;
     const parameters = req.body;
     try {
-        const categories = await sellerInfo.find({ 'sellerID': sellerID }, { 'categories': 1 });
-        const response = await products.aggregate([
-            { $match: { 'sellerID': new ObjectId(sellerID) } },
-            { $skip: (parameters.page - 1) * parameters.limit },
-            { $limit: parameters.limit },
-            // { $match: {$or: [{'info.category': parameters.caetgories}]}},
+        aggregationPipe = [
             {
-                $project: {
-                    'sku': 1,
-                    "name": 1,
-                    "assets.stockQuantity": 1,
-                    "assets.photo": 1,
-                    'price': 1,
-                    'info.category': 1,
-                    'info.brand': 1
+                $match: {
+                    $or: [
+                        { "name": { $regex: parameters.search, $options: 'i' } },
+                        { "info.category": { $regex: parameters.search, $options: 'i' } },
+                    ]
                 }
-            }
-        ]);
+            },
+            // {
+            //     $project: {
+            //         'sku': 1,
+            //         "name": 1,
+            //         "assets.stockQuantity": 1,
+            //         "assets.photo": 1,
+            //         "assets.unitSold": 1,
+            //         'price': 1,
+            //         'info.category': 1,
+            //         'info.brand': 1,
+            //         'updatedAt': 1
+            //     }
+            // },
+            { $skip: (parameters.page - 1) * parameters.limit },
+            { $limit: parameters.limit }
+        ];
 
-        console.log(response);
-        res.json({data: response, categories: categories});
+        if (parameters.filter['categories']) {
+            aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i'}}},)
+        }
+        aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID) } },)
+
+        let response = await products.aggregate(aggregationPipe);
+        console.log("pipe", aggregationPipe);
+
+        response = response.map((product)=>{
+            let stockAmt = 0;
+            let unitSold = 0;
+            product.assets.map((stock)=>{
+                stockAmt += stock.stockQuantity;
+                unitSold += stock.unitSold;
+            });
+            product.totalStock = stockAmt;
+            product.unitSold = unitSold;
+            return product;
+        });
+        response = await Promise.all(response.map(async (product) => {
+            product.avgRating = (await reviewsController.fetchReviews(product._id)).avgRating;
+            return product;
+        }));
+
+        res.status(200).json(response);
     } catch (err) {
         console.log(err);
     }
@@ -166,8 +197,6 @@ async function getAdminDetails(req, res) {
         return res.status(404).send();
     }
 }
-
-
 
 function dataTranformation(product, sellerID) {
     let data = {
