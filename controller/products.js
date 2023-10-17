@@ -143,44 +143,47 @@ async function fetchProducts(req, res) {
     }
 }
 
-async function fetchUniqueCategories(req, res) {
+async function fetchUniqueFields(req, res) {
     const products = await Products.find({});
-    console.log(products, "all products");
 
-    let filterObject={
-        size: [],
-        color: [],
-        category: [],
-        price: [],
-        brand: [],
-        tags: [],
-        gender: []
-    }
     const uniqueData = {
-        'male': filterObject,
-        'female': filterObject
+        'male': {
+            size: [],
+            color: [],
+            category: [],
+            price: [],
+            brand: [],
+            tags: [],
+            gender: []
+        },
+        'female': {
+            size: [],
+            color: [],
+            category: [],
+            price: [],
+            brand: [],
+            tags: [],
+            gender: []
+        }
     }
 
     function getData(products, uniqueData) {
 
-       let filterObject;
+        let filterObject;
 
         products.forEach((data) => {
 
             if (data.info.gender == 'male') {
-                console.log("male");
                 filterObject = uniqueData.male;
             }
             else {
-                console.log("female");
                 filterObject = uniqueData.female;
             }
-            for (let filter in (filterObject)) {
+            for (let filter in filterObject) {
 
                 if (filter in data) {
                     target = data;
                 }
-
                 else {
                     target = data.info;
                 }
@@ -188,17 +191,12 @@ async function fetchUniqueCategories(req, res) {
                 const value = target[filter];
 
                 if (Array.isArray(value)) {
-
-
                     for (let v of value) {
-
-
                         const arr = filterObject[filter];
 
                         if (!arr.includes(v)) {
                             arr.push(v);
                         }
-
                     }
                 }
                 else {
@@ -208,20 +206,21 @@ async function fetchUniqueCategories(req, res) {
                     }
                 }
             }
-            return uniqueData;
+            // return uniqueData;
         });
 
         return uniqueData;
     }
 
-    const data = getData(products, uniqueData);
-    console.log('data is ', data);
-    res.status(200).json({ message: "sucess", uniqueData });
+    getData(products, uniqueData);
 
+    console.log(uniqueData);
+
+    res.status(200).json(uniqueData);
 }
 module.exports = {
     fetchAll,
     fetchProducts,
     fetchProductDetails,
-    fetchUniqueCategories
+    fetchUniqueFields
 }
