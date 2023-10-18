@@ -1,15 +1,8 @@
 const nodemailer = require("nodemailer")
-const {ForgetTemplate,SignupTemplate}=require('../helpers/INDEX');
+const {ForgetTemplate,SignupTemplate, SubscribeTemplate}=require('../helpers/INDEX');
 
-async function sendMail(data,token='') {
-    let Template
-    if(!token){
-        Template=SignupTemplate(data.email)
-    }
-    else{
-        Template=ForgetTemplate(token)
-    }
-
+async function sendMail(data, Template) {
+  
     try {
         console.log("nodemailer data", data);
         const transport = nodemailer.createTransport({
@@ -23,7 +16,7 @@ async function sendMail(data,token='') {
             from: 'testnodemailerapis@gmail.com',
             to: data.email,
             subject: data.subject,
-            html: Template
+            html: Template()
         }
         console.log("you are inside nodemailer function");
         await transport.sendMail(details, (error) => {

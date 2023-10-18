@@ -1,6 +1,6 @@
 function ForgetTemplate(token) {
   let html =
-`<!DOCTYPE html>
+    `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -129,6 +129,67 @@ function SignupTemplate(email) {
   return html;
 }
 
+function SubscribeTemplate(email) {
+  let html =
+    `<!DOCTYPE html>
+  <html>
+  <head>
+    <style>
+      /* Add inline CSS for better email client compatibility */
+      table {
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 60%;
+        margin: 0 auto;
+      }
+  
+      table, td {
+        border: 1px solid #ddd;
+        margin-block: 30px;
+      }
+      .outer-div{
+        background-color : #f5f6f7;
+      }
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+  
+      td.header {
+        border-block-end : 1px solid #f5f6f7;
+      }
+      tr {
+        background-color : white;
+      }
+  
+    </style>
+  </head>
+  <body>
+  <div class="outer-div">
+  <table >
+    <tr>
+      <td class="header" colspan="2">
+        <h1>Dear User,</h1>
+      </td>
+    </tr>
+    <tr>
+      <td class="content" colspan="2">
+        <p>Dear Sir/Ma'am,</p>
+        <p>We hope this message finds you well. We are excited to express our gratitude for your continued support and loyalty. It's subscribers like you who make our community special, and we want to thank you for being a part of our journey.</p>
+        <p>As a token of our appreciation, we are pleased to offer you an exclusive 25% discount on your next purchase! This is our way of saying "thank you" for choosing to be a part of our family.</p>
+        <p>To redeem your 25% discount, simply use the following promo code at checkout: SUBSCRIBE25</p>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+  </body>
+  </html>
+  
+  `
+  return html;
+}
+
 // <img src="https://cdn.filestackcontent.com/orYXP4hDTryz5vNbCfBo" alt="logo" width="140" height="35"/>
 
-module.exports = { ForgetTemplate, SignupTemplate }
+module.exports = { ForgetTemplate, SignupTemplate, SubscribeTemplate }

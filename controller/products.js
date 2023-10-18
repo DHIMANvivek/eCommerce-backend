@@ -149,41 +149,47 @@ async function fetchProducts(req, res) {
 async function fetchUniqueFields(req, res) {
     const products = await Products.find({});
 
-    const uniqueData = {
-        'male': {
-            size: [],
-            color: [],
-            category: [],
-            price: [],
-            brand: [],
-            tags: [],
-            gender: []
-        },
-        'female': {
-            size: [],
-            color: [],
-            category: [],
-            price: [],
-            brand: [],
-            tags: [],
-            gender: []
-        }
-    }
+console.log('hooii');
+    function getData(products, parameter = 'all') {
 
-    function getData(products, uniqueData) {
+        const uniqueData = {
+            size: [],
+            category: [],
+            price: [],
+            brand: [],
+            tags: [], 
+        }
 
         let filterObject;
 
+        if (parameter != 'all') {
+            filterObject2= { male: uniqueData, female: uniqueData };
+            aa=20;
+            console.log(filterObject, "male femle");
+        }
+        else {
+            filterObject = uniqueData;
+            console.log(filterObject, "filter obj");
+        }
+       
         products.forEach((data) => {
 
-            if (data.info.gender == 'male') {
-                filterObject = uniqueData.male;
-            }
-            else {
-                filterObject = uniqueData.female;
+            if (parameter != 'all') {
+            
+                // console.log('filterObject EVERY TIME IS  ',filterObject);
+                if (data.info.gender == 'male') {
+                    console.log("male"); 
+                    a=aa;
+                    filterObject = filterObject2.male; // object  male: uniqueData, female: uniqueData }  
+                }
+                else {
+                    // console.log("female  ",filterObject.female);
+                    filterObject = filterObject2.female;
+                } 
             }
             for (let filter in filterObject) {
 
+                console.log(filter, "filterrr")
                 if (filter in data) {
                     target = data;
                 }
@@ -204,6 +210,7 @@ async function fetchUniqueFields(req, res) {
                 }
                 else {
                     const arr = filterObject[filter];
+                    console.log(arr, "array ", filter, "------filter");
                     if (!arr.includes(value)) {
                         arr.push(value);
                     }
@@ -215,12 +222,16 @@ async function fetchUniqueFields(req, res) {
         return uniqueData;
     }
 
-    getData(products, uniqueData);
+    const data = getData(products, 'all');
+    // console.log('data is ', data);
+    res.status(200).json({ data });
 
-    console.log(uniqueData);
+    // console.log(uniqueData);
 
-    res.status(200).json(uniqueData);
+    // res.status(200).json(uniqueData);
 }
+
+
 module.exports = {
     fetchAll,
     fetchProducts,

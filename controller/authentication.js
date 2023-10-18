@@ -5,9 +5,10 @@ const bcryptjs = require('bcryptjs');
 const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
+const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
 async function login(req, res) {
     try {
-        console.log('LOGIN CALLEDD--------');
+        
         const input = req.body;
         if (input.token) {
             console.log("login google");
@@ -28,7 +29,7 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
-        const firstName = userFound.name.firstname
+        const firstName = userFound?.name.firstname
 
         if (!userFound) {
             throw ({ message: 'User not found! Kindly sign in.' })
@@ -112,7 +113,7 @@ async function signup(req, res) {
             email: req.body.email,
             subject: "We're Thrilled to Have You, Welcome to Trade Vogue!",
         }
-        const mailSent = await mailer(mailData)
+        const mailSent = await mailer(mailData, SignupTemplate)
 
         const tokenData = {
             id: userCreated._id,
@@ -169,7 +170,7 @@ async function forgotPassword(req, res) {
             email: user.email,
             subject: "Password Reset",
         }
-        const mailSent = await mailer(mailData, passwordToken)
+        const mailSent = await mailer(mailData, ForgetTemplate(passwordToken) )
         res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {
