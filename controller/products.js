@@ -15,10 +15,10 @@ async function fetchAll(req, res) {
 }
 
 // ideal for Product page
-async function fetchProductDetails(req, res) {
+async function fetchProductDetails(req, res, sku = null) {
     try {
         let query = {
-            sku: req.query.sku
+            sku: req.query.sku ? req.query.sku : sku
         }
         let product = JSON.parse(JSON.stringify(await Products.findOne(query)));
 
@@ -27,7 +27,11 @@ async function fetchProductDetails(req, res) {
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
 
-        res.status(200).json(product);
+        if(req.query.sku){
+            res.status(200).json(product);
+            return;
+        }
+        return product;
 
     } catch (error) {
         res.status(500).json({
@@ -149,7 +153,6 @@ async function fetchProducts(req, res) {
 async function fetchUniqueFields(req, res) {
     const products = await Products.find({});
 
-console.log('hooii');
     function getData(products, parameter = 'all') {
 
         const uniqueData = {
@@ -164,8 +167,6 @@ console.log('hooii');
 
         if (parameter != 'all') {
             filterObject2= { male: uniqueData, female: uniqueData };
-            aa=20;
-            console.log(filterObject, "male femle");
         }
         else {
             filterObject = uniqueData;
@@ -189,7 +190,6 @@ console.log('hooii');
             }
             for (let filter in filterObject) {
 
-                console.log(filter, "filterrr")
                 if (filter in data) {
                     target = data;
                 }
@@ -210,7 +210,6 @@ console.log('hooii');
                 }
                 else {
                     const arr = filterObject[filter];
-                    console.log(arr, "array ", filter, "------filter");
                     if (!arr.includes(value)) {
                         arr.push(value);
                     }

@@ -9,6 +9,7 @@ router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
 router.use('/orders', require('./v1/orders'));
+router.use('/cart', require('./v1/cart'));
 
 // check type of user (Used for purpose of Authguard)
 router.get('/checkUser', (req, res)=>{
