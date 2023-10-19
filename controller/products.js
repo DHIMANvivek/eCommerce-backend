@@ -170,7 +170,6 @@ async function fetchUniqueFields(req, res) {
         }
         else {
             filterObject = uniqueData;
-            console.log(filterObject, "filter obj");
         }
        
         products.forEach((data) => {

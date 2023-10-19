@@ -30,22 +30,29 @@ const productSchema = mongoose.Schema({
       type: String,
       required: true
     },
-    stockQuantity: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    unitSold: {
-      type: Number,
-      default: 0
-    },
+    stockQuantity: [{
+      size: {
+        type: String,
+        unique: true,
+        enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        required: true
+      },
+      quantity: {
+        type: Number,
+        default: 0,
+        required: true
+      },
+      unitSold: {
+        type: Number,
+        default: 0
+      }
+    }],
     photo: [{
       type: String,
       min: 2, 
       required: true
     }]
   }],
-
   info: {
     code: {
       type: String,
@@ -61,10 +68,6 @@ const productSchema = mongoose.Schema({
       enum: ['male', 'female', 'unisex'],
       required: true
     },
-    size: [{
-      type: String,
-      required: true
-    }],
     brand: {
       type: String,
       required: true

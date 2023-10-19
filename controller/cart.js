@@ -12,7 +12,7 @@ async function fetchCart(req, res) {
             }
         };
         cart.details = req.body;
-
+        console.log(cart);
         cart.details = await Promise.all(cart.details.map(async (item) => {
             let product = await productsController.fetchProductDetails(req, res, item.sku);
             const fields = ['name', 'assets', 'info', 'price'];
@@ -22,7 +22,8 @@ async function fetchCart(req, res) {
                     if (!item.info) {
                         item.info = {};
                     }
-                    item.info['size'] = product.info.size;
+                    // item.info['size'] = product.info.size;
+                    item.info['category'] = product.info.category;
                     item.info['orderQuantity'] = product.info.orderQuantity;
                 } else {
                     item[field] = product[field];
@@ -30,9 +31,13 @@ async function fetchCart(req, res) {
             }
 
             // setting defaults if not choosen
-            item.size = item.size ? item.size : product.info.size[0];
+        
             item.quantity = item.quantity ? item.quantity : product.info.orderQuantity[0];
             item.color = item.color ? item.color : product.assets[0].color;
+
+            item.size = item.size ? item.size : product.assets.find((asset)=>{
+                return asset.color === item.color;
+            }).stockQuantity[0].size;
             
             // amounting
             // shipping will be calculated after getting it from tracking page dynamically later
@@ -43,6 +48,7 @@ async function fetchCart(req, res) {
             return item;
         }));
 
+        console.log(cart);
         // cart.amounts.savings -= cart.amounts.subTotal;
         // cart.amounts.savings = (Math.round((cart.amounts.savings) * 100)) / 100;
         cart.amounts.subTotal = (Math.round((cart.amounts.subTotal) * 100) / 100);
@@ -51,6 +57,7 @@ async function fetchCart(req, res) {
         res.status(200).json(cart);
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             message: 'Problem while fetching Cart'
         });
