@@ -1,6 +1,7 @@
 const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
 const OffersModel=require('../models/offers');
+const { verifyToken } = require('../helpers/jwt');
 
 // variably pending 
 async function fetchAll(req, res) {
@@ -17,9 +18,14 @@ async function fetchAll(req, res) {
 // ideal for Product page
 async function fetchProductDetails(req, res, sku = null) {
     try {
-        let query = {
-            sku: req.query.sku ? req.query.sku : sku
+
+        let query = {};
+        if (req.headers.authorization){
+            data = verifyToken(req.headers.authorization.split(' ')[1])
+            if (data.role == 'admin') query['sellerID'] = data.id;
         }
+        query['sku'] = req.query.sku ? req.query.sku : sku;
+
         let product = JSON.parse(JSON.stringify(await Products.findOne(query)));
 
         // getting all the reviews and average

@@ -33,7 +33,7 @@ async function addProduct(req, res) {
     }
 }
 
-async function fetchProducts(req, res) {
+async function fetchProductInventory(req, res) {
     const sellerID = req.tokenData.id;
     const parameters = req.body;
     try {
@@ -46,37 +46,40 @@ async function fetchProducts(req, res) {
                     ]
                 }
             },
-            // {
-            //     $project: {
-            //         'sku': 1,
-            //         "name": 1,
-            //         "assets.stockQuantity": 1,
-            //         "assets.photo": 1,
-            //         "assets.unitSold": 1,
-            //         'price': 1,
-            //         'info.category': 1,
-            //         'info.brand': 1,
-            //         'updatedAt': 1
-            //     }
-            // },
+            {
+                $project: {
+                    'sku': 1,
+                    "name": 1,
+                    "assets.stockQuantity": 1,
+                    "assets.photo": 1,
+                    "assets.unitSold": 1,
+                    'price': 1,
+                    'info.category': 1,
+                    'info.brand': 1,
+                    'updatedAt': 1
+                }
+            },
             { $skip: (parameters.page - 1) * parameters.limit },
             { $limit: parameters.limit }
         ];
 
         if (parameters.filter['categories']) {
-            aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i'}}},)
+            aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i' } } },)
         }
         aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID) } },)
 
         let response = await products.aggregate(aggregationPipe);
         console.log("pipe", aggregationPipe);
 
-        response = response.map((product)=>{
+        response = response.map((product) => {
             let stockAmt = 0;
             let unitSold = 0;
-            product.assets.map((stock)=>{
-                stockAmt += stock.stockQuantity;
-                unitSold += stock.unitSold;
+
+            product.assets.map((assets) => {
+                assets.stockQuantity.map(stock => {
+                    stockAmt += stock.quantity;
+                    unitSold += stock.unitSold;
+                })
             });
             product.totalStock = stockAmt;
             product.unitSold = unitSold;
@@ -93,7 +96,7 @@ async function fetchProducts(req, res) {
     }
 }
 
-async function fetchProductDetails(req, res) {
+async function fetchFeatures(req, res) {
     const sellerID = req.tokenData.id;
 
     try {
@@ -119,7 +122,7 @@ async function fetchProductDetails(req, res) {
     }
 }
 
-async function updateProductDetails(req, res) {
+async function updateFeatures(req, res) {
     const sellerID = req.tokenData.id;
     const field = req.body.field;
     const data = req.body.data;
@@ -297,9 +300,9 @@ async function deleteOffer(req, res) {
 
 module.exports = {
     addProduct,
-    fetchProducts,
-    fetchProductDetails,
-    updateProductDetails,
+    fetchProductInventory,
+    fetchFeatures,
+    updateFeatures,
     updateDetails,
     getAdminDetails,
     createOffer,
