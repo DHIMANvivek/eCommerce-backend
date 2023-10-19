@@ -3,7 +3,7 @@ const Reviews = require('../models/reviews');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
-
+const OffersModel=require('../models/offers');
 async function getDetails(req, res) {
     try {
         // req.body._id =req.tokenData._id;
@@ -71,7 +71,6 @@ async function addAddress(req, res) {
     
     
     catch (error) {
-        console.log('ERROR IS ',error);
         res.status(500).json(error)
     }
 }
@@ -88,7 +87,6 @@ async function deleteAddress(req, res) {
 
         )
 
-            console.log('delteted address ',deleteAddress);
         res.status(200).json(deleteAddress);
     } catch (error) {
         console.log('error is ',error);
@@ -186,6 +184,11 @@ async function addReview(req, res){
 async function putReviews(req, res){
     console.log(req.body);
     Reviews.insertMany(req.body);
+}
+
+
+async function GetCoupons(req,res){
+
 }
 
 module.exports = {

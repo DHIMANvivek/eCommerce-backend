@@ -7,5 +7,5 @@ router.get('/all', productsController.fetchAll);
 router.get('/fetch', productsController.fetchProducts);
 router.get('/fetchProduct', productsController.fetchProductDetails);
 router.get('/uniqueFields', productsController.fetchUniqueFields);
-
+router.get('/getOriginalPrice',productsController.getProductPrice)
 module.exports = router;

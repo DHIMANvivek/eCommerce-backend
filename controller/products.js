@@ -1,6 +1,6 @@
 const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
-
+const OffersModel=require('../models/offers');
 
 // variably pending 
 async function fetchAll(req, res) {
@@ -230,9 +230,53 @@ async function fetchUniqueFields(req, res) {
 }
 
 
+
+
+function helper(Array, productPrice) {
+    let productDiscount = 0;
+    Array.forEach((element) => {
+        if (element.discountType == 'percentage') {
+            let discountPrice = Math.ceil((productPrice * element.discountAmount) / 100);
+            if (discountPrice > productDiscount) {
+                productDiscount = discountPrice;
+            }
+        }
+        else {
+            if (element.discountAmount > productDiscount) productDiscount = element.discountAmount;
+        }
+    })
+
+    return productDiscount;
+}
+
+
+async function getProductPrice(req, res) {
+    try {
+        let productDiscount;
+        let productCategory = 'Kurti';
+        let productPrice = 1000;
+        let productBrand = 'Sangria';
+        let globalDiscounts = await OffersModel.find({ 'ExtraInfo': { $exists: 0 } }, { 'discountType': 1, 'discountAmount': 1 });
+        productDiscount = helper(globalDiscounts, productPrice);
+        let anotherDiscount = await OffersModel.find(
+            { "ExtraInfo.categories": { $in: [productCategory] } }, { 'discountType': 1, 'discountAmount': 1 });
+        let result = helper(anotherDiscount, productPrice);
+        if (result > productDiscount) productDiscount = result;
+
+
+
+        res.status(200).json(productDiscount);
+
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
+
 module.exports = {
     fetchAll,
     fetchProducts,
     fetchProductDetails,
-    fetchUniqueFields
+    fetchUniqueFields,
+    getProductPrice
 }
