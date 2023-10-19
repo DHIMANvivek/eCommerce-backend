@@ -4,6 +4,7 @@ const sellerInfo = require('../models/sellerDetails');
 const reviewsController = require('../controller/reviews');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
+const faqData = require('../models/faq');
 
 const OffersModel = require('../models/offers');
 
@@ -298,6 +299,60 @@ async function deleteOffer(req, res) {
     }
 }
 
+async function updateFaq(req, res) {
+    try {
+      const updateFaqData = req.body;
+      const itemId = updateFaqData._id;
+      const updatedTitle = updateFaqData.title; 
+      const updatedContent = updateFaqData.content;
+  
+
+      const result = await faqData.findOneAndUpdate(
+        { 'childrens._id': itemId },
+        {
+          $set: {
+            'childrens.$.title': updatedTitle,
+            'childrens.$.content': updatedContent,
+          },
+        },
+        { new: true } 
+      );
+  
+      if (!result) {
+        return res.status(404).json({ error: 'FAQ item not found' });
+      }
+  
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
+    }
+  }
+
+  async function deleteFaq(req, res) {
+    try {
+        const itemId = req.body._id;
+        console.log(itemId)
+        const result = await faqData.findOneAndUpdate(
+            { 'childrens._id': itemId },
+            {
+                $pull: {
+                    childrens: { _id: itemId },
+                },
+            },
+            { new: true }
+        );
+        console.log(result)
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred while deleting the FAQ item' });
+    }
+}
+  
+
+
+
 module.exports = {
     addProduct,
     fetchProductInventory,
@@ -308,6 +363,8 @@ module.exports = {
     createOffer,
     getOffers,
     deleteOffer,
-    // getProductPrice
+    // getProductPrice,
+    updateFaq,
+    deleteFaq
 }
 

@@ -13,6 +13,7 @@ router.get('/fetchProductFeatures', adminController.fetchFeatures);
 router.post('/updateProductFeature', adminController.updateFeatures);
 router.post('/deleteProductFeature', adminController.updateFeatures);
 router.post('/updateDetails', adminController.updateDetails);
+router.post('/updateFaq', adminController.updateFaq);
 router.get('/getAdminDetails', adminController.getAdminDetails);
 
 
@@ -22,4 +23,7 @@ router.get('/getOffers',adminController.getOffers)
 router.post('/deleteOffer',adminController.deleteOffer)
 // router.get('/getProductPrice',adminController.getProductPrice)
 
+router.post('/deleteFaq', adminController.deleteFaq);
+
+// router.get('/getFaq', adminController.getFaq);
 module.exports = router;
