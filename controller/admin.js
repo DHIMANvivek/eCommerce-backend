@@ -17,20 +17,71 @@ async function addProduct(req, res) {
             const response = await products.insertMany(productObject.data);
         } else {
 
-            // const data = dataTranformation(productObject.data, sellerID);
-
             Object.keys(productObject.data.basicinfo).forEach((key) => {
                 productObject.data[key] = productObject.data.basicinfo[key];
             });
             productObject.data.sellerID = sellerID;
             productObject.data.sku = "sku-kurta001";
-            console.log(productObject.data);
             delete productObject.data.basicinfo;
             const response = await products.create(productObject.data);
             return res.status(200).json("uploaded");
         }
     } catch (err) {
         console.log(err);
+    }
+}
+
+async function updateProduct(req, res) {
+    const sellerID = req.tokenData.id;
+    const productObject = req.body;
+    const _id = productObject.data._id;
+
+    try {
+        // Transform Data
+        Object.keys(productObject.data.basicinfo).forEach((key) => {
+            productObject.data[key] = productObject.data.basicinfo[key];
+        });
+        delete productObject.data['basicinfo'];
+        delete productObject.data['_id'];
+
+        console.log(productObject.data, _id);
+
+        const response = await products.updateOne({
+            '_id': _id,
+            'sellerID': sellerID
+        }, { $set: productObject });
+
+        console.log(response);
+        return res.status(200).json("uploaded");
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function deleteProductInventory(req, res){
+    console.log(req.body);
+    const sellerID = req.tokenData.id;
+    const reqData = req.body;
+
+    try{
+        // console.log(reqData.data.map((productID)=>{
+        //     return products.updateOne({'sellerID': sellerID, '_id': productID}, {$set: {'active': false}});
+        // }));
+        let response;
+        if(Array.isArray(reqData.data)){
+            response = await products.updateMany({'sellerID': sellerID, _id: {$in: reqData.data}}, {$set: {'active': false}});
+        }
+        response = await products.updateOne({'sellerID': sellerID, _id: reqData.data}, {$set: {'active': false}});
+
+        // const response = await Promise.all(reqData.data.map((productID)=>{
+        //     return products.updateOne({'sellerID': sellerID, '_id': productID}, {$set: {'active': false}});
+        // }));
+        console.log(response);
+        if(!response) throw "Unable to Delete";
+
+        return res.status(200).json({message: 'Products Deleted'})
+    }catch(err){
+        return res.status(409).json({message: 'Products not Deleted'})
     }
 }
 
@@ -51,9 +102,8 @@ async function fetchProductInventory(req, res) {
                 $project: {
                     'sku': 1,
                     "name": 1,
-                    "assets.stockQuantity": 1,
-                    "assets.photo": 1,
-                    "assets.unitSold": 1,
+                    "assets": 1,
+                    "info.orderQuantity": 1,
                     'price': 1,
                     'info.category': 1,
                     'info.brand': 1,
@@ -67,7 +117,7 @@ async function fetchProductInventory(req, res) {
         if (parameters.filter['categories']) {
             aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i' } } },)
         }
-        aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID) } },)
+        aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } },)
 
         let response = await products.aggregate(aggregationPipe);
         console.log("pipe", aggregationPipe);
@@ -99,19 +149,20 @@ async function fetchProductInventory(req, res) {
 
 async function fetchFeatures(req, res) {
     const sellerID = req.tokenData.id;
+    const data = req.body;
 
+    console.log("hello");
     try {
-        const response = await sellerInfo.findOne(
-            {
-                'sellerID': sellerID
-            },
-            {
-                categories: 1,
-                brands: 1,
-                sizes: 1,
-                tags: 1,
-                orderQuantity: 1
-            });
+        let response;
+        let query = {};
+        data.forEach((field) => {
+            query[field] = 1
+        })
+
+        if (sellerID)
+            response = await sellerInfo.findOne({ 'sellerID': sellerID }, query);
+        else
+            response = await sellerInfo.findOne({}, query);
 
         if (response) {
             return res.status(200).json(response);
@@ -203,32 +254,6 @@ async function getAdminDetails(req, res) {
     }
 }
 
-function dataTranformation(product, sellerID) {
-    let data = {
-        'sellerID': sellerID,
-        'sku': 'sku-kurta001',
-        'name': product.basicinfo.name,
-        'subTitle': product.basicinfo.subtitle,
-        'description': product.basicinfo.description,
-        'assets': product.productDesc.map((item) => {
-            item.photo = item.photo.image;
-        }),
-        'info': {
-            'code': product.basicinfo.code,
-            'category': product.basicinfo.category,
-            'gender': (product.basicinfo.gender).toLowerCase(),
-            'sizes': product.basicinfo.sizes,
-            'brand': product.basicinfo.brand,
-            'weight': product.basicinfo.weight,
-            'composition': product.basicinfo.materialType,
-            'tags': product.basicinfo.tags,
-            'orderQuantity': product.basicinfo.orderQuantity
-        },
-        'price': product.basicinfo.actualprice
-    }
-    return data;
-
-}
 async function createOffer(req, res) {
     try {
         const offer = await OffersModel(req.body);
@@ -292,7 +317,7 @@ async function getOffers(req, res) {
 }
 async function deleteOffer(req, res) {
     try {
-        const offerdeleted = await OffersModel.updateOne({ _id: req.body.id },{$set:{"status.deleted":true}});
+        const offerdeleted = await OffersModel.updateOne({ _id: req.body.id }, { $set: { "status.deleted": true } });
         res.status(200).json({ message: 'Deleted Successfully' });
     } catch (error) {
         res.status(500).json(error);
@@ -377,6 +402,8 @@ async function updateFaq(req, res) {
 
 module.exports = {
     addProduct,
+    updateProduct,
+    deleteProductInventory,
     fetchProductInventory,
     fetchFeatures,
     updateFeatures,
