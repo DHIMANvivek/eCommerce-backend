@@ -52,7 +52,8 @@ async function fetchProducts(req, res) {
         // Pagination, fixed limit to showing only 8 product at a time
 
         req.query = req.query ? req.query : req.body;
-        
+
+        console.log(req.query);
         let limit = req.query.limit || 8;
         let page = req.query.page || 1;
         let skip = (page - 1) * limit;
@@ -157,82 +158,129 @@ async function fetchProducts(req, res) {
 }
 
 async function fetchUniqueFields(req, res) {
-    const products = await Products.find({});
-
-    function getData(products, parameter = 'all') {
-
-        const uniqueData = {
-            size: [],
-            category: [],
-            price: [],
-            brand: [],
-            tags: [], 
-        }
-
-        let filterObject;
-
-        if (parameter != 'all') {
-            filterObject2= { male: uniqueData, female: uniqueData };
-        }
-        else {
-            filterObject = uniqueData;
-        }
-       
-        products.forEach((data) => {
-
-            if (parameter != 'all') {
-            
-                // console.log('filterObject EVERY TIME IS  ',filterObject);
-                if (data.info.gender == 'male') {
-                    // console.log("male"); 
-                    a=aa;
-                    filterObject = filterObject2.male; // object  male: uniqueData, female: uniqueData }  
-                }
-                else {
-                    // console.log("female  ",filterObject.female);
-                    filterObject = filterObject2.female;
-                } 
+    try {
+        const parameter = req.body.parameter;
+        // console.log(parameter, "param");
+        const products = await Products.find({});
+    
+        function getData(products, parameter) {
+    
+            const uniqueData = {
+                category: [],
+                price: [],
+                brand: [],
+                tags: [],
             }
-            for (let filter in filterObject) {
-
-                if (filter in data) {
-                    target = data;
+    
+            let filterObject;
+    
+            if (parameter != 'all') {
+                filterObject2 = {
+                    male: {
+                        category: [],
+                        price: [],
+                        brand: [],
+                        tags: [],
+                    }, female: {
+                        category: [],
+                        price: [],
+                        brand: [],
+                        tags: [],
+                    }
+                };
+                aa = 20;
+                // console.log(filterObject, "male femle");
+            }
+            else {
+                filterObject = uniqueData;
+                // console.log(filterObject, "filter obj");
+            }
+    
+            products.forEach((data) => {
+    
+                if (parameter != 'all') {
+    
+                    // console.log('filterObject EVERY TIME IS  ',filterObject);
+                    if (data.info.gender == 'male') {
+                        // console.log("male");/
+                        // a=aa;
+                        filterObject = filterObject2.male; // object  male: uniqueData, female: uniqueData }  
+                    }
+                    else {
+                        // console.log("female  ",filterObject.female);
+                        filterObject = filterObject2.female;
+                    }
                 }
-                else {
-                    target = data.info;
-                }
+                for (let filter in filterObject) {
+    
+                    // console.log(filter, "filterrr")
+                    if (filter in data) {
+                        target = data;
+                    }
+                    else {
+                        target = data.info;
+                    }
+    
+                    const value = target[filter];
+    
+                    // console.log('value is ',value);
+                    if (Array.isArray(value)) {
+                        for (let v of value) {
+                            const arr = filterObject[filter];
+                            // console.log('v is ', v, " arr is ", arr);
+                            if (!filterObject[filter].includes(v)) {
+                                // arr.push(v);
+                                filterObject[filter].push(v);
+                            }
+                        }
+                    }
+                    else {
+                        filterObject[filter];
 
-                const value = target[filter];
-
-                if (Array.isArray(value)) {
-                    for (let v of value) {
-                        const arr = filterObject[filter];
-
-                        if (!arr.includes(v)) {
-                            arr.push(v);
+                        // console.log(arr, "array ", filter, "------filter");
+                        if (!filterObject[filter].includes(value)) {
+                            filterObject[filter].push(value);
                         }
                     }
                 }
-                else {
-                    const arr = filterObject[filter];
-                    if (!arr.includes(value)) {
-                        arr.push(value);
-                    }
-                }
+                // return uniqueData;
+            });
+    
+
+            let sizes=['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+            if (parameter != 'all') {
+                // console.log('filter data is ',filterObject2);
+                filterObject2.male.sizes=sizes;
+                filterObject2.female.sizes=sizes;
+                // filterObject2.data.male.sizes=sizes;
+                // filterObject2.data.female.sizes=sizes;
+                return filterObject2;
             }
-            // return uniqueData;
-        });
 
-        return uniqueData;
+            else {
+                // filterObject2.male.sizes=sizes;
+                // filterObject2.female.sizes=sizes;
+                filterObject.sizes=sizes;
+                return filterObject;}
+        }
+    
+        const data = getData(products, parameter);
+        // console.log('DATA IS ',data);rs
+        res.status(200).json({ data });   
     }
+    catch (error) {
+        console.log("errror", error);
+    }
+}
 
-    const data = getData(products, 'all');
-    // console.log('data is ', data);
-    res.status(200).json({ data });
+async function fetchUnique(req, res) {
+    
+    try {
 
-    // console.log(uniqueData);
+    }
+    catch {
 
-    // res.status(200).json(uniqueData);
+    }
 }
 
 
@@ -285,4 +333,4 @@ module.exports = {
     fetchProductDetails,
     fetchUniqueFields,
     getProductPrice
-}
+} 

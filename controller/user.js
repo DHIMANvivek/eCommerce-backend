@@ -176,8 +176,27 @@ async function putReviews(req, res){
 }
 
 
-async function GetCoupons(req,res){
+async function getCoupons(req,res){
+try {
+    const getAllCoupons=await OffersModel.find({$and:[{OfferType:'coupon'},{userUsed:{$nin: [ req.body.id ] }}]});
+    res.status(200).json(getAllCoupons);
 
+} catch (error) {
+    res.status.json(error);
+}
+}
+
+async function UserCoupon(req,res){
+    try {
+        const findCoupon=await OffersModel.findById(req.body.couponId);
+
+        // info.adddr
+        findCoupon.userId.push(req.body.userId);
+        await findCoupon.save();
+        res.status(200).json(findCoupon);
+    } catch (error) {
+        
+    }
 }
 
 async function getFaq(req , res) {
@@ -218,6 +237,7 @@ module.exports = {
     getDetails,
     updateDetails,
     getAddress,
+    getCoupons,
     addAddress,
     deleteAddress,
     updateAddress,

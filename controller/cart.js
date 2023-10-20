@@ -13,6 +13,7 @@ async function fetchCart(req, res) {
         };
         cart.details = req.body;
         // console.log(cart);
+        // console.log(cart," CART IS  ");
         cart.details = await Promise.all(cart.details.map(async (item) => {
             let product = await productsController.fetchProductDetails(req, res, item.sku);
             const fields = ['name', 'assets', 'info', 'price'];
