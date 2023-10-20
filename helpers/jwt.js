@@ -32,5 +32,4 @@ function createToken(tokenData) {
 
 module.exports = {
     createToken, verifyToken
-
 }

@@ -300,6 +300,7 @@ async function deleteOffer(req, res) {
 }
 
 async function updateFaq(req, res) {
+    console.log(req.body)
     try {
       const updateFaqData = req.body;
       const itemId = updateFaqData._id;
@@ -326,6 +327,27 @@ async function updateFaq(req, res) {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
+    }
+  }
+
+  async function addFaq(req, res) {
+    try {
+        const { title, children } = req.body; 
+
+        const category = await faqData.findOne({ title });
+
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+
+        category.childrens.push(...children);
+
+        await category.save();
+
+        return res.status(200).json({ success: true, message: 'Children added to the category' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
     }
   }
 
@@ -365,6 +387,7 @@ module.exports = {
     deleteOffer,
     // getProductPrice,
     updateFaq,
-    deleteFaq
+    deleteFaq,
+    addFaq
 }
 

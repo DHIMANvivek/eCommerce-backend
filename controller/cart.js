@@ -12,7 +12,7 @@ async function fetchCart(req, res) {
             }
         };
         cart.details = req.body;
-        console.log(cart);
+        // console.log(cart);
         cart.details = await Promise.all(cart.details.map(async (item) => {
             let product = await productsController.fetchProductDetails(req, res, item.sku);
             const fields = ['name', 'assets', 'info', 'price'];
@@ -48,7 +48,7 @@ async function fetchCart(req, res) {
             return item;
         }));
 
-        console.log(cart);
+        // console.log(cart);
         // cart.amounts.savings -= cart.amounts.subTotal;
         // cart.amounts.savings = (Math.round((cart.amounts.savings) * 100)) / 100;
         cart.amounts.subTotal = (Math.round((cart.amounts.subTotal) * 100) / 100);

@@ -184,7 +184,7 @@ async function fetchUniqueFields(req, res) {
             
                 // console.log('filterObject EVERY TIME IS  ',filterObject);
                 if (data.info.gender == 'male') {
-                    console.log("male"); 
+                    // console.log("male"); 
                     a=aa;
                     filterObject = filterObject2.male; // object  male: uniqueData, female: uniqueData }  
                 }

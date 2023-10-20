@@ -11,7 +11,7 @@ async function getDetails(req, res) {
         // req.body._id =req.tokenData._id;
         // console.log('token data is ',req.tokenData);
         const basicDetails = await Users.findById(req.tokenData.id);
-        console.log("baic details ",basicDetails);
+        // console.log("baic details ",basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
         console.log('ERORR IS ',error);
