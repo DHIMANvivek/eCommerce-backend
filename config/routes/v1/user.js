@@ -30,4 +30,5 @@ router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
 
 router.get('/coupons',userController.getCoupons);
+router.get('/getPaginatedData/:model', userController.getPaginatedData);
 module.exports = router;
