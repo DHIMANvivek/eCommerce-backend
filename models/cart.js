@@ -4,19 +4,18 @@ let cartSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
+        unique: true,
         required: true,
     },
     items: [
         {
-            productID: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'products',
-                required: true,
+            sku: { 
+                type: String,
+                required: true
             },
-            size: { String },
-            color: { String },
-            qty: { Number },
-            price: { Number }
+            size: String,
+            color: String ,
+            quantity: Number
         }
     ]
 });

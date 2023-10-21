@@ -8,8 +8,8 @@ async function JwtVerify(req, res, next) {
         }
         else{
             data = verifyToken(req.body.tokenData)
-         }
-    //    console.log(data, "jwt cdsccsdvc");
+        }
+        
         req.tokenData = data;
         next();
     } catch (error) {
