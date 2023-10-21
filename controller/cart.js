@@ -12,7 +12,7 @@ async function fetchCart(req, res) {
                 total: 0
             }
         };
-
+        
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
             delete req.headers.authorization;
@@ -20,12 +20,11 @@ async function fetchCart(req, res) {
 
         if (req.tokenData) {
             let userId = req.tokenData.id;
-            cart.details = (await Cart.findOne({ userId: userId })).items;
+            cart.details = ((await Cart.findOne({ userId: userId }) ? (await Cart.findOne({ userId: userId })) : {items: []})).items;
         }
         else {
             cart.details = req.body;
         }
-        console.log(req.body, 'mitron');
 
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
@@ -76,7 +75,7 @@ async function fetchCart(req, res) {
     }
 }
 
-async function addItem(req, res) {
+async function addItems(req, res) {
     try {
         let userId = req.tokenData.id;
         let items = req.body;
@@ -118,18 +117,16 @@ async function removeItem(req, res) {
         const userId = req.tokenData.id;
         const itemId = req.body.itemId;
 
-        console.log('here', itemId);
-        let ok = await Cart.updateOne({ userId: userId },
+        await Cart.updateOne({ userId: userId },
             {
                 $pull: {
                     items: { _id: itemId }
                 }
             });
 
-        console.log(ok);
         res.status(200).json({
             message: 'Item removed from cart'
-        })
+        });
     } catch (error) {
         res.status(500).json({
             message: 'Problem while removing Item from Cart'
@@ -137,8 +134,55 @@ async function removeItem(req, res) {
     }
 }
 
+async function updateItem(req, res) {
+    try {
+        const userId = req.tokenData.id;
+        const itemId = req.body.index;
+        const newQuantity = req.body.quantity;
+
+        console.log(itemId);
+        await Cart.updateOne(
+            { userId: userId, 'items._id': itemId },
+            { $set: { 'items.$.quantity': newQuantity } }
+        );
+
+        let cart = (await Cart.findOne({ userId: userId })).items;
+        console.log(newQuantity, cart);
+
+        res.status(200).json({
+            message: 'Cart item updated successfully',
+            updated: true
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: 'Problem while updating Item from Cart',
+            updated: false
+        });
+    }
+}
+
+async function clearCart(req, res) {
+    try {
+        const userId = req.tokenData.id;
+        await Cart.deleteOne({ userId: userId });
+
+        res.status(200).json({
+            message: 'Cart Cleared'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: 'Problem while clearing Cart',
+            updated: false
+        });
+    }
+}
+
 module.exports = {
     fetchCart,
-    addItem,
-    removeItem
+    addItems,
+    updateItem,
+    removeItem,
+    clearCart
 }
