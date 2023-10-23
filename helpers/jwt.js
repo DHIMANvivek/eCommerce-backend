@@ -6,7 +6,7 @@ function verifyToken(token) {
         const data = token;
 
         if (!data) {
-            throw ({ message: 'token not found' });
+            throw ({ message: 'Please login/signup.' });
         }
         const details = jwt.verify(data, process.env.secretKey);
         return details;

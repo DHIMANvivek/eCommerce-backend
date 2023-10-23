@@ -10,6 +10,8 @@ router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
+router.use('/wishlist', require('./v1/wishlist'))
+
 
 // check type of user (Used for purpose of Authguard)
 router.get('/checkUser', (req, res)=>{

@@ -25,6 +25,7 @@ async function fetchCart(req, res) {
         else {
             cart.details = req.body;
         }
+    
 
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
@@ -184,5 +185,7 @@ module.exports = {
     addItems,
     updateItem,
     removeItem,
-    clearCart
+    clearCart,
+    removeItem
+   
 }

@@ -28,7 +28,6 @@ router.post('/r', userController.putReviews);
 router.post('/create-payment-intent', userController.createPaymentIntent);
 router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
-
-router.get('/coupons',userController.getCoupons);
-router.get('/getPaginatedData/:model', userController.getPaginatedData);
+// router.get('/getPaginatedData/:model', userController.getPaginatedData);
+router.get('/coupons',userController.GetCoupons);
 module.exports = router;

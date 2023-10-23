@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const address = require('./address');
+const wishlist = require('./wishlist')
 
 let userSchema = new mongoose.Schema({
 
@@ -28,9 +29,9 @@ let userSchema = new mongoose.Schema({
         type: String,
         minlength: 8,
         // match: ^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]).{8,32}$,
-        required:function validate(){
-            if(this.provider=='direct') return true;
-            
+        required: function validate() {
+            if (this.provider == 'direct') return true;
+
         }
     },
     mobile: {
@@ -49,7 +50,7 @@ let userSchema = new mongoose.Schema({
         },
         address: {
             type: [address],
-            validate:  {
+            validate: {
                 validator: function (address) {
                     return address.length <= 3;
                 },
@@ -57,10 +58,10 @@ let userSchema = new mongoose.Schema({
             }
         }
     },
-   photo: {
+    photo: {
         type: String,
         trim: true
-    }, 
+    },
     role: {
         type: String,
         required: true,
@@ -71,17 +72,17 @@ let userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    provider:{
+    provider: {
         type: String,
         enum: ['GOOGLE', 'direct'],
-        required:true,
-        default:'direct',
+        required: true,
+        default: 'direct',
     },
 
-    Lead:{
+    Lead: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'leads',
-     
+
     }
 },
     {
@@ -89,12 +90,19 @@ let userSchema = new mongoose.Schema({
         autoIndex: true,
     });
 
-    userSchema.pre("save", function (next){
-        if(this.password){
-            this.password= bcrypt.hashSync(this.password); 
-           
-        }
-        next();
-    });
-    
+userSchema.pre("save", async function (next) {
+    if (this.password) {
+        this.password = bcrypt.hashSync(this.password);
+    }
+    const defaultWishlist = {
+        wishlistName : 'My Wishlist',
+        products : []
+    }
+    await wishlist.create({
+        userId : this._id,
+        wishlists : [defaultWishlist]
+    })
+    next();
+});
+
 module.exports = mongoose.model('users', userSchema);

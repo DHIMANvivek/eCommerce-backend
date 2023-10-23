@@ -6,6 +6,9 @@ const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
 const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
+const wishlistModel = require('../models/wishlist')
+
+
 async function login(req, res) {
     try {
         
@@ -54,7 +57,6 @@ async function login(req, res) {
             throw ({ message: 'Try to login manually.' });
         }
 
-
         // PURE MANUAL LOGIN
         const compare = await bcryptjs.compare(input.password, userFound.password);
         if (!compare) {
@@ -101,13 +103,17 @@ async function signup(req, res) {
         }
 
         const leadFound = await leadModel.findOne({ email: req.body.email });
-        const userCreated = await usersModel(req.body);
+        const userCreated =  usersModel(req.body);
 
         if (leadFound) {
             userCreated.Lead = leadFound;
         }
 
+        // userCreated.x=fals
+
         await userCreated.save();
+
+
 
         const mailData = {
             email: req.body.email,
@@ -115,11 +121,13 @@ async function signup(req, res) {
         }
         const mailSent = await mailer(mailData, SignupTemplate)
 
+
         const tokenData = {
             id: userCreated._id,
             role: userCreated.role
         }
         const token = createToken(tokenData);
+
         res.status(200).json({ token, message: 'Signup Successful!', firstName });
 
     } catch (error) {
@@ -151,7 +159,6 @@ async function forgotPassword(req, res) {
         if (user.provider == 'GOOGLE') {
             return res.status(500).json({ message: 'You cannot change your password as you are a Google user.' });
         }
-
         const hasRequested = await passwordModel.findOne({
             UserId: user._id
         })
