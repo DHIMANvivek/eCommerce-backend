@@ -5,7 +5,7 @@ const faqData = require('../models/faq');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
-const OffersModel=require('../models/offers');
+const OffersModel = require('../models/offers');
 async function getDetails(req, res) {
     try {
         // req.body._id =req.tokenData._id;
@@ -14,7 +14,7 @@ async function getDetails(req, res) {
         // console.log("baic details ",basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
-        console.log('ERORR IS ',error);
+        console.log('ERORR IS ', error);
         res.status(500).json(error);
     }
 }
@@ -23,7 +23,7 @@ async function updateDetails(req, res) {
     try {
         req.body._id = '6513a7af4e2d06d1e0e44660';
         const basicDetails = await Users.findByIdAndUpdate(req.body._id, req.body, { new: true });
-       
+
         res.status(200).json(basicDetails)
     } catch (error) {
         res.status(500).json(error);
@@ -44,9 +44,9 @@ async function getAddress(req, res) {
 async function addAddress(req, res) {
 
 
-    try{
+    try {
 
-        const findUserAddress=await Users.findById(req.tokenData.id,'info.address');
+        const findUserAddress = await Users.findById(req.tokenData.id, 'info.address');
 
         // info.adddr
         findUserAddress.info.address.push(req.body);
@@ -62,7 +62,7 @@ async function addAddress(req, res) {
     //     )
 
 
-       
+
 
     //     if (!addressAdded) throw ({ message: 'Address not updated' })
     //     const lastIndex=addressAdded.info.address.length;
@@ -70,8 +70,8 @@ async function addAddress(req, res) {
     //     console.log('ADDED ADDRESS IS ',addressAdded.info.address[lastIndex-1]);
     //     res.status(200).json(addressAdded.info.address[lastIndex-1]);
     // } 
-    
-    
+
+
     catch (error) {
         res.status(500).json(error)
     }
@@ -81,7 +81,7 @@ async function deleteAddress(req, res) {
     try {
         const deletedAddress = await Users.findOneAndUpdate(
 
-            
+
             { _id: req.tokenData.id },
             { $pull: { 'info.address': { _id: req.body.id } } },
             { new: true }
@@ -91,7 +91,7 @@ async function deleteAddress(req, res) {
 
         res.status(200).json(deleteAddress);
     } catch (error) {
-        console.log('error is ',error);
+        console.log('error is ', error);
         res.status(500).json(error);
     }
 }
@@ -108,11 +108,11 @@ async function updateAddress(req, res) {
         //     findUserAddress.info.address[0].firstname='New name given';
         // await findUserAddress.save();
         res.status(200).json(findUserAddress);
-        
+
         // const updateParticularAddress = await Users.updateOne({ _id: new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660") }, { $set: { email: 'Abhishekl23@gmail.com' } })
         // res.status(200).json(updateParticularAddress)
     } catch (error) {
-        console.log('error is ',error);
+        console.log('error is ', error);
         res.status(500).json(error)
     }
 }
@@ -131,7 +131,7 @@ async function createPaymentIntent(req, res) {
                 enabled: true,
             },
         });
-    
+
         res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
     } catch (error) {
         console.error(error);
@@ -153,34 +153,18 @@ async function getOrders(req, res) {
     }
 }
 
-
-// incomplete
-async function addReview(req, res){
+async function getCoupons(req, res) {
     try {
-        let input = req.body;
-        console.log(req.body);
+        const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.body.id] } }] });
+        res.status(200).json(getAllCoupons);
 
-        await Reviews.insertOne(input);
-    } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
+    }
+    catch (error) {
         res.status(500).json(error);
     }
 }
 
-async function putReviews(req, res){
-    console.log(req.body);
-    Reviews.insertMany(req.body);
-}
-
-
-async function GetCoupons(req,res){
-
-}
-
-async function getFaq(req , res) {
+async function getFaq(req, res) {
     try {
         const page = req.query.page || 1;
         const limit = req.query.limit || 2;
@@ -223,9 +207,7 @@ module.exports = {
     updateAddress,
     createPaymentIntent,
     getOrders,
-    addReview,
-    putReviews,
     getFaq,
     sendData,
-    GetCoupons
+    getCoupons
 }

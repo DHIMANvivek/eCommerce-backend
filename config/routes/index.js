@@ -8,6 +8,7 @@ const { SubscribeTemplate } = require('../../helpers/INDEX');
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
+router.use('/reviews', require('./v1/reviews'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
 router.use('/wishlist', require('./v1/wishlist'))

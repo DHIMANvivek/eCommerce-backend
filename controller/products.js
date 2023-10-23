@@ -20,10 +20,12 @@ async function fetchProductDetails(req, res, sku = null) {
     try {
 
         let query = {};
+        let user;
         if (req.headers.authorization){
-            data = verifyToken(req.headers.authorization.split(' ')[1])
-            if (data.role == 'admin') query['sellerID'] = data.id;
+            user = verifyToken(req.headers.authorization.split(' ')[1])
+            if (user.role == 'admin') query['sellerID'] = user.id;
         }
+
         query['sku'] = req.query.sku ? req.query.sku : sku;
 
         let product = JSON.parse(JSON.stringify(await Products.findOne(
@@ -31,12 +33,11 @@ async function fetchProductDetails(req, res, sku = null) {
             {
                 active: 0,
                 updatedAt: 0
-            }
-            
+            }     
             )));
 
         // getting all the reviews and average
-        let reviews_rating = await reviewsController.fetchReviews(product._id);
+        let reviews_rating = await reviewsController.fetchReviews(product._id, user.id);
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
 
