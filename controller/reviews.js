@@ -9,6 +9,7 @@ async function fetchReviews(productId, userId = '') {
                 path: 'reviews.userId',
                 select: 'name'
             })).reviews;
+            
 
             let userReview;
             if(userId){
@@ -20,7 +21,7 @@ async function fetchReviews(productId, userId = '') {
                 }));
             }
 
-            console.log(userReview, 'hhhhh', );
+            // console.log(userReview, 'Users review here', );
 
         // getting avg rating
         let avgRating = reviews.reduce((accumulator, current) => {

@@ -15,18 +15,19 @@ async function fetchCart(req, res) {
         
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
-            delete req.headers.authorization;
+            delete req.headers;
         }
 
         if (req.tokenData) {
             let userId = req.tokenData.id;
-            cart.details = ((await Cart.findOne({ userId: userId }) ? (await Cart.findOne({ userId: userId })) : {items: []})).items;
+            let cartExists = await Cart.findOne({ userId: userId });
+            cart.details = (cartExists ? cartExists : {items: []}).items;
         }
         else {
             cart.details = req.body;
         }
     
-
+        
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
             let product = await productsController.fetchProductDetails(req, res, item.sku);

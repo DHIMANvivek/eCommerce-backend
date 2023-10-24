@@ -27,7 +27,7 @@ async function fetchProductDetails(req, res, sku = null) {
         }
 
         query['sku'] = req.query.sku ? req.query.sku : sku;
-
+        
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {
@@ -37,9 +37,11 @@ async function fetchProductDetails(req, res, sku = null) {
             )));
 
         // getting all the reviews and average
+        
         let reviews_rating = await reviewsController.fetchReviews(product._id, user.id);
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
+
 
         if(req.query.sku){
             res.status(200).json(product);
