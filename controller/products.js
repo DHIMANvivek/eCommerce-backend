@@ -37,11 +37,18 @@ async function fetchProductDetails(req, res, sku = null) {
             )));
 
         // getting all the reviews and average
-        
-        let reviews_rating = await reviewsController.fetchReviews(product._id, user.id);
+        const reviews_rating = await reviewsController.fetchReviews(
+            product._id,
+            user ? user.id : ''
+        );
+
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
+        if(reviews_rating.userReview){
+            product.userReview = reviews_rating.userReview;
+        }
 
+        console.log(product.userReview);
 
         if(req.query.sku){
             res.status(200).json(product);

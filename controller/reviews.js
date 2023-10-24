@@ -1,6 +1,4 @@
 const Reviews = require('../models/reviews');
-const mongoose = require('mongoose');
-const {verifyToken} = require('./../helpers/jwt')
 
 async function fetchReviews(productId, userId = '') {
     try {
@@ -9,35 +7,24 @@ async function fetchReviews(productId, userId = '') {
                 path: 'reviews.userId',
                 select: 'name'
             })).reviews;
-            
 
-            let userReview;
-            if(userId){
-                reviews = (reviews.filter((review)=>{ 
-                    if(review.userId._id != userId) {
-                        return review;
-                    }
-                    userReview = review;
-                }));
-            }
-
-            // console.log(userReview, 'Users review here', );
-
-        // getting avg rating
+        // getting avg rating 
         let avgRating = reviews.reduce((accumulator, current) => {
             return accumulator += current.rating;
         }, 0)
 
-
-        // reviews = reviews.map((r) => {
-        //     // console.log("r is ",r.date," type is ",typeof(r));
-        //     console.log((r.date).toString());
-        //     r.date = r.date.toString();
-        //     console.log(r.date," working");
-        //     return r;
-        // });
-
         avgRating /= reviews.length;
+        avgRating = parseFloat(avgRating.toFixed(1));
+
+        let userReview;
+        if (userId) {
+            reviews = (reviews.filter((review) => {
+                if (review.userId._id != userId) {
+                    return review;
+                }
+                userReview = review;
+            }));
+        }
 
         return {
             reviews,
@@ -53,14 +40,10 @@ async function fetchReviews(productId, userId = '') {
     }
 }
 
-
-// incomplete
-
-async function addReview(req, res) {
+async function addOrUpdateReview(req, res) {
     try {
         const userId = req.tokenData.id;
         const input = req.body;
-        console.log(input, userId, 'add');
 
         const existingReview = await Reviews.findOne({
             productID: input.productId,
@@ -68,26 +51,44 @@ async function addReview(req, res) {
         });
 
         if (existingReview) {
-            res.status(400).json({ message: 'User has already reviewed this product' });
-            return;
-        }
-
-        const result = await Reviews.findOneAndUpdate(
-            { productID: input.productId },
-            {
-                $push: {
-                    reviews: {
-                        userId: userId,
-                        rating: input.rating,
-                        comment: input.comment
+            // User already has a review, update it
+            await Reviews.updateOne(
+                {
+                    productID: input.productId,
+                    'reviews.userId': userId
+                },
+                {
+                    $set: {
+                        'reviews.$.rating': input.rating,
+                        'reviews.$.comment': input.comment
                     }
                 }
-            },
-            { new: true }
-        );
+            );
+            res.status(200).json({
+                message: 'Review successfully updated'
+            });
 
-        console.log('result coming is ', result);
-        res.status(200).json(result);
+        }
+        else {
+            // User dpes'nt has a review, add it
+            await Reviews.updateOne(
+                { productID: input.productId },
+                {
+                    $push: {
+                        reviews: {
+                            userId: userId,
+                            rating: input.rating,
+                            comment: input.comment
+                        }
+                    }
+                },
+                { upsert: true }
+            );
+            res.status(200).json({
+                message: 'Review successfully added'
+            });
+        }
+
 
     } catch (error) {
         console.log('error is ', error);
@@ -96,17 +97,37 @@ async function addReview(req, res) {
 }
 
 async function deleteReview(req, res) {
+    try {
+        const userId = req.tokenData.id;
+        const productId = req.params.productId;
 
+        await Reviews.updateOne(
+            { productID: productId },
+            {
+                $pull: {
+                    reviews: { userId: userId }
+                }
+            }
+        );
+
+        res.status(201).json({
+            message: 'Review successfully deleted'
+        });
+
+    } catch (error) {
+        console.log('Error is ', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 }
 
-//bulk temp
-async function putReviews(req, res) {
-    console.log(req.body);
-    Reviews.insertMany(req.body);
-}
+// //bulk temp
+// async function putReviews(req, res) {
+//     console.log(req.body);
+//     Reviews.insertMany(req.body);
+// }
 
 module.exports = {
     fetchReviews,
-    addReview,
+    addOrUpdateReview,
     deleteReview
 }

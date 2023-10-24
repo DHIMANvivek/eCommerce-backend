@@ -12,7 +12,7 @@ async function fetchCart(req, res) {
                 total: 0
             }
         };
-        
+
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
             delete req.headers;
@@ -26,7 +26,6 @@ async function fetchCart(req, res) {
         else {
             cart.details = req.body;
         }
-    
         
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
