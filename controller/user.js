@@ -2,42 +2,40 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/faq');
 
-const Title = require('../models/createTicket');
-const Ticket = require('../models/supportTicket');
+// const Title = require('../models/createTicket');
+// const Ticket = require('../models/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
 const OffersModel = require('../models/offers');
 // const OffersModel=require('../models/offers');
 const paginateResults = require('../helpers/pagination');
+const ProductController=require('../controller/products');
 async function getDetails(req, res) {
+
     try {
-        // req.body._id =req.tokenData._id;
-        // console.log('token data is ',req.tokenData);
         const basicDetails = await Users.findById(req.tokenData.id);
-        // console.log("baic details ",basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
-        console.log('ERORR IS ', error);
         res.status(500).json(error);
     }
 }
 
 async function updateDetails(req, res) {
     try {
-        req.body._id = '6513a7af4e2d06d1e0e44660';
-        const basicDetails = await Users.findByIdAndUpdate(req.body._id, req.body, { new: true });
-
+        const basicDetails = await Users.findByIdAndUpdate(req.tokenData.id, req.body, { new: true });
+        console.log('details is ',basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
+        console.log('error is ',error);
         res.status(500).json(error);
     }
 }
 
 async function getAddress(req, res) {
     try {
-        // req.body._id = '6513a7af4e2d06d1e0e44660';
-        const Addresses = await Users.findById(req.tokenData.id, 'info.address');
+        const Addresses = await Users.findById({_id:req.tokenData.id,'info.address.status':true}, 'info.address');
+        // console.log('Adress isb ',Addresses);
         res.status(200).json(Addresses)
     }
     catch (error) {
@@ -62,80 +60,95 @@ async function getPaginatedData(req, res) {
   }
 
 async function addAddress(req, res) {
-
-
     try {
-
-        const findUserAddress = await Users.findById(req.tokenData.id, 'info.address');
-
-        // info.adddr
+        const findUserAddress = await Users.findOne({_id:req.tokenData.id});
+        if(findUserAddress.info.address.length==0)
+        {
+            req.body.defaultAddress=true;
+        }
         findUserAddress.info.address.push(req.body);
         await findUserAddress.save();
-        res.status(200).json(findUserAddress);
+        res.status(200).json(req.body);
     }
-    // try {
-    //     const addressAdded = await Users.findOneAndUpdate(
-    //         { _id: new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660') },
-    //         { $push: { 'info.address': req.body } },
-    //         { new: true }
-
-    //     )
-
-
-
-
-    //     if (!addressAdded) throw ({ message: 'Address not updated' })
-    //     const lastIndex=addressAdded.info.address.length;
-    // console.log("last index is ",lastIndex);
-    //     console.log('ADDED ADDRESS IS ',addressAdded.info.address[lastIndex-1]);
-    //     res.status(200).json(addressAdded.info.address[lastIndex-1]);
-    // } 
-
-
     catch (error) {
+        // if (error.name == 'ValidationError') {
+        //     res.status(400).json({ error: 'Validation error', message: error.message });
+        //     return;
+        // }
         res.status(500).json(error)
     }
 }
 
 async function deleteAddress(req, res) {
     try {
-        const deletedAddress = await Users.findOneAndUpdate(
 
+        // projection:{'info.address':1}
 
-            { _id: req.tokenData.id },
-            { $pull: { 'info.address': { _id: req.body.id } } },
-            { new: true }
-
-
-        )
-
-        res.status(200).json(deleteAddress);
+        const updatedValue = await Users.updateOne({
+            _id: req.tokenData.id,
+            'info.address._id': address_id
+        },{
+            $set: {
+                'info.address.status.$': false
+            }
+        },
+        { projection:{'info.address':1}});
+        // if(deleteAddress)
+        console.log('deleted Address is ',updatedValue);
+        res.status(200).json(updatedValue);
     } catch (error) {
-        console.log('error is ', error);
+        console.log('errpr is ',error);
         res.status(500).json(error);
     }
 }
 
 async function updateAddress(req, res) {
     try {
-
-        // const findUserAddress=await Users.findOne(new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660"),'info.address');
-        //     findUserAddress.info.address[0].firstname='New name given';
-        // await findUserAddress.save();
-
-        // const findUserAddress=await Users.findOne(new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660"),'info.address');
-        // const findUserAddress=await Users.findOne(new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660"),'info.address');
-        //     findUserAddress.info.address[0].firstname='New name given';
-        // await findUserAddress.save();
-        res.status(200).json(findUserAddress);
-
-        // const updateParticularAddress = await Users.updateOne({ _id: new mongoose.Types.ObjectId("6513a7af4e2d06d1e0e44660") }, { $set: { email: 'Abhishekl23@gmail.com' } })
-        // res.status(200).json(updateParticularAddress)
+        const address_id = req.body._id;
+        const updatedValue = await Users.updateOne({
+            _id: req.tokenData.id,
+            'info.address._id': address_id
+        },{
+            $set: {
+                'info.address.$': req.body
+            }
+        });
+        res.status(200).json(req.body);
     } catch (error) {
-        console.log('error is ', error);
         res.status(500).json(error)
     }
 }
+
+async function DefaultAddress(req,res){
+    try {
+        await Users.updateMany({
+            _id: req.tokenData.id,
+        },{
+            $set: {
+                'info.address.$[].defaultAddress': false
+            }
+        });
+        const updatedValue= await Users.updateOne({
+            _id: req.tokenData.id,
+            'info.address._id': req.body.address_id
+        },{
+            $set: {
+                'info.address.$.defaultAddress': true
+            }
+        });
+
+        const FindAllAddress=await Users.find({
+            _id:req.tokenData.id,
+
+        },{'info.address':1,_id:0})
+        console.log('updateAddress is ',updatedValue);
+        res.status(200).json(FindAllAddress)
+    } catch (error) {
+        console.log('error coming is ',error);
+        res.status(500).json(error)
+    }
+}
+
 async function createPaymentIntent(req, res) {
     try {
         // parseFloat(items[0].price * 100)
@@ -161,7 +174,10 @@ async function createPaymentIntent(req, res) {
 
 async function getOrders(req, res) {
     try {
-        const userOrders = await ordersModel.findOne({ buyerId: req.body._id });
+        // const userOrders = await ordersModel.findOne({ buyerId: req.body._id });
+        // const 
+        // const Products=await ProductController.get
+
         res.status(200).json(userOrders);
     } catch (error) {
         if (error.message) {
@@ -173,7 +189,9 @@ async function getOrders(req, res) {
     }
 }
 
-async function getCoupons(req, res) {
+
+// incomplete
+async function addReview(req, res) {
     try {
         const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.body.id] } }] });
         res.status(200).json(getAllCoupons);
@@ -183,6 +201,39 @@ async function getCoupons(req, res) {
         res.status(500).json(error);
     }
 }
+
+async function putReviews(req, res) {
+    console.log(req.body);
+    Reviews.insertMany(req.body);
+}
+
+
+async function getCoupons(req, res) {
+    try {
+        const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.tokenData.id] } },{startDate:{$lte:(new Date())}},{"status.active":false},{"status.deleted":false}], });
+        res.status(200).json(getAllCoupons);
+
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
+async function usedCoupon(req, res) {
+    try {
+        req.body.id = new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660');
+        req.body.couponId = new mongoose.Types.ObjectId('65312dcde94dc6738db7bb21');
+        const findCoupon = await OffersModel.findById(req.body.couponId);
+
+
+        findCoupon.userUsed.push(req.body.id);
+        await findCoupon.save();
+        res.status(200).json(findCoupon);
+    } catch (error) {
+        console.log('error is ', error);
+        res.status(500).json(error);
+    }
+}
+
 
 async function getFaq(req, res) {
     try {
@@ -217,52 +268,56 @@ async function sendData(req, res) {
     }
 }
 
-async function getTicketTitle(req, res) {
-    try {
-        const response = await Title.find({});
-        if (response) {
-            return res.status(200).json(response);
-        }
-        throw "404";
-    } catch (err) {
-        console.log(err);
-        return res.status(404).send();
-    }
-  }
+// async function getTicketTitle(req, res) {
+//     try {
+//         const response = await Title.find({});
+//         if (response) {
+//             return res.status(200).json(response);
+//         }
+//         throw "404";
+//     } catch (err) {
+//         console.log(err);
+//         return res.status(404).send();
+//     }
+//   }
 
-async function sendTicket(req , res) {
-    console.log(req.body)
-    try {
-        const ticketType = await Title.findOne({ title: req.body.selectedTicket});
+// async function sendTicket(req , res) {
+//     console.log(req.body)
+//     try {
+//         const ticketType = await Title.findOne({ title: req.body.selectedTicket});
     
-        if (!ticketType) {
-          return res.status(404).json({ error: 'TicketType not found' });
-        }
+//         if (!ticketType) {
+//           return res.status(404).json({ error: 'TicketType not found' });
+//         }
     
-        const newTicket = new Ticket({
-          userName: req.body.name,
-          userEmail: req.body.email,
-        //   status: '',
-        //   action: '',
-          ticketTypes: req.body.selectedTicket,
-          message: req.body.message,
-          ticketType: {title: ticketType},
-        });
+//         const newTicket = new Ticket({
+//           userName: req.body.name,
+//           userEmail: req.body.email,
+//         //   status: '',
+//         //   action: '',
+//           ticketTypes: req.body.selectedTicket,
+//           message: req.body.message,
+//           ticketType: {title: ticketType},
+//         });
     
-        const savedTicket = await newTicket.save();
+//         const savedTicket = await newTicket.save();
     
-        return res.status(200).json(savedTicket);
-      } catch (error) {
-        console.error('Error creating ticket:', error);
-        return res.status(500).json({ error: 'An error occurred while creating the ticket' });
-      }
-}
+//         return res.status(200).json(savedTicket);
+//       } catch (error) {
+//         console.error('Error creating ticket:', error);
+//         return res.status(500).json({ error: 'An error occurred while creating the ticket' });
+//       }
+// }
 
 
 module.exports = {
     getDetails,
     updateDetails,
     getAddress,
+    getCoupons,
+    DefaultAddress,
+    usedCoupon,
+    getCoupons,
     addAddress,
     deleteAddress,
     updateAddress,
@@ -272,6 +327,6 @@ module.exports = {
     sendData,
     getCoupons,
     getPaginatedData,
-    getTicketTitle,
-    sendTicket
+    // getTicketTitle,
+    // sendTicket
 }

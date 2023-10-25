@@ -2,6 +2,7 @@ const Reviews = require('../models/reviews');
 
 async function fetchReviews(productId, userId = '') {
     try {
+        console.log('prodcutId is ',productId);
         let reviews = (await Reviews.findOne({ productID: productId })
             .populate({
                 path: 'reviews.userId',

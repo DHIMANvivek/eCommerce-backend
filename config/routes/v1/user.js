@@ -14,12 +14,14 @@ router.post('/changePassword', JwtVerify, authController.changePassword)
 
 // User Account
 // router.use(JwtVerify)
-router.get('/getDetails',JwtVerify,userController.getDetails)
+router.use(JwtVerify);
+router.get('/getDetails',userController.getDetails)
 router.post('/updateDetails', userController.updateDetails)
-router.get('/getAddress',JwtVerify,userController.getAddress)
+router.get('/getAddress',userController.getAddress)
 router.post('/addAddress', userController.addAddress)
 router.post('/deleteAddress', userController.deleteAddress)
-router.get('/updateAdress', userController.updateAddress)
+router.post('/updateAdress', userController.updateAddress)
+router.post('/setDefault',userController.DefaultAddress)
 // router.post('/create-payment-intent', userController.createPaymentIntent);
 
 router.post('/create-payment-intent', userController.createPaymentIntent);
@@ -32,7 +34,10 @@ router.get('/coupons',userController.getCoupons);
 router.get('/getPaginatedData/:model', userController.getPaginatedData);
 
 // support ticket
-router.get('/getTicketTitle', userController.getTicketTitle);
-router.post('/sendTicket', userController.sendTicket);
+// router.get('/getTicketTitle', userController.getTicketTitle);
+// router.post('/sendTicket', userController.sendTicket);
 
+
+router.get('/coupons',userController.getCoupons);
+router.post('/used',userController.usedCoupon)
 module.exports = router;

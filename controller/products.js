@@ -1,6 +1,6 @@
 const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
-const OffersModel=require('../models/offers');
+const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
 
 // variably pending 
@@ -16,6 +16,45 @@ async function fetchAll(req, res) {
 }
 
 // ideal for Product page
+// async function fetchProductDetails(req, res, sku = null) {
+//     try {
+
+//         let query = {};
+//         let user;
+//         if (req.headers.authorization){
+//             user = verifyToken(req.headers.authorization.split(' ')[1])
+//             if (user.role == 'admin') query['sellerID'] = user.id;
+//         }
+
+//         query['sku'] = req.query.sku ? req.query.sku : sku;
+
+//         let product = JSON.parse(JSON.stringify(await Products.findOne(
+//             query,
+//             {
+//                 active: 0,
+//                 updatedAt: 0
+//             }     
+//             )));
+
+//         // getting all the reviews and average
+//         // let reviews_rating = await reviewsController.fetchReviews(product._id, user.id);
+//         // product.avgRating = reviews_rating.avgRating;
+//         // product.reviews = reviews_rating.reviews;
+
+//         if (req.query.sku) {
+//             res.status(200).json(product);
+//             return;
+//         }
+//         return product;
+
+//     } catch (error) {
+//         console.log('error coming is ',error);
+//         res.status(500).json({
+//             message: 'This Product is not available'
+//         });
+//     }
+// }
+
 async function fetchProductDetails(req, res, sku = null) {
     try {
 
@@ -37,6 +76,7 @@ async function fetchProductDetails(req, res, sku = null) {
             )));
 
         // getting all the reviews and average
+        console.log('proidcut is ',product);
         const reviews_rating = await reviewsController.fetchReviews(
             product._id,
             user ? user.id : ''
@@ -55,6 +95,7 @@ async function fetchProductDetails(req, res, sku = null) {
         return product;
 
     } catch (error) {
+        console.log('error is ',error);
         res.status(500).json({
             message: 'This Product is not available'
         });
@@ -64,10 +105,7 @@ async function fetchProductDetails(req, res, sku = null) {
 // exploring, searching and filtering
 async function fetchProducts(req, res) {
     try {
-        // Pagination, fixed limit to showing only 8 product at a time
-
         req.query = req.query ? req.query : req.body;
-        
         let limit = req.query.limit || 8;
         let page = req.query.page || 1;
         let skip = (page - 1) * limit;
@@ -115,18 +153,17 @@ async function fetchProducts(req, res) {
 
         // fetching the data
         let products = await Products.aggregate(aggregationPipe);
-
+    
         let matchedProducts = {
             total: 0
         };
-
-        // calculating total items and getting avg reviews
+        products  = await getProductPrice((products));
         matchedProducts.items = await Promise.all(products.map(async (product) => {
-            product.avgRating = (await reviewsController.fetchReviews(product._id)).avgRating;
+            // product.avgRating = (await reviewsController.fetchReviews(product._id)).avgRating;
+            product.avgRating=0;
             matchedProducts.total++;
             return product;
         }));
-
         res.status(200).json(matchedProducts);
 
         // filter aggregation query helper function
@@ -165,11 +202,14 @@ async function fetchProducts(req, res) {
         }
 
     } catch (error) {
+        console.log('error coming is ',error);
         res.status(500).json({
             message: 'Unable to fetch Products'
         });
     }
 }
+
+
 
 async function fetchUniqueFields(req, res) {
     const products = await Products.find({});
@@ -181,32 +221,32 @@ async function fetchUniqueFields(req, res) {
             category: [],
             price: [],
             brand: [],
-            tags: [], 
+            tags: [],
         }
 
         let filterObject;
 
         if (parameter != 'all') {
-            filterObject2= { male: uniqueData, female: uniqueData };
+            filterObject2 = { male: uniqueData, female: uniqueData };
         }
         else {
             filterObject = uniqueData;
         }
-       
+
         products.forEach((data) => {
 
             if (parameter != 'all') {
-            
+
                 // console.log('filterObject EVERY TIME IS  ',filterObject);
                 if (data.info.gender == 'male') {
                     // console.log("male"); 
-                    a=aa;
+                    a = aa;
                     filterObject = filterObject2.male; // object  male: uniqueData, female: uniqueData }  
                 }
                 else {
                     // console.log("female  ",filterObject.female);
                     filterObject = filterObject2.female;
-                } 
+                }
             }
             for (let filter in filterObject) {
 
@@ -250,49 +290,60 @@ async function fetchUniqueFields(req, res) {
     // res.status(200).json(uniqueData);
 }
 
-
-
-
-function helper(Array, productPrice) {
-    let productDiscount = 0;
-    Array.forEach((element) => {
-        if (element.discountType == 'percentage') {
-            let discountPrice = Math.ceil((productPrice * element.discountAmount) / 100);
-            if (discountPrice > productDiscount) {
-                productDiscount = discountPrice;
-            }
+async function getProductPrice(products) {
+    try {
+        let discount;
+        if (!Array.isArray(products)) {
+            discount = await discountQuery(products);
+        products=await discountQuery(products); 
         }
         else {
-            if (element.discountAmount > productDiscount) productDiscount = element.discountAmount;
+            products = await Promise.all(products.map(async (product) => {
+                if(!(product.info)){
+                    product = await Products.findOne({ sku: product.sku });
+                }   
+                product = await discountQuery(product); 
+                return product;
+            }))
         }
-    })
-
-    return productDiscount;
-}
-
-
-async function getProductPrice(req, res) {
-    try {
-        let productDiscount;
-        let productCategory = 'Kurti';
-        let productPrice = 1000;
-        let productBrand = 'Sangria';
-        let globalDiscounts = await OffersModel.find({ 'ExtraInfo': { $exists: 0 } }, { 'discountType': 1, 'discountAmount': 1 });
-        productDiscount = helper(globalDiscounts, productPrice);
-        let anotherDiscount = await OffersModel.find(
-            { "ExtraInfo.categories": { $in: [productCategory] } }, { 'discountType': 1, 'discountAmount': 1 });
-        let result = helper(anotherDiscount, productPrice);
-        if (result > productDiscount) productDiscount = result;
-
-
-
-        res.status(200).json(productDiscount);
+        return new Promise((res,rej)=>{
+            res(products);
+        })
 
     } catch (error) {
         res.status(500).json(error);
     }
-}
 
+    async function discountQuery(parameter) {
+        
+        let product = JSON.parse(JSON.stringify(parameter));
+
+        return new Promise(async (res,rej)=>{
+
+            let discount = await OffersModel.findOne({
+                $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
+                { "ExtraInfo.brands": { $in: [product.info.brand] } },
+                ], OfferType: 'discount'
+            }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
+
+        if (discount == null) {
+            res(product);
+            return;
+         }
+        product.discountType = discount.discountType;
+        product.discount = Math.floor(discount.discountAmount); 
+        if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
+            product.discountPercentage=discount.discountAmount;
+            product.discount=Math.floor((product.price/100) * discount.discountAmount);
+           if (product.discount > discount.maximumDiscount) {
+                product.discount =Math.floor( discount.maximumDiscount);
+            }
+        }
+        
+        res(product);
+     });
+    }
+}
 
 module.exports = {
     fetchAll,

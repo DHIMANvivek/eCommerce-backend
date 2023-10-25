@@ -94,7 +94,7 @@ const io = require('socket.io')(server);
 //   });
 // });
 
-const Message = require('./models/message');
+// const Message = require('./models/message');
 const User = require('./models/users')
 
 io.on('connection', (socket) => {

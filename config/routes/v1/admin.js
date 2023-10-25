@@ -22,6 +22,7 @@ router.get('/getAdminDetails', adminController.getAdminDetails);
 router.post('/createOffer',adminController.createOffer)
 router.get('/getOffers',adminController.getOffers)
 router.post('/deleteOffer',adminController.deleteOffer)
+router.post('/updateOffer',adminController.updateOffer)
 // router.get('/getProductPrice',adminController.getProductPrice)
 
 // FAQs

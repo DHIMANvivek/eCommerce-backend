@@ -43,7 +43,7 @@ let offerSchema = mongoose.Schema({
         required: true
     },
 
-    percentageDiscountType:{
+    DiscountPercentageType:{
         type:String,
         enum:['fixed','variable'],
         required:function validate() {
@@ -92,7 +92,8 @@ let offerSchema = mongoose.Schema({
     },
 
     ExtraInfo:{
-
+        type: Object,
+        lowercase: true
     },
 
     status:{

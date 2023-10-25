@@ -54,5 +54,15 @@ module.exports = new mongoose.Schema({
         lowercase: true,
         default: "India"
     },
+    mobile: {
+        type: Number,
+        trim: true,
+        minLength: [10],
+        maxLength: [10]
+    },
+    status:{
+        type:Boolean,
+        default:true
+    }
     
 });

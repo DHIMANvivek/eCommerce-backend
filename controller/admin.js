@@ -5,8 +5,8 @@ const reviewsController = require('../controller/reviews');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const faqData = require('../models/faq');
-const Ticket = require('../models/supportTicket');
-const Title = require('../models/createTicket');
+// const Ticket = require('../models/supportTicket');
+// const Title = require('../models/createTicket');
 
 const OffersModel = require('../models/offers');
 
@@ -262,6 +262,7 @@ async function createOffer(req, res) {
         await offer.save();
         res.status(200).json(offer);
     } catch (error) {
+        console.log('EROROR IS ',error);
         res.status(500).json(error);
     }
 }
@@ -314,6 +315,7 @@ async function getOffers(req, res) {
         const data = await OffersModel.find();
         res.status(200).json(data);
     } catch (error) {
+        // console.log('error is ',error);
         res.status(500).json(error);
     }
 }
@@ -592,6 +594,19 @@ async function deleteSupportTicket(req , res) {
 
   
 
+
+async function updateOffer(req,res){
+    try {
+        console.log('req   body is ',req.body);
+        const result=await  OffersModel.findOneAndUpdate({ _id: req.body.id },req.body,{new:true});
+        console.log('update offer is ',result);
+        res.status(200).json({ message: 'updated Successfully' });
+    } catch (error) {
+        console.log('error is ',error);
+        res.status(500).json(error);
+    }
+}
+
 module.exports = {
     addProduct,
     updateProduct,
@@ -615,6 +630,8 @@ module.exports = {
     deleteTicketTitle,
     getAllTicket,
     updateTicketStatus,
-    deleteSupportTicket
+    deleteSupportTicket,
+    updateOffer
+    // getProductPrice
 }
 
