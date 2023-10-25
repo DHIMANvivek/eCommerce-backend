@@ -99,8 +99,7 @@ async function addOrUpdateReview(req, res) {
 async function deleteReview(req, res) {
     try {
         const userId = req.tokenData.id;
-        const productId = req.params.productId;
-
+        const productId = req.query.productId;
         await Reviews.updateOne(
             { productID: productId },
             {

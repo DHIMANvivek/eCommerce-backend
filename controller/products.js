@@ -48,8 +48,6 @@ async function fetchProductDetails(req, res, sku = null) {
             product.userReview = reviews_rating.userReview;
         }
 
-        console.log(product.userReview);
-
         if(req.query.sku){
             res.status(200).json(product);
             return;
