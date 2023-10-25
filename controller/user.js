@@ -2,10 +2,14 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/faq');
 
+const Title = require('../models/createTicket');
+const Ticket = require('../models/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
 const OffersModel = require('../models/offers');
+// const OffersModel=require('../models/offers');
+const paginateResults = require('../helpers/pagination');
 async function getDetails(req, res) {
     try {
         // req.body._id =req.tokenData._id;
@@ -40,6 +44,22 @@ async function getAddress(req, res) {
         res.status(500).json(error);
     }
 }
+
+async function getPaginatedData(req, res) {
+    const modelName = req.params.model; 
+    const page = parseInt(req.query.page, 1) || 1;
+    const pageSize = parseInt(req.query.pageSize, 3) || 10;
+
+    try {
+      const Model = require(`../models/${modelName}`); 
+      const data = await paginateResults(Model, page, pageSize);
+
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 
 async function addAddress(req, res) {
 
@@ -197,6 +217,47 @@ async function sendData(req, res) {
     }
 }
 
+async function getTicketTitle(req, res) {
+    try {
+        const response = await Title.find({});
+        if (response) {
+            return res.status(200).json(response);
+        }
+        throw "404";
+    } catch (err) {
+        console.log(err);
+        return res.status(404).send();
+    }
+  }
+
+async function sendTicket(req , res) {
+    console.log(req.body)
+    try {
+        const ticketType = await Title.findOne({ title: req.body.selectedTicket});
+    
+        if (!ticketType) {
+          return res.status(404).json({ error: 'TicketType not found' });
+        }
+    
+        const newTicket = new Ticket({
+          userName: req.body.name,
+          userEmail: req.body.email,
+        //   status: '',
+        //   action: '',
+          ticketTypes: req.body.selectedTicket,
+          message: req.body.message,
+          ticketType: {title: ticketType},
+        });
+    
+        const savedTicket = await newTicket.save();
+    
+        return res.status(200).json(savedTicket);
+      } catch (error) {
+        console.error('Error creating ticket:', error);
+        return res.status(500).json({ error: 'An error occurred while creating the ticket' });
+      }
+}
+
 
 module.exports = {
     getDetails,
@@ -209,5 +270,8 @@ module.exports = {
     getOrders,
     getFaq,
     sendData,
-    getCoupons
+    getCoupons,
+    getPaginatedData,
+    getTicketTitle,
+    sendTicket
 }

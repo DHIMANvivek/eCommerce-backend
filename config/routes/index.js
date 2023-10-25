@@ -4,6 +4,7 @@ const AdminVerify=require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt'); 
 const mailer = require('../../helpers/nodemailer');
 const { SubscribeTemplate } = require('../../helpers/INDEX');
+const { TicketStatusTemplate } = require('../../helpers/INDEX');
 
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
@@ -39,6 +40,24 @@ router.post('/sendMail', async (req, res)=>{
         subject : "Thank You for Subscribing - Enjoy 25% Off!"
     }
     const mailSent = await mailer(mailData, SubscribeTemplate);
+
+    res.status(200).json({
+        message: "done"
+    })
+    
+})
+
+// ticket status
+router.post('/ticketStatus', async (req, res)=>{
+    console.log(req.body)
+    const mailData = {
+        email : req.body.email,
+        subject : "Ticket Status",
+        status : req.body.status,
+        message: req.body.message
+    }
+    const emailTemplate = TicketStatusTemplate(mailData);
+    const mailSent = await mailer(mailData, emailTemplate);
 
     res.status(200).json({
         message: "done"

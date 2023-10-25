@@ -7,6 +7,30 @@ require("dotenv").config();
 const app = express();
 app.use(bodyParser.json({limit: '50mb'}));
 
+const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
+const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
+
+webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
+app.post('/subscribe', (req, res) => {
+  const subscription = req.body;
+
+  const payload = JSON.stringify({ title: 'eCommerce New Notification' });
+  webpush
+      .sendNotification(subscription, payload)
+      .then(() => {
+          console.log('Push notification sent');
+          res.status(201).json({ message: 'Push notification sent successfully' });
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: 'Failed to send push notification' });
+      });
+});
+
+
+
+
+
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -51,3 +75,45 @@ app.listen(port, (err) => {
 });
 
 
+const server = app.listen(3000, () => {
+  console.log(`Chat Server listening on port ${3000}`);
+});
+
+const io = require('socket.io')(server);
+
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
+
+//   socket.on('chatMessage', (data) => {
+//       console.log(data);
+//       io.emit('message', data);
+//   });
+
+//   socket.on('disconnect', () => {
+//       console.log('A user disconnected');
+//   });
+// });
+
+const Message = require('./models/message');
+const User = require('./models/users')
+
+io.on('connection', (socket) => {
+    socket.on('chatMessage', (data) => {
+        const user = socket.user; 
+        const newMessage = new Message({
+            user: user, 
+            content: data, 
+        });
+
+        console.log(newMessage)
+
+        newMessage.save()
+            .then(() => {
+                
+                io.emit('message', { user: user, content: newMessage.content });
+            })
+            .catch((error) => {
+                console.error('Error saving message:', error);
+            });
+    });
+});

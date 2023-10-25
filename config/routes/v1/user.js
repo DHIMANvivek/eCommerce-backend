@@ -27,4 +27,12 @@ router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
 // router.get('/getPaginatedData/:model', userController.getPaginatedData);
 router.get('/coupons',userController.getCoupons);
+// router.get('/coupons',userController.GetCoupons);
+
+router.get('/getPaginatedData/:model', userController.getPaginatedData);
+
+// support ticket
+router.get('/getTicketTitle', userController.getTicketTitle);
+router.post('/sendTicket', userController.sendTicket);
+
 module.exports = router;

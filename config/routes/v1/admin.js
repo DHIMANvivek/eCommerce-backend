@@ -30,4 +30,13 @@ router.post('/updateFaq', adminController.updateFaq);
 router.post('/addFaq', adminController.addFaq);
 
 // router.get('/getFaq', adminController.getFaq);
+router.post('/setTicketTitle', adminController.setTicketTitle);
+router.post('/createTicketTitle', adminController.createTicketTitle);
+router.post('/updateTicketTitle', adminController.updateTicketTitle);
+router.post('/addTitleToTicketType', adminController.addTitleToTicketType);
+router.post('/deleteTicketTitle', adminController.deleteTicketTitle);
+router.get('/getAllTicket', adminController.getAllTicket);
+router.post('/updateTicketStatus', adminController.updateTicketStatus);
+router.post('/deleteSupportTicket', adminController.deleteSupportTicket);
+
 module.exports = router;

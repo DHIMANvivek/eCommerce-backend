@@ -190,6 +190,79 @@ function SubscribeTemplate(email) {
   return html;
 }
 
+
+
+async function TicketStatusTemplate(mailData) {
+  console.log(mailData , "status")
+  let statusText = mailData.status === 'open' ? 'Open' : 'Closed'; 
+
+  let html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Add inline CSS for better email client compatibility */
+    table {
+      font-family: Arial, sans-serif;
+      border-collapse: collapse;
+      width: 60%;
+      margin: 0 auto;
+    }
+
+    table, td {
+      border: 1px solid #ddd;
+      margin-block: 30px;
+    }
+
+    .outer-div {
+      background-color: #f5f6f7;
+      padding-block: 30px;
+    }
+
+    td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    td.header {
+      border-block-end: 1px solid #f5f6f7;
+    }
+
+    tr, td {
+      background-color: #ffffff;
+    }
+
+  </style>
+</head>
+<body>
+<div class="outer-div">
+  <table>
+    <tr>
+      <td class="header" colspan="2">
+        <h1>Ticket Status Notification</h1>
+      </td>
+    </tr>
+    <tr>
+      <td class="content" colspan="2">
+        <p>Dear Sir/Ma'am,</p>
+        <p>Your support ticket status has been updated to: <strong>${statusText}</strong></p>
+        <p>Message : <strong>${mailData.message}</strong></p>
+        <p>Our team is here to assist you. If you have any further questions or need additional help, please don't hesitate to reach out to us.</p>
+        <p>Thank you for choosing our services. We are committed to providing the best support for you.</p>
+        <p>Best regards,</p>
+        <p>The Support Team</p>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>
+  `;
+
+  return html;
+}
+
+
 // <img src="https://cdn.filestackcontent.com/orYXP4hDTryz5vNbCfBo" alt="logo" width="140" height="35"/>
 
-module.exports = { ForgetTemplate, SignupTemplate, SubscribeTemplate }
+module.exports = { ForgetTemplate, SignupTemplate, SubscribeTemplate, TicketStatusTemplate }

@@ -5,6 +5,8 @@ const reviewsController = require('../controller/reviews');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const faqData = require('../models/faq');
+const Ticket = require('../models/supportTicket');
+const Title = require('../models/createTicket');
 
 const OffersModel = require('../models/offers');
 
@@ -396,9 +398,199 @@ async function updateFaq(req, res) {
         res.status(500).json({ error: 'An error occurred while deleting the FAQ item' });
     }
 }
+
+async function setTicketTitle(req, res) {
+    try {
+          const titlesToAdd = ["Security Related Issue", "Product Pricing Issue", "Others"];
+          const childDocument = { title };
+          const ticket = new Ticket({
+            ticketTitle: 'Sample Ticket',
+            userName: 'User Name',
+            userEmail: 'user@example.com',
+            status: 'Pending',
+            action: 'View Message',
+            ticketType: [childDocument],
+          });
+          await ticket.save();
+    
+        return res.status(201).json({ message: 'Titles added successfully' });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error adding titles' });
+      }
+  }
+
+  async function createTicketTitle(req , res) {
+    try {
+        const { title } = req.body;
+
+        if (!title) {
+          return res.status(400).json({ error: 'Title is required' });
+        }
+
+        const newTitle = new Title({ title });
+        await newTitle.save();
+    
+        return res.status(201).json({ message: 'Title created successfully' });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error creating title' });
+      }
+  }
+
+  async function addTitleToTicketType(req, res) {
+    try {
+      const { _id, newTitle } = req.body;
+  
+      if (!newTitle) {
+        return res.status(400).json({ error: 'New title is required' });
+      }
+  
+    //   const defaultStatusValues = [
+    //     'pending',
+    //     'open',
+    //     'rejected',
+    //     'resolved',
+    //     'closed',
+    //     'cancelled',
+    //     'in-progress',
+    //   ];
+  
+      const result = await Title.findByIdAndUpdate(
+        _id,
+        {
+          $push: { 
+            title: newTitle,
+            // status: { $each: defaultStatusValues } 
+          }
+        },
+        { new: true }
+      );
+  
+      if (!result) {
+        return res.status(404).json({ error: 'Ticket type not found' });
+      }
+  
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Error adding title' });
+    }
+  }
   
 
+  async function updateTicketTitle(req, res) {
+    try {
+      const { oldTitle, newTitle , _id } = req.body;
 
+      if (!oldTitle || !newTitle) {
+        return res.status(400).json({ error: 'Both oldTitle and newTitle are required' });
+      }
+  
+      const result = await Title.findOneAndUpdate(
+        {
+          'title': oldTitle,
+        },
+        {
+          $set: {
+            'title.$': newTitle,
+          },
+        },
+        { new: true }
+      );
+  
+      if (!result) {
+        return res.status(404).json({ error: 'Title not found' });
+      }
+  
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Error updating title' });
+    }
+  }
+  
+  async function deleteTicketTitle(req, res) {
+    try {
+      const { _id , title } = req.body;
+
+      console.log(_id , title)
+  
+      if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+      }
+  
+    //   const ticketTypeId = '6534ab7f7033d7d5a6f71b22'; 
+      const result = await Title.findByIdAndUpdate(
+        _id,
+        { $pull: { title: title } },
+        { new: true }
+      );
+  
+      if (!result) {
+        return res.status(404).json({ error: 'Title not found' });
+      }
+  
+      return res.status(200).json({ message: 'Title deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Error deleting title' });
+    }
+  }
+
+  async function getAllTicket(req, res) {
+    try {
+
+        const response = await Ticket.find({}).populate('ticketType.title');
+        if (response) {
+            return res.status(200).json(response);
+        }
+        throw "404";
+    } catch (err) {
+        console.log(err);
+        return res.status(404).send();
+    }
+}
+
+async function updateTicketStatus(req , res) {
+    try {
+        const { _id , status } = req.body;
+        console.log(_id , status)
+        const result = await Ticket.findByIdAndUpdate(
+            _id,
+            { $set: { status: status } },
+            { new: true }
+          );
+      
+          if (!result) {
+            return res.status(404).json({ error: 'Ticket not found' });
+          }
+      
+          return res.status(200).json({ message: 'Ticket status updated successfully' });
+        } catch (error) {
+          console.error(error);
+          return res.status(500).json({ error: 'Error updating ticket status' });
+        }
+}
+
+async function deleteSupportTicket(req , res) {
+    try {
+        const { _id } = req.body;
+        console.log(_id)
+        const result = await Ticket.findByIdAndDelete(_id);
+      
+          if (!result) {
+            return res.status(404).json({ error: 'Ticket not found' });
+          }
+      
+          return res.status(200).json({ message: 'Ticket deleted successfully' });
+        } catch (error) {
+          console.error(error);
+          return res.status(500).json({ error: 'Error deleting ticket' });
+        }
+}
+
+  
 
 module.exports = {
     addProduct,
@@ -415,6 +607,14 @@ module.exports = {
     // getProductPrice,
     updateFaq,
     deleteFaq,
-    addFaq
+    addFaq,
+    setTicketTitle,
+    createTicketTitle,
+    updateTicketTitle,
+    addTitleToTicketType,
+    deleteTicketTitle,
+    getAllTicket,
+    updateTicketStatus,
+    deleteSupportTicket
 }
 

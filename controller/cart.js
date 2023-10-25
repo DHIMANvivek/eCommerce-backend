@@ -27,6 +27,9 @@ async function fetchCart(req, res) {
             cart.details = req.body;
         }
         
+    
+        // console.log(req.body, 'mitron');
+
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
             let product = await productsController.fetchProductDetails(req, res, item.sku);
@@ -77,40 +80,40 @@ async function fetchCart(req, res) {
 }
 
 async function addItems(req, res) {
-    try {
-        let userId = req.tokenData.id;
-        let items = req.body;
+    // try {
+    //     let userId = req.tokenData.id;
+    //     let items = req.body;
 
-        let existingCart = await Cart.findOne({ userId: userId });
+    //     let existingCart = await Cart.findOne({ userId: userId });
 
-        items = await Promise.all(items.map(async (item) => {
-            let product = await productsController.fetchProductDetails(req, res, item.sku);
+    //     items = await Promise.all(items.map(async (item) => {
+    //         let product = await productsController.fetchProductDetails(req, res, item.sku);
 
-            item.quantity = item.quantity ? item.quantity : product.info.orderQuantity[0];
-            item.color = item.color ? item.color : product.assets[0].color;
+    //         item.quantity = item.quantity ? item.quantity : product.info.orderQuantity[0];
+    //         item.color = item.color ? item.color : product.assets[0].color;
 
-            item.size = item.size ? item.size : product.assets.find((asset) => {
-                return asset.color === item.color;
-            }).stockQuantity[0].size;
+    //         item.size = item.size ? item.size : product.assets.find((asset) => {
+    //             return asset.color === item.color;
+    //         }).stockQuantity[0].size;
 
-            return item;
-        }))
+    //         return item;
+    //     }))
 
-        if (existingCart) {
-            await Cart.updateOne({ userId: userId }, { $push: { items: items } });
-        } else {
-            await Cart.create({ userId: userId, items: items });
-        }
+    //     if (existingCart) {
+    //         await Cart.updateOne({ userId: userId }, { $push: { items: items } });
+    //     } else {
+    //         await Cart.create({ userId: userId, items: items });
+    //     }
 
-        return res.status(200).json({
-            message: "Item/s successfully added to cart"
-        })
+    //     return res.status(200).json({
+    //         message: "Item/s successfully added to cart"
+    //     })
 
-    } catch (error) {
-        res.status(500).json({
-            message: 'Problem while adding item/s to Cart'
-        });
-    }
+    // } catch (error) {
+    //     res.status(500).json({
+    //         message: 'Problem while adding item/s to Cart'
+    //     });
+    // }
 }
 
 async function removeItem(req, res) {
