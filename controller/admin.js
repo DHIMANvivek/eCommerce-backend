@@ -5,8 +5,8 @@ const reviewsController = require('../controller/reviews');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const faqData = require('../models/faq');
-// const Ticket = require('../models/supportTicket');
-// const Title = require('../models/createTicket');
+const Ticket = require('../models/supportTicket');
+const Title = require('../models/createTicket');
 
 const OffersModel = require('../models/offers');
 
@@ -547,7 +547,14 @@ async function setTicketTitle(req, res) {
   async function getAllTicket(req, res) {
     try {
 
-        const response = await Ticket.find({}).populate('ticketType.title');
+        const response = await Ticket.find({}).populate([
+          {
+            path: 'ticketType.title',
+          },
+          {
+            path: 'notificationDetails',
+          }
+        ]);
         if (response) {
             return res.status(200).json(response);
         }

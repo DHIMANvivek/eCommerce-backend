@@ -2,12 +2,13 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/faq');
 
-// const Title = require('../models/createTicket');
-// const Ticket = require('../models/supportTicket');
+const Title = require('../models/createTicket');
+const Ticket = require('../models/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
 const OffersModel = require('../models/offers');
+const webPush = require('../models/supportNotifications');
 // const OffersModel=require('../models/offers');
 const paginateResults = require('../helpers/pagination');
 const ProductController=require('../controller/products');
@@ -295,46 +296,69 @@ async function sendData(req, res) {
     }
 }
 
-// async function getTicketTitle(req, res) {
-//     try {
-//         const response = await Title.find({});
-//         if (response) {
-//             return res.status(200).json(response);
-//         }
-//         throw "404";
-//     } catch (err) {
-//         console.log(err);
-//         return res.status(404).send();
-//     }
-//   }
+async function getTicketTitle(req, res) {
+    try {
+        const response = await Title.find({});
+        if (response) {
+            return res.status(200).json(response);
+        }
+        throw "404";
+    } catch (err) {
+        console.log(err);
+        return res.status(404).send();
+    }
+  }
 
-// async function sendTicket(req , res) {
-//     console.log(req.body)
-//     try {
-//         const ticketType = await Title.findOne({ title: req.body.selectedTicket});
+async function sendTicket(req , res) {
+    console.log(req.body)
+    try {
+        const ticketType = await Title.findOne({ title: req.body.selectedTicket});
+        const webPushDetails = await webPush.findOne({});
     
-//         if (!ticketType) {
-//           return res.status(404).json({ error: 'TicketType not found' });
-//         }
+        if (!ticketType) {
+          return res.status(404).json({ error: 'TicketType not found' });
+        }
     
-//         const newTicket = new Ticket({
-//           userName: req.body.name,
-//           userEmail: req.body.email,
-//         //   status: '',
-//         //   action: '',
-//           ticketTypes: req.body.selectedTicket,
-//           message: req.body.message,
-//           ticketType: {title: ticketType},
-//         });
+        const newTicket = new Ticket({
+          userName: req.body.name,
+          userEmail: req.body.email,
+        //   status: '',
+        //   action: '',
+          ticketTypes: req.body.selectedTicket,
+          message: req.body.message,
+          ticketType: {title: ticketType},
+          notificationDetails: webPushDetails,
+        });
     
-//         const savedTicket = await newTicket.save();
+        const savedTicket = await newTicket.save();
     
-//         return res.status(200).json(savedTicket);
-//       } catch (error) {
-//         console.error('Error creating ticket:', error);
-//         return res.status(500).json({ error: 'An error occurred while creating the ticket' });
-//       }
-// }
+        return res.status(200).json(savedTicket);
+      } catch (error) {
+        console.error('Error creating ticket:', error);
+        return res.status(500).json({ error: 'An error occurred while creating the ticket' });
+      }
+}
+
+async function webPushDetails(req, res) {
+    try {
+        const { email, token } = req.body;
+        console.log('email is ', email, 'token is ', token);
+    
+        const supportNotification = await webPush.findOne({});
+    
+        if (supportNotification) {
+            supportNotification.tokenDetail.push({ token, email });
+          await supportNotification.save();
+          res.status(200).json(supportNotification);
+        } else {
+          // If the document doesn't exist, you can create a new one or handle this case as needed
+          res.status(404).json({ error: 'SupportNotifications document not found' });
+        }
+      } catch (error) {
+        console.error('Error saving user details:', error);
+        return res.status(500).json({ error: 'An error occurred while saving user details' });
+      }
+  }
 
 
 module.exports = {
@@ -354,6 +378,9 @@ module.exports = {
     sendData,
     getCoupons,
     getPaginatedData,
-    // getTicketTitle,
-    // sendTicket
+    getTicketTitle,
+    sendTicket,
+    getTicketTitle,
+    sendTicket,
+    webPushDetails
 }
