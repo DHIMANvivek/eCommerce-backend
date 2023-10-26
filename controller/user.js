@@ -202,20 +202,9 @@ async function addReview(req, res) {
     }
 }
 
-async function putReviews(req, res) {
+async function putReviews(req, res){
     console.log(req.body);
     Reviews.insertMany(req.body);
-}
-
-
-async function getCoupons(req, res) {
-    try {
-        const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.tokenData.id] } },{startDate:{$lte:(new Date())}},{"status.active":false},{"status.deleted":false}], });
-        res.status(200).json(getAllCoupons);
-
-    } catch (error) {
-        res.status(500).json(error);
-    }
 }
 
 async function usedCoupon(req, res) {
@@ -234,8 +223,46 @@ async function usedCoupon(req, res) {
     }
 }
 
+async function getCoupons(req,res){
+try {
+    const getAllCoupons=await OffersModel.find({$and:[{OfferType:'coupon'},{userUsed:{$nin: [ req.body.id ] }}]});
+    res.status(200).json(getAllCoupons);
 
-async function getFaq(req, res) {
+} catch (error) {
+    res.status.json(error);
+}
+}
+
+async function UserCoupon(req,res){
+    try {
+        const findCoupon=await OffersModel.findById(req.body.couponId);
+
+        // info.adddr
+        findCoupon.userId.push(req.body.userId);
+        await findCoupon.save();
+        res.status(200).json(findCoupon);
+    } catch (error) {
+        
+    }
+}
+
+async function getPaginatedData(req, res) {
+    const modelName = req.params.model; 
+    const page = parseInt(req.query.page, 1) || 1;
+    const pageSize = parseInt(req.query.pageSize) ? 10 : 10;
+  
+    try {
+      const Model = require(`../models/${modelName}`); 
+      const data = await paginateResults(Model, page, pageSize);
+  
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+async function getFaq(req , res) {
     try {
         const page = req.query.page || 1;
         const limit = req.query.limit || 2;

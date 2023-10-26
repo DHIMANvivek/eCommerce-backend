@@ -46,14 +46,17 @@ async function updateProduct(req, res) {
         delete productObject.data['basicinfo'];
         delete productObject.data['_id'];
 
-        console.log(productObject.data, _id);
+        // var received = productObject.data;
 
-        const response = await products.updateOne({
+        console.log("dataREcieved:: ",productObject.data.assets[0].stockQuantity, _id);
+
+        const response = await products.findOneAndUpdate({
             '_id': _id,
-            'sellerID': sellerID
-        }, { $set: productObject });
 
-        console.log(response);
+            'sellerID': sellerID
+        }, { $set: productObject.data });
+
+        console.log("response:: ", response);
         return res.status(200).json("uploaded");
     } catch (err) {
         console.log(err);
@@ -134,6 +137,7 @@ async function fetchProductInventory(req, res) {
                     unitSold += stock.unitSold;
                 })
             });
+            
             product.totalStock = stockAmt;
             product.unitSold = unitSold;
             return product;

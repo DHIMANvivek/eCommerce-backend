@@ -46,7 +46,7 @@ const productSchema = mongoose.Schema({
       },
       unitSold: {
         type: Number,
-        default: 0
+        default: 0,
       }
     }],
     photo: [{
