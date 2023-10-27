@@ -34,8 +34,9 @@ router.get('/coupons',userController.getCoupons);
 router.get('/getPaginatedData/:model', userController.getPaginatedData);
 
 // support ticket
-// router.get('/getTicketTitle', userController.getTicketTitle);
-// router.post('/sendTicket', userController.sendTicket);
+router.get('/getTicketTitle', userController.getTicketTitle);
+router.post('/sendTicket', userController.sendTicket);
+router.post('/webPushDetails', userController.webPushDetails);
 
 
 router.get('/coupons',userController.getCoupons);

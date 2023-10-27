@@ -3,29 +3,63 @@ const webpush = require("web-push");
 const bodyParser = require("body-parser");
 const path = require("path");
 const crypto = require("crypto");
+const admin = require('firebase-admin');
 require("dotenv").config();
 const app = express();
 app.use(bodyParser.json({limit: '50mb'}));
 
-const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
-const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
-
-webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
-app.post('/subscribe', (req, res) => {
-  const subscription = req.body;
-
-  const payload = JSON.stringify({ title: 'eCommerce New Notification' });
-  webpush
-      .sendNotification(subscription, payload)
-      .then(() => {
-          console.log('Push notification sent');
-          res.status(201).json({ message: 'Push notification sent successfully' });
-      })
-      .catch((err) => {
-          console.error(err);
-          res.status(500).json({ error: 'Failed to send push notification' });
-      });
+const serviceAccount = require('./tradevogue-firebase-adminsdk-mohjp-c7361ba1b1.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
 });
+
+app.post('/send-notification', (req, res) => {
+  const { title, body, icon, token } = req.body;
+
+  console.log('title is ', title, 'body is ', body, 'icon is ', icon, 'token is ', token)
+
+  const message = {
+      "notification": {
+        "title": title,
+        "body": body,
+      },
+      "token": req.body.token,
+    };
+
+  admin.messaging().send(message)
+    .then((response) => {
+      console.log('Successfully sent message:', response);
+      res.status(200).send('Notification sent successfully');
+    })
+    .catch((error) => {
+      console.error('Error sending message:', error);
+      res.status(500).send('Error sending notification');
+    });
+});
+
+
+// const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
+// const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
+
+// webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
+// app.post('/subscribe', (req, res) => {
+//   const subscription = req.body;
+
+//   const payload = JSON.stringify({ title: req.body.title ,
+//   body: req.body.body,
+// icon: req.body.icon,
+// to: req.body.to });
+
+//   webpush.sendNotification(subscription, payload)
+//       .then(() => {
+//           console.log('Push notification sent');
+//           res.status(201).json({ message: 'Push notification sent successfully' });
+//       })
+//       .catch((err) => {
+//           console.error(err);
+//           res.status(500).json({ error: 'Failed to send push notification' });
+//       });
+// });
 
 
 
