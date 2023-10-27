@@ -76,7 +76,7 @@ async function fetchProductDetails(req, res, sku = null) {
             )));
 
         // getting all the reviews and average
-        console.log('proidcut is ',product);
+        console.log('product is ',product);
         const reviews_rating = await reviewsController.fetchReviews(
             product._id,
             user ? user.id : ''
