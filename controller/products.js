@@ -3,80 +3,27 @@ const reviewsController = require('../controller/reviews');
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
 
-// variably pending 
-async function fetchAll(req, res) {
-    try {
-        let output = await Products.find();
-        res.status(200).json(output);
-    } catch (error) {
-        res.status(500).json({
-            message: 'Unable to fetch Products'
-        });
-    }
-}
-
-// ideal for Product page
-// async function fetchProductDetails(req, res, sku = null) {
-//     try {
-
-//         let query = {};
-//         let user;
-//         if (req.headers.authorization){
-//             user = verifyToken(req.headers.authorization.split(' ')[1])
-//             if (user.role == 'admin') query['sellerID'] = user.id;
-//         }
-
-//         query['sku'] = req.query.sku ? req.query.sku : sku;
-
-//         let product = JSON.parse(JSON.stringify(await Products.findOne(
-//             query,
-//             {
-//                 active: 0,
-//                 updatedAt: 0
-//             }     
-//             )));
-
-//         // getting all the reviews and average
-//         // let reviews_rating = await reviewsController.fetchReviews(product._id, user.id);
-//         // product.avgRating = reviews_rating.avgRating;
-//         // product.reviews = reviews_rating.reviews;
-
-//         if (req.query.sku) {
-//             res.status(200).json(product);
-//             return;
-//         }
-//         return product;
-
-//     } catch (error) {
-//         console.log('error coming is ',error);
-//         res.status(500).json({
-//             message: 'This Product is not available'
-//         });
-//     }
-// }
-
 async function fetchProductDetails(req, res, sku = null) {
     try {
 
         let query = {};
         let user;
-        if (req.headers.authorization){
+        if (req.headers.authorization) {
             user = verifyToken(req.headers.authorization.split(' ')[1])
             if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
         query['sku'] = req.query.sku ? req.query.sku : sku;
-        
+
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {
                 active: 0,
                 updatedAt: 0
-            }     
-            )));
+            }
+        )));
 
         // getting all the reviews and average
-        console.log('product is ',product);
         const reviews_rating = await reviewsController.fetchReviews(
             product._id,
             user ? user.id : ''
@@ -84,18 +31,18 @@ async function fetchProductDetails(req, res, sku = null) {
 
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
-        if(reviews_rating.userReview){
+        if (reviews_rating.userReview) {
             product.userReview = reviews_rating.userReview;
         }
 
-        if(req.query.sku){
+        if (req.query.sku) {
             res.status(200).json(product);
             return;
         }
         return product;
 
     } catch (error) {
-        console.log('error is ',error);
+        console.log('error is ', error);
         res.status(500).json({
             message: 'This Product is not available'
         });
@@ -106,11 +53,6 @@ async function fetchProductDetails(req, res, sku = null) {
 async function fetchProducts(req, res) {
     try {
         req.query = req.query ? req.query : req.body;
-        let limit = req.query.limit || 8;
-        let page = req.query.page || 1;
-        let skip = (page - 1) * limit;
-        delete req.query.page;
-        delete req.query.limit;
 
         // Search
         let search = req.query.search || '';
@@ -131,19 +73,61 @@ async function fetchProducts(req, res) {
                 }
             },
             {
-                $project: {
-                    subTitle: 0,
-                    description: 0,
-                    sellerID: 0
+                $lookup: {
+                    from: "reviews",
+                    localField: "_id",
+                    foreignField: "productID",
+                    as: "rating",
+                },
+            },
+            { $unwind: "$rating" },
+            { $unwind: "$rating.reviews" },
+            {
+              $group: {
+                _id: "$_id",
+                sellerID: { $first: '$$ROOT.sellerID'},
+                sku: { $first: '$$ROOT.sku'},
+                name: {$first: '$$ROOT.name'},
+                assets: {$first: '$$ROOT.assets'},
+                info: {$first: '$$ROOT.info'},
+                price: {$first: '$$ROOT.price'},
+                avgRating: {
+                    $avg: "$rating.reviews.rating",
                 }
+              },
             },
-            {
-                $skip: skip
-            },
-            {
-                $limit: limit
-            }
         ];
+
+        if(req.query.sort){
+            let keyCanContain = ['avgRating', 'price'];
+            let key = (req.query.sort).split(':')[0];
+            if(!(keyCanContain.includes(key))){
+                key = 'price';
+            }
+            let value = Number((req.query.sort).split(':')[1]);
+
+            aggregationPipe.push({
+                $sort: { [key]: value }
+            });
+            delete req.query.sort;
+        }
+
+        if (req.query.limit) {
+            let limit = Number(req.query.limit)
+            let page = Number(req.query.page) || 1;
+            let skip = (page - 1) * limit;
+
+            aggregationPipe.push({
+                $skip: skip
+            });
+            aggregationPipe.push({
+                $limit: limit
+            });
+
+            delete req.query.limit;
+            delete req.query.page;
+        }
+
         if ((Object.keys(req.query)).length > 0) {
             aggregationPipe.unshift(
                 {
@@ -153,17 +137,12 @@ async function fetchProducts(req, res) {
 
         // fetching the data
         let products = await Products.aggregate(aggregationPipe);
-    
+
         let matchedProducts = {
             total: 0
         };
-        products  = await getProductPrice((products));
-        matchedProducts.items = await Promise.all(products.map(async (product) => {
-            // product.avgRating = (await reviewsController.fetchReviews(product._id)).avgRating;
-            product.avgRating=0;
-            matchedProducts.total++;
-            return product;
-        }));
+        matchedProducts.items = await getProductPrice((products));
+
         res.status(200).json(matchedProducts);
 
         // filter aggregation query helper function
@@ -179,12 +158,21 @@ async function fetchProducts(req, res) {
                         }));
                         query.push({ $or: colorConditions });
                     }
+                    else if (key === 'size') {
+                        const sizeConditions = parameters[key].map(size => ({
+                            'assets.stockQuantity.size': { $regex: new RegExp(`^${size}$`, 'i') }
+                        }));
+                        query.push({ $or: sizeConditions });
+                    }
                     else {
                         query.push({ [`info.${key}`]: { $in: parameters[key].map(value => new RegExp(`^${value}$`, 'i')) } });
                     }
                 } else {
                     if (key === 'color') {
                         query.push({ [`assets.color`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
+                    }
+                    if (key === 'size') {
+                        query.push({ [`assets.stockQuantity.size`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
                     }
                     else if (key === 'minPrice') {
                         query.push({ 'price': { $gte: parseFloat(parameters[key]) } });
@@ -202,14 +190,12 @@ async function fetchProducts(req, res) {
         }
 
     } catch (error) {
-        console.log('error coming is ',error);
+        console.log('error coming is ', error);
         res.status(500).json({
             message: 'Unable to fetch Products'
         });
     }
 }
-
-
 
 async function fetchUniqueFields(req, res) {
     const products = await Products.find({});
@@ -217,9 +203,7 @@ async function fetchUniqueFields(req, res) {
     function getData(products, parameter = 'all') {
 
         const uniqueData = {
-            size: [],
             category: [],
-            price: [],
             brand: [],
             tags: [],
         }
@@ -295,18 +279,18 @@ async function getProductPrice(products) {
         let discount;
         if (!Array.isArray(products)) {
             discount = await discountQuery(products);
-        products=await discountQuery(products); 
+            products = await discountQuery(products);
         }
         else {
             products = await Promise.all(products.map(async (product) => {
-                if(!(product.info)){
+                if (!(product.info)) {
                     product = await Products.findOne({ sku: product.sku });
-                }   
-                product = await discountQuery(product); 
+                }
+                product = await discountQuery(product);
                 return product;
             }))
         }
-        return new Promise((res,rej)=>{
+        return new Promise((res, rej) => {
             res(products);
         })
 
@@ -315,10 +299,10 @@ async function getProductPrice(products) {
     }
 
     async function discountQuery(parameter) {
-        
+
         let product = JSON.parse(JSON.stringify(parameter));
 
-        return new Promise(async (res,rej)=>{
+        return new Promise(async (res, rej) => {
 
             let discount = await OffersModel.findOne({
                 $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
@@ -326,27 +310,26 @@ async function getProductPrice(products) {
                 ], OfferType: 'discount'
             }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
 
-        if (discount == null) {
-            res(product);
-            return;
-         }
-        product.discountType = discount.discountType;
-        product.discount = Math.floor(discount.discountAmount); 
-        if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
-            product.discountPercentage=discount.discountAmount;
-            product.discount=Math.floor((product.price/100) * discount.discountAmount);
-           if (product.discount > discount.maximumDiscount) {
-                product.discount =Math.floor( discount.maximumDiscount);
+            if (discount == null) {
+                res(product);
+                return;
             }
-        }
-        
-        res(product);
-     });
+            product.discountType = discount.discountType;
+            product.discount = Math.floor(discount.discountAmount);
+            if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
+                product.discountPercentage = discount.discountAmount;
+                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
+                if (product.discount > discount.maximumDiscount) {
+                    product.discount = Math.floor(discount.maximumDiscount);
+                }
+            }
+
+            res(product);
+        });
     }
 }
 
 module.exports = {
-    fetchAll,
     fetchProducts,
     fetchProductDetails,
     fetchUniqueFields,
