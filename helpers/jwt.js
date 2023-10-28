@@ -19,7 +19,7 @@ function createToken(tokenData) {
     try {
 
         // { expiresIn: '1000s' }
-        const token = jwt.sign(tokenData, process.env.secretKey, );
+        const token = jwt.sign(tokenData, process.env.secretKey);
 
         return token;
 

@@ -32,6 +32,7 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
+        console.log(userFound);
         const firstName = userFound?.name.firstname
 
         if (!userFound) {
@@ -41,7 +42,7 @@ async function login(req, res) {
 
         // PURE GOOGLE LOGIN
         if (userFound.provider == 'GOOGLE' && input.token) {
-            const tokenData = { email: userFound.email, role: userFound.role }
+            const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
             res.status(200).json({ message: 'login sucece', token, firstName });
             return;
@@ -64,6 +65,7 @@ async function login(req, res) {
         }
 
         const tokenData = { id: userFound._id, role: userFound.role }
+        console.log(tokenData, 'ks');
         const token = createToken(tokenData);
 
         res.status(200).json({
