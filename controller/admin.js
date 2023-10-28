@@ -104,7 +104,6 @@ async function fetchProductInventory(req, res) {
           ]
         }
       },
-
       {
         $facet: {
           data: [
@@ -155,7 +154,6 @@ async function fetchProductInventory(req, res) {
               {
                 _id: null,
                 count: { $sum: 1 },
-                // data: {$push: '$$ROOT'}
               }
             },
           ],
@@ -181,8 +179,6 @@ async function fetchProductInventory(req, res) {
     });
 
     aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } });
-
-    console.log(aggregationPipe[aggregationPipe.length - 1]);
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       { $skip: (parameters.page - 1) * parameters.limit },
       { $limit: parameters.limit }
@@ -194,8 +190,6 @@ async function fetchProductInventory(req, res) {
       data.productInfo = await products.findOne({ _id: data._id });
       return data;
     }));
-    
-    console.log(response[0], "response", aggregationPipe);
 
     res.status(200).json(response[0]);
   } catch (err) {
@@ -595,24 +589,24 @@ async function deleteTicketTitle(req, res) {
 async function getAllTicket(req, res) {
   try {
 
-        const response = await Ticket.find({}).populate([
-          {
-            path: 'ticketType.title',
-          },
-          {
-            path: 'notificationDetails',
-          }
-        ]);
-        if (response) {
-            return res.status(200).json(response);
-        }
-        throw "404";
-    } catch (err) {
-        console.log(err);
-        return res.status(404).send();
+    const response = await Ticket.find({}).populate([
+      {
+        path: 'ticketType.title',
+      },
+      {
+        path: 'notificationDetails',
+      }
+    ]);
+    if (response) {
+      return res.status(200).json(response);
     }
+    throw "404";
+  } catch (err) {
+    console.log(err);
+    return res.status(404).send();
   }
-  
+}
+
 async function updateTicketStatus(req, res) {
   try {
     const { _id, status } = req.body;
