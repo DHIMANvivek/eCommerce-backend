@@ -50,12 +50,12 @@ let userSchema = new mongoose.Schema({
         },
         address: {
             type: [address],
-            validate: {
-                validator: function (address) {
-                    return address.length <= 3;
-                },
-                message: 'You can only add a maximum of 3 addresses.'
-            }
+            // validate: {
+            //     validator: function (address) {
+            //         return address.length <= 3;
+            //     },
+            //     message: 'You can only add a maximum of 3 addresses.'
+            // }
         }
     },
     photo: {
