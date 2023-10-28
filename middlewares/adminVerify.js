@@ -5,7 +5,7 @@ async function AdminVerify(req, res, next) {
         let data;
         if (req.headers.authorization)
             data = verifyToken(req.headers.authorization.split(' ')[1])
-
+        console.log('data come is ',data);
         if (data.role == 'user') {
             throw ({ message: 'You are not eligible for this route' });
         }

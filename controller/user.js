@@ -2,8 +2,8 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/faq');
 
-const Title = require('../models/createTicket');
-const Ticket = require('../models/supportTicket');
+// const Title = require('../models/createTicket');
+// const Ticket = require('../models/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
@@ -11,7 +11,7 @@ const OffersModel = require('../models/offers');
 const webPush = require('../models/supportNotifications');
 // const OffersModel=require('../models/offers');
 const paginateResults = require('../helpers/pagination');
-const ProductController=require('../controller/products');
+const ProductController = require('../controller/products');
 async function getDetails(req, res) {
 
     try {
@@ -25,19 +25,59 @@ async function getDetails(req, res) {
 async function updateDetails(req, res) {
     try {
         const basicDetails = await Users.findByIdAndUpdate(req.tokenData.id, req.body, { new: true });
-        console.log('details is ',basicDetails);
         res.status(200).json(basicDetails)
     } catch (error) {
-        console.log('error is ',error);
         res.status(500).json(error);
     }
 }
 
+
+async function getActiveAddresses(req,res){
+
+try {
+      const data=await Users.aggregate([
+        {$match:{_id:new mongoose.Types.ObjectId( req.tokenData.id)}},
+        {$unwind:'$info.address'},
+        {$match:{'info.address.status':true}},
+        {$project:{'info.address':1}},
+        {$group:{
+            _id:'$_id',
+            addresses:{$push:'$info.address'}
+        }}]);
+
+
+
+        return  new Promise((res)=>{
+            res(data);
+        })
+  
+
+} catch (error) {
+    console.log('error inside main function is ',error);
+    return  new Promise((res,rej)=>{
+        rej(0);
+    })
+    
+}
+}
+
+
 async function getAddress(req, res) {
     try {
-        const Addresses = await Users.findById({_id:req.tokenData.id,'info.address.status':true}, 'info.address');
-        // console.log('Adress isb ',Addresses);
-        res.status(200).json(Addresses)
+    // const data=await Users.aggregate([
+    //     {$match:{_id:new mongoose.Types.ObjectId( req.tokenData.id)}},
+    //     {$unwind:'$info.address'},
+    //     {$match:{'info.address.status':true}},
+    //     {$project:{'info.address':1}},
+    //     {$group:{
+    //         _id:'$_id',
+    //         addresses:{$push:'$info.address'}
+    //     }}
+
+    // ])
+
+    const data=await getActiveAddresses(req);
+        res.status(200).json(data[0]);
     }
     catch (error) {
         res.status(500).json(error);
@@ -45,37 +85,32 @@ async function getAddress(req, res) {
 }
 
 async function getPaginatedData(req, res) {
-    const modelName = req.params.model; 
+    const modelName = req.params.model;
     const page = parseInt(req.query.page, 1) || 1;
     const pageSize = parseInt(req.query.pageSize, 3) || 10;
 
     try {
-      const Model = require(`../models/${modelName}`); 
-      const data = await paginateResults(Model, page, pageSize);
+        const Model = require(`../models/${modelName}`);
+        const data = await paginateResults(Model, page, pageSize);
 
-      res.status(200).json(data);
+        res.status(200).json(data);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-  }
+}
 
 async function addAddress(req, res) {
     try {
-        const findUserAddress = await Users.findOne({_id:req.tokenData.id});
-        if(findUserAddress.info.address.length==0)
-        {
-            req.body.defaultAddress=true;
-        }
-        findUserAddress.info.address.push(req.body);
-        await findUserAddress.save();
-        res.status(200).json(req.body);
+        const findUserAddress=await getActiveAddresses(req);
+if(findUserAddress[0].addresses.length==3){
+    throw({message:'You cannot add more than 3 addresses'});
+}
+
+const updateAddress=await Users.findByIdAndUpdate({_id:req.tokenData.id},{$push:{'info.address':req.body}});
+        res.status(200).json({message:'Successfully added address'});
     }
     catch (error) {
-        // if (error.name == 'ValidationError') {
-        //     res.status(400).json({ error: 'Validation error', message: error.message });
-        //     return;
-        // }
         res.status(500).json(error)
     }
 }
@@ -84,21 +119,19 @@ async function deleteAddress(req, res) {
     try {
 
         // projection:{'info.address':1}
-
+        console.log('reqbody is ', req.body);
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
-            'info.address._id': address_id
-        },{
+            'info.address._id': req.body.address_id
+        }, {
             $set: {
-                'info.address.status.$': false
+                'info.address.$.status': false
             }
-        },
-        { projection:{'info.address':1}});
-        // if(deleteAddress)
-        console.log('deleted Address is ',updatedValue);
+        });
+
         res.status(200).json(updatedValue);
     } catch (error) {
-        console.log('errpr is ',error);
+        console.log('errpr is ', error);
         res.status(500).json(error);
     }
 }
@@ -106,10 +139,11 @@ async function deleteAddress(req, res) {
 async function updateAddress(req, res) {
     try {
         const address_id = req.body._id;
+        console.log('body comingi is ',req.body);
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
-            'info.address._id': address_id
-        },{
+            'info.address._id': new mongoose.Types.ObjectId(address_id)
+        }, {
             $set: {
                 'info.address.$': req.body
             }
@@ -120,32 +154,33 @@ async function updateAddress(req, res) {
     }
 }
 
-async function DefaultAddress(req,res){
+async function DefaultAddress(req, res) {
     try {
-        await Users.updateMany({
-            _id: req.tokenData.id,
-        },{
-            $set: {
-                'info.address.$[].defaultAddress': false
-            }
-        });
-        const updatedValue= await Users.updateOne({
-            _id: req.tokenData.id,
-            'info.address._id': req.body.address_id
-        },{
-            $set: {
-                'info.address.$.defaultAddress': true
-            }
-        });
+        // await Users.updateMany({
+        //     _id: req.tokenData.id,
+        // },{
+        //     $set: {
+        //         'info.address.$[].defaultAddress': false
+        //     }
+        // });
+        // const updatedValue= await Users.updateOne({
+        //     _id: req.tokenData.id,
+        //     'info.address._id': req.body.address_id
+        // },{
+        //     $set: {
+        //         'info.address.$.defaultAddress': true
+        //     }
+        // });
 
-        const FindAllAddress=await Users.find({
-            _id:req.tokenData.id,
+        // const FindAllAddress=await Users.find({
+        //     _id:req.tokenData.id,
 
-        },{'info.address':1,_id:0})
-        console.log('updateAddress is ',updatedValue);
-        res.status(200).json(FindAllAddress)
+        // },{'info.address':1,_id:0})
+        // console.log('updateAddress is ',updatedValue);
+        // res.status(200).json(FindAllAddress)
+
     } catch (error) {
-        console.log('error coming is ',error);
+        console.log('error coming is ', error);
         res.status(500).json(error)
     }
 }
@@ -175,10 +210,6 @@ async function createPaymentIntent(req, res) {
 
 async function getOrders(req, res) {
     try {
-        // const userOrders = await ordersModel.findOne({ buyerId: req.body._id });
-        // const 
-        // const Products=await ProductController.get
-
         res.status(200).json(userOrders);
     } catch (error) {
         if (error.message) {
@@ -195,6 +226,7 @@ async function getOrders(req, res) {
 async function addReview(req, res) {
     try {
         const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.body.id] } }] });
+
         res.status(200).json(getAllCoupons);
 
     }
@@ -206,6 +238,17 @@ async function addReview(req, res) {
 async function putReviews(req, res){
     console.log(req.body);
     Reviews.insertMany(req.body);
+}
+
+
+async function getCoupons(req, res) {
+    try {
+        const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.tokenData.id] } }, { startDate: { $lte: (new Date()) } }, { "status.active": false }, { "status.deleted": false }], });
+        res.status(200).json(getAllCoupons);
+
+    } catch (error) {
+        res.status(500).json(error);
+    }
 }
 
 async function usedCoupon(req, res) {
@@ -313,7 +356,6 @@ async function sendTicket(req , res) {
     console.log(req.body)
     try {
         const ticketType = await Title.findOne({ title: req.body.selectedTicket});
-        const webPushDetails = await webPush.findOne({});
     
         if (!ticketType) {
           return res.status(404).json({ error: 'TicketType not found' });
@@ -327,7 +369,6 @@ async function sendTicket(req , res) {
           ticketTypes: req.body.selectedTicket,
           message: req.body.message,
           ticketType: {title: ticketType},
-          notificationDetails: webPushDetails,
         });
     
         const savedTicket = await newTicket.save();
@@ -338,27 +379,6 @@ async function sendTicket(req , res) {
         return res.status(500).json({ error: 'An error occurred while creating the ticket' });
       }
 }
-
-async function webPushDetails(req, res) {
-    try {
-        const { email, token } = req.body;
-        console.log('email is ', email, 'token is ', token);
-    
-        const supportNotification = await webPush.findOne({});
-    
-        if (supportNotification) {
-            supportNotification.tokenDetail.push({ token, email });
-          await supportNotification.save();
-          res.status(200).json(supportNotification);
-        } else {
-          // If the document doesn't exist, you can create a new one or handle this case as needed
-          res.status(404).json({ error: 'SupportNotifications document not found' });
-        }
-      } catch (error) {
-        console.error('Error saving user details:', error);
-        return res.status(500).json({ error: 'An error occurred while saving user details' });
-      }
-  }
 
 
 module.exports = {
@@ -379,8 +399,8 @@ module.exports = {
     getCoupons,
     getPaginatedData,
     getTicketTitle,
-    sendTicket,
+    // sendTicket,
     getTicketTitle,
     sendTicket,
-    webPushDetails
+    // webPushDetails
 }

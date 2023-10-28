@@ -290,7 +290,17 @@ async function getProductPrice(products) {
                 return product;
             }))
         }
-        return new Promise((res, rej) => {
+
+
+        /* 
+        offers.aggregrate([
+            $match:product.id,
+            
+        ])
+
+
+        */ 
+        return new Promise((res,rej)=>{
             res(products);
         })
 
@@ -302,30 +312,48 @@ async function getProductPrice(products) {
 
         let product = JSON.parse(JSON.stringify(parameter));
 
-        return new Promise(async (res, rej) => {
-
+        return new Promise(async (res,rej)=>{
             let discount = await OffersModel.findOne({
                 $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
                 { "ExtraInfo.brands": { $in: [product.info.brand] } },
                 ], OfferType: 'discount'
             }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
 
-            if (discount == null) {
-                res(product);
-                return;
-            }
-            product.discountType = discount.discountType;
-            product.discount = Math.floor(discount.discountAmount);
-            if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
-                product.discountPercentage = discount.discountAmount;
-                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
-                if (product.discount > discount.maximumDiscount) {
-                    product.discount = Math.floor(discount.maximumDiscount);
-                }
+        if (discount == null) {
+            res(product);
+            return;
+         }
+        product.discountType = discount.discountType;
+        product.discount = Math.floor(discount.discountAmount); 
+        // if(product.discount){
+        //     product.oldPrice=product.price;
+        //     product.price=product.price-product.discount;
+            
+        // }
+        if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
+
+            product.discountPercentage=discount.discountAmount;
+            product.discount=Math.floor((product.price/100) * discount.discountAmount);
+
+           if (product.discount > discount.maximumDiscount) {
+                product.discount =Math.floor( discount.maximumDiscount);
             }
 
-            res(product);
-        });
+          
+
+        }
+        
+
+        if(product.discount){
+            product.oldPrice=product.price;
+            product.price=product.price-product.discount;
+            
+        }
+
+        // console.log('product come is-----> ',product);
+
+        res(product);
+     });
     }
 }
 

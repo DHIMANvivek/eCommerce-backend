@@ -17,12 +17,17 @@ async function getOrders(req, res) {
 
 async function CreateOrder(req,res){
     try {
-        req.body.buyerId=req.tokenData.id;
-        // console.log('create order srtated ',req.body.);
-        const fetchProducts=await ProductController.fetchProducts();
-        // console.log('fetchProcduts is ',fetchProducts);
+
+        // console.log('body coming is ',req.body," tokenData is ",req.tokenData);
+
+        // req.body.products.forEach(async element => {
+        //     const data=ProductController.fetchProductDetails(element.sku);
+        // });
         
-        
+            // req.body.details.forEach(async (element) => {
+            //     let response =await ProductController.fetchProductDetails();
+            //     console.log('response is ',response);
+            // });
         res.status(200).json({message:'Order created Succes'});
     } catch (error) {
         console.log('error is ',error);
