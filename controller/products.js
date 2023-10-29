@@ -58,6 +58,12 @@ async function fetchProducts(req, res) {
         let search = req.query.search || '';
         delete req.query.search;
 
+        let minPrice = Number(req.query.minPrice) || '';
+        delete req.query.minPrice;
+
+        let maxPrice = Number(req.query.maxPrice)|| '';
+        delete req.query.maxPrice;
+
         // aggregation pipe array
         aggregationPipe = [
             {
@@ -91,6 +97,7 @@ async function fetchProducts(req, res) {
                 assets: {$first: '$$ROOT.assets'},
                 info: {$first: '$$ROOT.info'},
                 price: {$first: '$$ROOT.price'},
+                createdAt: {$first: '$$ROOT.createdAt'},
                 avgRating: {
                     $avg: "$rating.reviews.rating",
                 }
@@ -98,31 +105,44 @@ async function fetchProducts(req, res) {
             },
         ];
 
+        let priceSortValue;
         if(req.query.sort){
-            let keyCanContain = ['avgRating', 'price'];
+            let keyCanContain = ['avgRating', 'price', 'createdAt'];
             let key = (req.query.sort).split(':')[0];
-            if(!(keyCanContain.includes(key))){
-                key = 'price';
-            }
             let value = Number((req.query.sort).split(':')[1]);
 
-            aggregationPipe.push({
-                $sort: { [key]: value }
-            });
+            //defaults to if some other value is input
+            if(!(keyCanContain.includes(key))){
+                key = 'createdAt';
+            }
+
+            if(key == 'price'){
+                priceSortValue = value
+            }
+            else{
+                console.log(key, value, 'gehe');
+                aggregationPipe.push({
+                    $sort: { [key]: value }
+                });
+            }
+
             delete req.query.sort;
         }
 
-        if (req.query.limit) {
-            let limit = Number(req.query.limit)
-            let page = Number(req.query.page) || 1;
-            let skip = (page - 1) * limit;
+        let limit = Number(req.query.limit) || '';
+        let page = Number(req.query.page) || 1;
+        let skip = (page - 1) * limit;
 
-            aggregationPipe.push({
-                $skip: skip
-            });
-            aggregationPipe.push({
-                $limit: limit
-            });
+        if (req.query.limit) {
+
+            if(!(minPrice || maxPrice)){
+                aggregationPipe.push({
+                    $skip: skip
+                });
+                aggregationPipe.push({
+                    $limit: limit
+                });
+            }
 
             delete req.query.limit;
             delete req.query.page;
@@ -141,7 +161,36 @@ async function fetchProducts(req, res) {
         let matchedProducts = {
             total: 0
         };
+
         matchedProducts.items = await getProductPrice((products));
+
+        if(priceSortValue){
+            matchedProducts.items = matchedProducts.items.sort((a, b) => {            
+                if (a.price < b.price) {
+                  return -1 * priceSortValue;
+                }
+                if (a.price > b.price) {
+                  return 1 * priceSortValue;
+                }
+                return 0;
+            });
+        }
+        if(minPrice){
+            matchedProducts.items = matchedProducts.items.filter((item)=>{
+                return (item.discount ? (item.price - item.discount) : item.price) >= minPrice;
+            });
+        }
+        if(maxPrice){
+            matchedProducts.items = matchedProducts.items.filter((item)=>{
+                return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
+            });
+        }
+
+        if((minPrice || maxPrice)){
+            if(limit){
+                matchedProducts.items = matchedProducts.items.splice(skip, limit);
+            }
+        }
 
         res.status(200).json(matchedProducts);
 
@@ -171,14 +220,8 @@ async function fetchProducts(req, res) {
                     if (key === 'color') {
                         query.push({ [`assets.color`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
                     }
-                    if (key === 'size') {
+                    else if (key === 'size') {
                         query.push({ [`assets.stockQuantity.size`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
-                    }
-                    else if (key === 'minPrice') {
-                        query.push({ 'price': { $gte: parseFloat(parameters[key]) } });
-                    }
-                    else if (key === 'maxPrice') {
-                        query.push({ 'price': { $lte: parseFloat(parameters[key]) } });
                     }
                     else {
                         query.push({ [`info.${key}`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
