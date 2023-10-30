@@ -7,6 +7,8 @@ const faqData = require('../models/faq');
 const Ticket = require('../models/supportTicket');
 const Title = require('../models/createTicket');
 
+const productController = require('../controller/products');
+
 const OffersModel = require('../models/offers');
 
 async function addProduct(req, res) {
@@ -89,6 +91,8 @@ async function deleteProductInventory(req, res) {
   }
 }
 
+
+// Fetch All Products specific to seller/Admin
 async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
   const parameters = req.body;
@@ -195,6 +199,24 @@ async function fetchProductInventory(req, res) {
   } catch (err) {
     console.log(err);
   }
+}
+
+//Extract all detail of products using SQU
+async function fetchProductDetail(req, res){
+    let sku = req.query.data;
+    delete req.query.data;
+
+    try{
+      let response = await productController.fetchProductDetails(req, res, sku, true);
+      console.log(response);
+      return res.status(200).json(response);
+
+    }catch(err){
+      console.log(err);
+      return res.status(404).json({message: err});
+
+    }
+
 }
 
 async function fetchFeatures(req, res) {
@@ -313,8 +335,6 @@ async function createOffer(req, res) {
     }
 }
 
-
-
 async function getOffers(req, res) {
   try {
 
@@ -324,7 +344,6 @@ async function getOffers(req, res) {
         res.status(500).json(error);
     }
 }
-
 
 async function deleteOffer(req, res) {
   try {
@@ -607,9 +626,6 @@ async function deleteSupportTicket(req, res) {
   }
 }
 
-
-
-
 async function updateOffer(req, res) {
   try {
     console.log('req   body is ', req.body);
@@ -627,6 +643,7 @@ module.exports = {
   updateProduct,
   deleteProductInventory,
   fetchProductInventory,
+  fetchProductDetail,
   fetchFeatures,
   updateFeatures,
   updateDetails,

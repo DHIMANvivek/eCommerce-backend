@@ -3,18 +3,18 @@ const reviewsController = require('../controller/reviews');
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
 
-async function fetchProductDetails(req, res, sku = null) {
+async function fetchProductDetails(req, res, sku = null, admincontroller = null) {
     try {
 
         let query = {};
         let user;
-        if (req.headers.authorization) {
+
+        if (admincontroller) {
             user = verifyToken(req.headers.authorization.split(' ')[1])
             if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
         query['sku'] = req.query.sku ? req.query.sku : sku;
-
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {
@@ -24,10 +24,19 @@ async function fetchProductDetails(req, res, sku = null) {
         )));
 
         // getting all the reviews and average
-        const reviews_rating = await reviewsController.fetchReviews(
-            product._id,
-            user ? user.id : ''
-        );
+        console.log('proidcut is ',product);
+        let reviews_rating;
+        if(user && admincontroller){
+            reviews_rating = await reviewsController.fetchReviews(
+                product._id,
+                user.id
+            );
+        }
+        else{
+            reviews_rating = await reviewsController.fetchReviews(
+                product._id
+            );
+        }
 
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
@@ -43,9 +52,12 @@ async function fetchProductDetails(req, res, sku = null) {
 
     } catch (error) {
         console.log('error is ', error);
-        res.status(500).json({
-            message: 'This Product is not available'
-        });
+        if(req.query.sku){
+            res.status(500).json({
+                message: 'This Product is not available'
+            });
+        }
+        throw 404;
     }
 }
 

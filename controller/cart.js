@@ -29,6 +29,7 @@ async function fetchCart(req, res) {
         
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
+            console.log(item);
             let product = await productsController.fetchProductDetails(req, res, item.sku);
             const fields = ['name', 'assets', 'info', 'price'];
 
