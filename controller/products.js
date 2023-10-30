@@ -14,6 +14,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
+        
         query['sku'] = req.query.sku ? req.query.sku : sku;
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
@@ -22,6 +23,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
                 updatedAt: 0
             }
         )));
+
 
         // getting all the reviews and average
         console.log('proidcut is ',product);

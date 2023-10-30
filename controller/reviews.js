@@ -91,7 +91,6 @@ async function addOrUpdateReview(req, res) {
 
 
     } catch (error) {
-        console.log('error is ', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }

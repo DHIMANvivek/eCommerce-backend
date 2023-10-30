@@ -28,7 +28,7 @@ router.post('/create-payment-intent', userController.createPaymentIntent);
 router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
 // router.get('/getPaginatedData/:model', userController.getPaginatedData);
-router.get('/coupons',userController.getCoupons);
+// router.get('/coupons',userController.getCoupons);
 // router.get('/coupons',userController.GetCoupons);
 
 router.get('/getPaginatedData/:model', userController.getPaginatedData);
@@ -39,6 +39,6 @@ router.post('/sendTicket', userController.sendTicket);
 // router.post('/webPushDetails', userController.webPushDetails);
 
 
-router.get('/coupons',userController.getCoupons);
+// router.get('/coupons',userController.getCoupons);
 router.post('/used',userController.usedCoupon)
 module.exports = router;

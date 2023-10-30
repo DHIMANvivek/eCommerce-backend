@@ -13,6 +13,7 @@ router.use('/reviews', require('./v1/reviews'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
 router.use('/wishlist', require('./v1/wishlist'))
+router.use('/offer',require('./v1/offer'));
 
 
 // check type of user (Used for purpose of Authguard)

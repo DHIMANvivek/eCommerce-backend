@@ -9,7 +9,7 @@ const orderSchema = mongoose.Schema(
             required: true,
         },
 
-        product: [
+        products: [
             {
                 // productId: {
                 //     type: mongoose.Schema.Types.ObjectId,
@@ -67,35 +67,38 @@ const orderSchema = mongoose.Schema(
             enum: ['confirmed', 'pending', 'cancelled', 'refund'],
             default: 'pending'
         },
-        OTP:{
-            type:Number,
-            default:function OtpCreater(){
-                return Math.floor((Math.random() * 999999));
-            },
-            // default:100000,
-            validate: {
-                validator: function (value) {
-                  // Check if the value is a number and has at least 6 digits.
-                  let result= value >= 100000 && value<=999999;
-                  console.log('value coming is ',value," result is ",result, " ",value >= 100000," "," ",value<=999999);
-                  return result;
-                },
-                message: 'Your field must be a number with a minimum of 6 digits.',
-              },
-        },
-        couponCode:{
-          type:String
+        // OTP:{
+        //     type:Number,
+        //     default:function OtpCreater(){
+        //         return Math.floor((Math.random() * 999999));
+        //     },
+        //     // default:100000,
+        //     validate: {
+        //         validator: function (value) {
+        //           // Check if the value is a number and has at least 6 digits.
+        //           let result= value >= 100000 && value<=999999;
+        //           console.log('value coming is ',value," result is ",result, " ",value >= 100000," "," ",value<=999999);
+        //           return result;
+        //         },
+        //         message: 'Your field must be a number with a minimum of 6 digits.',
+        //       },
+        // },
+        coupon:{
+        //   type:String
+        type: mongoose.Schema.Types.ObjectId,
+            ref: 'Offers',
         },
         discount:{
             type:Number,
             default:0,
             required:function (){
-                return this.couponApplied;
+                return this.coupon;
             }
         },
         
         orderValueAfterDiscount: {
             type: Number,
+            default:this.orderAmount
           },
        
     },
@@ -108,17 +111,16 @@ const orderSchema = mongoose.Schema(
 
 orderSchema.pre('save', function (next) {
 
-
-    this.orderAmount = this.product.reduce((totalAmount, product) => {
+    this.orderAmount = this.products.reduce((totalAmount, product) => {
         return totalAmount + product.amount;
     },0);
 
-    if (!this.couponCode) {
+    if (!this.coupon) {
         this.orderValueAfterDiscount = this.orderAmount;
       }
     
-      if(this.couponCode){
-        console.log('coupon applied is ',this.couponApplied);
+      if(this.coupon){
+        // console.log('coupon applied is ',this.couponApplied);
         this.orderValueAfterDiscount =this.orderAmount-this.discount;
       }
     

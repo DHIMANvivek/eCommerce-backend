@@ -324,35 +324,38 @@ async function getAdminDetails(req, res) {
   }
 }
 
-async function createOffer(req, res) {
-    try {
-        const offer = await OffersModel(req.body);
-        await offer.save();
-        res.status(200).json(offer);
-    } catch (error) {
-      console.log('error is ',error);
-        res.status(500).json(error);
-    }
-}
+// async function createOffer(req, res) {
+//     try {
+//         const offer = await OffersModel(req.body);
+//         await offer.save();
+//         res.status(200).json(offer);
+//     } catch (error) {
+//       console.log('error is ',error);
+//         res.status(500).json(error);
+//     }
+// }
 
-async function getOffers(req, res) {
-  try {
 
-        const data = await OffersModel.find({'status.deleted':false});
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json(error);
-    }
-}
 
-async function deleteOffer(req, res) {
-  try {
-    const offerdeleted = await OffersModel.updateOne({ _id: req.body.id }, { $set: { "status.deleted": true } });
-    res.status(200).json({ message: 'Deleted Successfully' });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-}
+// async function getOffers(req, res) {
+//   try {
+
+//         const data = await OffersModel.find({'status.deleted':false});
+//         res.status(200).json(data);
+//     } catch (error) {
+//         res.status(500).json(error);
+//     }
+// }
+
+
+// async function deleteOffer(req, res) {
+//   try {
+//     const offerdeleted = await OffersModel.updateOne({ _id: req.body.id }, { $set: { "status.deleted": true } });
+//     res.status(200).json({ message: 'Deleted Successfully' });
+//   } catch (error) {
+//     res.status(500).json(error);
+//   }
+// }
 
 
 async function updateFaq(req, res) {
@@ -626,17 +629,20 @@ async function deleteSupportTicket(req, res) {
   }
 }
 
-async function updateOffer(req, res) {
-  try {
-    console.log('req   body is ', req.body);
-    const result = await OffersModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
-    console.log('update offer is ', result);
-    res.status(200).json({ message: 'updated Successfully' });
-  } catch (error) {
-    console.log('error is ', error);
-    res.status(500).json(error);
-  }
-}
+
+
+
+// async function updateOffer(req, res) {
+//   try {
+//     console.log('req   body is ', req.body);
+//     const result = await OffersModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
+//     console.log('update offer is ', result);
+//     res.status(200).json({ message: 'updated Successfully' });
+//   } catch (error) {
+//     console.log('error is ', error);
+//     res.status(500).json(error);
+//   }
+// }
 
 module.exports = {
   addProduct,
@@ -648,9 +654,9 @@ module.exports = {
   updateFeatures,
   updateDetails,
   getAdminDetails,
-  createOffer,
-  getOffers,
-  deleteOffer,
+  // createOffer,
+  // getOffers,
+  // deleteOffer,
   // getProductPrice,
   updateFaq,
   deleteFaq,
@@ -663,7 +669,7 @@ module.exports = {
   getAllTicket,
   updateTicketStatus,
   deleteSupportTicket,
-  updateOffer
+  // updateOffer
   // getProductPrice
 }
 

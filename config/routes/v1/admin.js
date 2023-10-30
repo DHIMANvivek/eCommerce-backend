@@ -20,10 +20,10 @@ router.get('/getAdminDetails', adminController.getAdminDetails);
 
 
 //  COUPONS
-router.post('/createOffer',adminController.createOffer)
-router.get('/getOffers',adminController.getOffers)
-router.post('/deleteOffer',adminController.deleteOffer)
-router.post('/updateOffer',adminController.updateOffer)
+// router.post('/createOffer',adminController.createOffer)
+// router.get('/getOffers',adminController.getOffers)
+// router.post('/deleteOffer',adminController.deleteOffer)
+// router.post('/updateOffer',adminController.updateOffer)
 // router.get('/getProductPrice',adminController.getProductPrice)
 
 // FAQs

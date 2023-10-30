@@ -35,6 +35,7 @@ async function updateDetails(req, res) {
 async function getActiveAddresses(req,res){
 
 try {
+    console.log('tokendata is ',req.tokenData);
       const data=await Users.aggregate([
         {$match:{_id:new mongoose.Types.ObjectId( req.tokenData.id)}},
         {$unwind:'$info.address'},
@@ -103,7 +104,7 @@ async function getPaginatedData(req, res) {
 async function addAddress(req, res) {
     try {
         const findUserAddress=await getActiveAddresses(req);
-if(findUserAddress[0].addresses.length==3){
+if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
     throw({message:'You cannot add more than 3 addresses'});
 }
 
@@ -111,15 +112,13 @@ const updateAddress=await Users.findByIdAndUpdate({_id:req.tokenData.id},{$push:
         res.status(200).json({message:'Successfully added address'});
     }
     catch (error) {
+        console.log('error is ',error);
         res.status(500).json(error)
     }
 }
 
 async function deleteAddress(req, res) {
     try {
-
-        // projection:{'info.address':1}
-        console.log('reqbody is ', req.body);
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
             'info.address._id': req.body.address_id
@@ -241,15 +240,15 @@ async function putReviews(req, res){
 }
 
 
-async function getCoupons(req, res) {
-    try {
-        const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.tokenData.id] } }, { startDate: { $lte: (new Date()) } }, { "status.active": false }, { "status.deleted": false }], });
-        res.status(200).json(getAllCoupons);
+// async function getCoupons(req, res) {
+//     try {
+//         const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.tokenData.id] } }, { startDate: { $lte: (new Date()) } }, { "status.active": false }, { "status.deleted": false }], });
+//         res.status(200).json(getAllCoupons);
 
-    } catch (error) {
-        res.status(500).json(error);
-    }
-}
+//     } catch (error) {
+//         res.status(500).json(error);
+//     }
+// }
 
 async function usedCoupon(req, res) {
     try {
@@ -267,15 +266,15 @@ async function usedCoupon(req, res) {
     }
 }
 
-async function getCoupons(req,res){
-try {
-    const getAllCoupons=await OffersModel.find({$and:[{OfferType:'coupon'},{userUsed:{$nin: [ req.body.id ] }}]});
-    res.status(200).json(getAllCoupons);
+// async function getCoupons(req,res){
+// try {
+//     const getAllCoupons=await OffersModel.find({$and:[{OfferType:'coupon'},{userUsed:{$nin: [ req.body.id ] }}]});
+//     res.status(200).json(getAllCoupons);
 
-} catch (error) {
-    res.status.json(error);
-}
-}
+// } catch (error) {
+//     res.status.json(error);
+// }
+// }
 
 async function UserCoupon(req,res){
     try {
@@ -385,10 +384,10 @@ module.exports = {
     getDetails,
     updateDetails,
     getAddress,
-    getCoupons,
+    // getCoupons,
     DefaultAddress,
     usedCoupon,
-    getCoupons,
+    // getCoupons,
     addAddress,
     deleteAddress,
     updateAddress,
@@ -396,7 +395,7 @@ module.exports = {
     getOrders,
     getFaq,
     sendData,
-    getCoupons,
+    // getCoupons,
     getPaginatedData,
     getTicketTitle,
     // sendTicket,

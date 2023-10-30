@@ -18,7 +18,6 @@ let offerSchema = mongoose.Schema({
                 if (this.OfferType == 'coupon') return true;
             },
         
-       
         unique:function validate() {
             if (this.OfferType == 'coupon') return true;
         },
@@ -45,7 +44,7 @@ let offerSchema = mongoose.Schema({
 
     DiscountPercentageType:{
         type:String,
-        enum:['fixed','variable'],
+        // enum:['fixed','variable'],
         required:function validate() {
             if (this.discountType == 'percentage') return true;
 
