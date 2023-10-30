@@ -29,7 +29,6 @@ async function fetchCart(req, res) {
         
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
-            console.log(item);
             let product = await productsController.fetchProductDetails(req, res, item.sku);
             const fields = ['name', 'assets', 'info', 'price'];
 
@@ -142,14 +141,12 @@ async function updateItem(req, res) {
         const itemId = req.body.index;
         const newQuantity = req.body.quantity;
 
-        console.log(itemId);
         await Cart.updateOne(
             { userId: userId, 'items._id': itemId },
             { $set: { 'items.$.quantity': newQuantity } }
         );
 
         let cart = (await Cart.findOne({ userId: userId })).items;
-        console.log(newQuantity, cart);
 
         res.status(200).json({
             message: 'Cart item updated successfully',

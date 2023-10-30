@@ -26,7 +26,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
 
         // getting all the reviews and average
-        console.log('proidcut is ',product);
+        // console.log('proidcut is ',product);
         let reviews_rating;
         if(user && admincontroller){
             reviews_rating = await reviewsController.fetchReviews(
@@ -134,7 +134,6 @@ async function fetchProducts(req, res) {
                 priceSortValue = value
             }
             else{
-                console.log(key, value, 'gehe');
                 aggregationPipe.push({
                     $sort: { [key]: value }
                 });
@@ -190,14 +189,17 @@ async function fetchProducts(req, res) {
             });
         }
         if(minPrice){
-            matchedProducts.items = matchedProducts.items.filter((item)=>{
+            console.log('min is ',minPrice);
+            matchedProducts.items = JSON.parse(JSON.stringify( matchedProducts.items.filter((item)=>{
                 return (item.discount ? (item.price - item.discount) : item.price) >= minPrice;
-            });
+            })));
+            
         }
         if(maxPrice){
-            matchedProducts.items = matchedProducts.items.filter((item)=>{
+            console.log('max is ',maxPrice);
+            matchedProducts.items =(matchedProducts.items.filter((item)=>{
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
-            });
+            }));
         }
 
         if((minPrice || maxPrice)){
@@ -277,15 +279,12 @@ async function fetchUniqueFields(req, res) {
         products.forEach((data) => {
 
             if (parameter != 'all') {
-
-                // console.log('filterObject EVERY TIME IS  ',filterObject);
+;
                 if (data.info.gender == 'male') {
-                    // console.log("male"); 
                     a = aa;
-                    filterObject = filterObject2.male; // object  male: uniqueData, female: uniqueData }  
+                    filterObject = filterObject2.male; 
                 }
                 else {
-                    // console.log("female  ",filterObject.female);
                     filterObject = filterObject2.female;
                 }
             }
@@ -316,19 +315,14 @@ async function fetchUniqueFields(req, res) {
                     }
                 }
             }
-            // return uniqueData;
         });
 
         return uniqueData;
     }
 
     const data = getData(products, 'all');
-    // console.log('data is ', data);
     res.status(200).json({ data });
 
-    // console.log(uniqueData);
-
-    // res.status(200).json(uniqueData);
 }
 
 async function getProductPrice(products) {
