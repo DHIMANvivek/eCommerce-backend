@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const AdminVerify=require('../../middlewares/adminVerify');
-const { verifyToken } = require('../../helpers/jwt'); 
+const AdminVerify = require('../../middlewares/adminVerify');
+const { verifyToken } = require('../../helpers/jwt');
 const mailer = require('../../helpers/nodemailer');
 const { SubscribeTemplate } = require('../../helpers/INDEX');
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
@@ -12,49 +12,50 @@ router.use('/products', require('./v1/products'));
 router.use('/reviews', require('./v1/reviews'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
-router.use('/wishlist', require('./v1/wishlist'))
-router.use('/offer',require('./v1/offer'));
+router.use('/wishlist', require('./v1/wishlist'));
+router.use('/offer', require('./v1/offer'));
+router.use('/socials', require('./v1/custom-website-elements/socials'));
 
 
 // check type of user (Used for purpose of Authguard)
-router.get('/checkUser', (req, res)=>{
-    
+router.get('/checkUser', (req, res) => {
+
     const token = req.headers.authorization;
-    try{
-        if(token){
+    try {
+        if (token) {
             const data = verifyToken(token.split(' ')[1]);
-            if(data.role!='admin'){
-                throw({message:'You are not an admin.'})
+            if (data.role != 'admin') {
+                throw ({ message: 'You are not an admin.' })
             }
             return res.json("sucess");
         }
-        throw{message: 'Please login/signup first.'};
-    }catch(error){
+        throw { message: 'Please login/signup first.' };
+    } catch (error) {
         return res.status(404).json(error);
     }
 })
 
 //send subscribe mail 
-router.post('/sendMail', async (req, res)=>{
+router.post('/sendMail', async (req, res) => {
     const mailData = {
-        email : req.body.email,
-        subject : "Thank You for Subscribing - Enjoy 25% Off!"
+        email: req.body.email,
+        subject: "Thank You for Subscribing - Enjoy 25% Off!"
     }
     const mailSent = await mailer(mailData, SubscribeTemplate);
 
     res.status(200).json({
         message: "done"
     })
-    
+
 })
 
 // ticket status
-router.post('/ticketStatus', async (req, res)=>{
+router.post('/ticketStatus', async (req, res) => {
     console.log(req.body)
     const mailData = {
-        email : req.body.email,
-        subject : "Ticket Status",
-        status : req.body.status,
+        email: req.body.email,
+        subject: "Ticket Status",
+        status: req.body.status,
         message: req.body.message
     }
     const emailTemplate = TicketStatusTemplate(mailData);
@@ -63,7 +64,7 @@ router.post('/ticketStatus', async (req, res)=>{
     res.status(200).json({
         message: "done"
     })
-    
+
 })
 
 router.use(function (req, res) {

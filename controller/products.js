@@ -14,7 +14,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
-        
+
         query['sku'] = req.query.sku ? req.query.sku : sku;
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
@@ -28,13 +28,13 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         // getting all the reviews and average
         // console.log('proidcut is ',product);
         let reviews_rating;
-        if(user && admincontroller){
+        if (user && admincontroller) {
             reviews_rating = await reviewsController.fetchReviews(
                 product._id,
                 user.id
             );
         }
-        else{
+        else {
             reviews_rating = await reviewsController.fetchReviews(
                 product._id
             );
@@ -54,7 +54,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
     } catch (error) {
         console.log('error is ', error);
-        if(req.query.sku){
+        if (req.query.sku) {
             res.status(500).json({
                 message: 'This Product is not available'
             });
@@ -67,7 +67,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 async function fetchProducts(req, res) {
     try {
         req.query = req.query ? req.query : req.body;
-
+        console.log(req.query);
         // Search
         let search = req.query.search || '';
         delete req.query.search;
@@ -75,7 +75,7 @@ async function fetchProducts(req, res) {
         let minPrice = Number(req.query.minPrice) || '';
         delete req.query.minPrice;
 
-        let maxPrice = Number(req.query.maxPrice)|| '';
+        let maxPrice = Number(req.query.maxPrice) || '';
         delete req.query.maxPrice;
 
         // aggregation pipe array
@@ -103,37 +103,37 @@ async function fetchProducts(req, res) {
             { $unwind: "$rating" },
             { $unwind: "$rating.reviews" },
             {
-              $group: {
-                _id: "$_id",
-                sellerID: { $first: '$$ROOT.sellerID'},
-                sku: { $first: '$$ROOT.sku'},
-                name: {$first: '$$ROOT.name'},
-                assets: {$first: '$$ROOT.assets'},
-                info: {$first: '$$ROOT.info'},
-                price: {$first: '$$ROOT.price'},
-                createdAt: {$first: '$$ROOT.createdAt'},
-                avgRating: {
-                    $avg: "$rating.reviews.rating",
-                }
-              },
+                $group: {
+                    _id: "$_id",
+                    sellerID: { $first: '$$ROOT.sellerID' },
+                    sku: { $first: '$$ROOT.sku' },
+                    name: { $first: '$$ROOT.name' },
+                    assets: { $first: '$$ROOT.assets' },
+                    info: { $first: '$$ROOT.info' },
+                    price: { $first: '$$ROOT.price' },
+                    createdAt: { $first: '$$ROOT.createdAt' },
+                    avgRating: {
+                        $avg: "$rating.reviews.rating",
+                    }
+                },
             },
         ];
 
         let priceSortValue;
-        if(req.query.sort){
+        if (req.query.sort) {
             let keyCanContain = ['avgRating', 'price', 'createdAt'];
             let key = (req.query.sort).split(':')[0];
             let value = Number((req.query.sort).split(':')[1]);
 
             //defaults to if some other value is input
-            if(!(keyCanContain.includes(key))){
+            if (!(keyCanContain.includes(key))) {
                 key = 'createdAt';
             }
 
-            if(key == 'price'){
+            if (key == 'price') {
                 priceSortValue = value
             }
-            else{
+            else {
                 aggregationPipe.push({
                     $sort: { [key]: value }
                 });
@@ -142,24 +142,26 @@ async function fetchProducts(req, res) {
             delete req.query.sort;
         }
 
+
         let limit = Number(req.query.limit) || '';
         let page = Number(req.query.page) || 1;
         let skip = (page - 1) * limit;
 
         if (req.query.limit) {
 
-            if(!(minPrice || maxPrice)){
-                aggregationPipe.push({
-                    $skip: skip
-                });
-                aggregationPipe.push({
-                    $limit: limit
-                });
-            }
+            // if(!(minPrice || maxPrice)){
+            //     aggregationPipe.push({
+            //         $skip: skip
+            //     });
+            //     aggregationPipe.push({
+            //         $limit: limit
+            //     });
+            // }
 
             delete req.query.limit;
             delete req.query.page;
         }
+        if (req.query.page) delete req.query.page;
 
         if ((Object.keys(req.query)).length > 0) {
             aggregationPipe.unshift(
@@ -168,44 +170,43 @@ async function fetchProducts(req, res) {
                 })
         }
 
-        // fetching the data
-        let products = await Products.aggregate(aggregationPipe);
-
         let matchedProducts = {
             total: 0
         };
 
+        // fetching the data
+        let products = await Products.aggregate(aggregationPipe); 
+        matchedProducts.total = products.length;
         matchedProducts.items = await getProductPrice((products));
 
-        if(priceSortValue){
-            matchedProducts.items = matchedProducts.items.sort((a, b) => {            
+        if (priceSortValue) {
+            matchedProducts.items = matchedProducts.items.sort((a, b) => {
                 if (a.price < b.price) {
-                  return -1 * priceSortValue;
+                    return -1 * priceSortValue;
                 }
                 if (a.price > b.price) {
-                  return 1 * priceSortValue;
+                    return 1 * priceSortValue;
                 }
                 return 0;
             });
         }
-        if(minPrice){
-            console.log('min is ',minPrice);
-            matchedProducts.items = JSON.parse(JSON.stringify( matchedProducts.items.filter((item)=>{
+        if (minPrice) {
+            console.log('min is ', minPrice);
+            matchedProducts.items = JSON.parse(JSON.stringify(matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) >= minPrice;
             })));
-            
+
         }
-        if(maxPrice){
-            console.log('max is ',maxPrice);
-            matchedProducts.items =(matchedProducts.items.filter((item)=>{
+        if (maxPrice) {
+            console.log('max is ', maxPrice);
+            matchedProducts.items = (matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
             }));
         }
 
-        if((minPrice || maxPrice)){
-            if(limit){
-                matchedProducts.items = matchedProducts.items.splice(skip, limit);
-            }
+
+        if (limit) {
+            matchedProducts.items = matchedProducts.items.splice(skip, limit);
         }
 
         res.status(200).json(matchedProducts);
@@ -279,10 +280,10 @@ async function fetchUniqueFields(req, res) {
         products.forEach((data) => {
 
             if (parameter != 'all') {
-;
+                ;
                 if (data.info.gender == 'male') {
                     a = aa;
-                    filterObject = filterObject2.male; 
+                    filterObject = filterObject2.male;
                 }
                 else {
                     filterObject = filterObject2.female;
@@ -327,7 +328,6 @@ async function fetchUniqueFields(req, res) {
 
 async function getProductPrice(products) {
     try {
-        let discount;
         if (!Array.isArray(products)) {
             discount = await discountQuery(products);
             products = await discountQuery(products);
@@ -350,8 +350,8 @@ async function getProductPrice(products) {
         ])
 
 
-        */ 
-        return new Promise((res,rej)=>{
+        */
+        return new Promise((res, rej) => {
             res(products);
         })
 
@@ -363,48 +363,48 @@ async function getProductPrice(products) {
 
         let product = JSON.parse(JSON.stringify(parameter));
 
-        return new Promise(async (res,rej)=>{
+        return new Promise(async (res, rej) => {
             let discount = await OffersModel.findOne({
                 $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
                 { "ExtraInfo.brands": { $in: [product.info.brand] } },
                 ], OfferType: 'discount'
             }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
 
-        if (discount == null) {
-            res(product);
-            return;
-         }
-        product.discountType = discount.discountType;
-        product.discount = Math.floor(discount.discountAmount); 
-        // if(product.discount){
-        //     product.oldPrice=product.price;
-        //     product.price=product.price-product.discount;
-            
-        // }
-        if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
+            if (discount == null) {
+                res(product);
+                return;
+            }
+            product.discountType = discount.discountType;
+            product.discount = Math.floor(discount.discountAmount);
+            // if(product.discount){
+            //     product.oldPrice=product.price;
+            //     product.price=product.price-product.discount;
 
-            product.discountPercentage=discount.discountAmount;
-            product.discount=Math.floor((product.price/100) * discount.discountAmount);
+            // }
+            if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
 
-           if (product.discount > discount.maximumDiscount) {
-                product.discount =Math.floor( discount.maximumDiscount);
+                product.discountPercentage = discount.discountAmount;
+                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
+
+                if (product.discount > discount.maximumDiscount) {
+                    product.discount = Math.floor(discount.maximumDiscount);
+                }
+
+
+
             }
 
-          
 
-        }
-        
+            if (product.discount) {
+                product.oldPrice = product.price;
+                product.price = product.price - product.discount;
 
-        if(product.discount){
-            product.oldPrice=product.price;
-            product.price=product.price-product.discount;
-            
-        }
+            }
 
-        // console.log('product come is-----> ',product);
+            // console.log('product come is-----> ',product);
 
-        res(product);
-     });
+            res(product);
+        });
     }
 }
 
