@@ -11,7 +11,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
         if (admincontroller) {
             user = verifyToken(req.headers.authorization.split(' ')[1])
-            if (user.role == 'admin') query['sellerID'] = user.id;
+            // if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
 
@@ -258,10 +258,12 @@ async function fetchProducts(req, res) {
 }
 
 async function fetchUniqueFields(req, res) {
+    const input = req.body.parameter;
+    console.log(input, "nv inout");
     const products = await Products.find({});
 
-    function getData(products, parameter = 'all') {
-
+    function getData(products, parameter = input) {
+        console.log(parameter, "parameter");
         const uniqueData = {
             category: [],
             brand: [],
@@ -271,6 +273,7 @@ async function fetchUniqueFields(req, res) {
         let filterObject;
 
         if (parameter != 'all') {
+            console.log("even here");
             filterObject2 = { male: uniqueData, female: uniqueData };
         }
         else {
@@ -317,7 +320,7 @@ async function fetchUniqueFields(req, res) {
                 }
             }
         });
-
+        console.log(uniqueData, "unique");
         return uniqueData;
     }
 

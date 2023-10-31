@@ -5,6 +5,7 @@ const { verifyToken } = require('../../helpers/jwt');
 const mailer = require('../../helpers/nodemailer');
 const { SubscribeTemplate } = require('../../helpers/INDEX');
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
+const jwtVerify = require('../../middlewares/jwtVerify')
 
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
@@ -12,8 +13,8 @@ router.use('/products', require('./v1/products'));
 router.use('/reviews', require('./v1/reviews'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
-router.use('/wishlist', require('./v1/wishlist'));
-router.use('/offer', require('./v1/offer'));
+router.use('/offer',require('./v1/offer'));
+router.use('/wishlist', jwtVerify, require('./v1/wishlist'))
 router.use('/socials', require('./v1/custom-website-elements/socials'));
 
 
