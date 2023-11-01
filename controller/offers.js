@@ -50,7 +50,7 @@ async function getCoupons(req, res) {
   try {
     //{ userUsed: { $nin: [req.tokenData.id] } }
     const getAllCoupons = await OfferModel.find({ $and: [{ OfferType: 'coupon' },{ "status.active": true },{ "status.deleted": false} ,{ startDate: { $lte: (new Date()) } }, {endDate:{$gte:(new Date())}}] });
-    console.log('getAllcoupon is ',getAllCoupons);
+    // console.log('getAllcoupon is ',getAllCoupons);
     res.status(200).json(getAllCoupons);
 
   } catch (error) {

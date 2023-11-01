@@ -262,7 +262,113 @@ async function TicketStatusTemplate(mailData) {
   return html;
 }
 
+async function sendInvoiceTemplate(paymentData) {
+  let productList = JSON.parse(paymentData.description);
+  console.log(productList, "product data is");
+
+  let productRows = productList.map(product => {
+    let productDetails = product.id.map((productId, index) => {
+      return `
+        <a href="http://localhost:4200/product/${productId}" style="text-decoration: none; color: #007bff;">${product.name[index]}: ${productId}</a>
+      `;
+    }).join('<br>');
+
+    return `
+      <tr>
+        <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
+        <td style="padding: 8px; border: 1px solid #dddddd;"> ${paymentData.amount / 100} ${paymentData.currency}</td>
+      </tr>
+    `;
+  }).join('');
+
+  let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        /* Add inline CSS for better email client compatibility */
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f5f5f5;
+          margin: 0;
+          padding: 0;
+        }
+
+        .outer-div {
+          width: 70%;
+          margin: 20px auto;
+          background-color: #fff;
+          border-radius: 5px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+        }
+
+        h1 {
+          color: #333;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        th {
+          background-color: #f2f2f2;
+          padding: 8px;
+          border: 1px solid #dddddd;
+        }
+
+        td {
+          padding: 8px;
+          border: 1px solid #dddddd;
+        }
+
+        a {
+          text-decoration: none;
+          color: #007bff;
+        }
+
+        a:hover {
+          color: #0056b3;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="outer-div">
+        <h1>Payment Successful</h1>
+        <p>Dear Customer,</p>
+        <p>Your payment was successful. Below are the details:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Product Details</th>
+              <th>Total Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${productRows}
+          </tbody>
+        </table>
+        <p><strong>Total Amount:</strong> ${paymentData.amount / 100} ${paymentData.currency}</p>
+        <p><strong>Payment ID:</strong> ${paymentData.id}</p>
+        <p><strong>Receipt Email:</strong> ${paymentData.receipt_email}</p>
+        <p>Our team is here to assist you. If you have any further questions or need additional help, please don't hesitate to reach out to us.</p>
+        <p>Thank you for your purchase. We appreciate your business!</p>
+        <p>Best regards,</p>
+        <p>The Support Team</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return html;
+}
+
+
+
+
+
 
 // <img src="https://cdn.filestackcontent.com/orYXP4hDTryz5vNbCfBo" alt="logo" width="140" height="35"/>
 
-module.exports = { ForgetTemplate, SignupTemplate, SubscribeTemplate, TicketStatusTemplate }
+module.exports = { ForgetTemplate, SignupTemplate, SubscribeTemplate, TicketStatusTemplate , sendInvoiceTemplate}

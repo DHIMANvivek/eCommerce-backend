@@ -2,8 +2,8 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/faq');
 
-// const Title = require('../models/createTicket');
-// const Ticket = require('../models/supportTicket');
+const Title = require('../models/createTicket');
+const Ticket = require('../models/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
@@ -12,6 +12,7 @@ const webPush = require('../models/supportNotifications');
 // const OffersModel=require('../models/offers');
 const paginateResults = require('../helpers/pagination');
 const ProductController = require('../controller/products');
+const PaymentKeys = require('../models/paymentKeys');
 async function getDetails(req, res) {
 
     try {
@@ -86,20 +87,20 @@ async function getAddress(req, res) {
 }
 
 async function getPaginatedData(req, res) {
-    const modelName = req.params.model;
+    const modelName = req.params.model; 
     const page = parseInt(req.query.page, 1) || 1;
     const pageSize = parseInt(req.query.pageSize, 3) || 10;
 
     try {
-        const Model = require(`../models/${modelName}`);
-        const data = await paginateResults(Model, page, pageSize);
+      const Model = require(`../models/${modelName}`); 
+      const data = await paginateResults(Model, page, pageSize);
 
-        res.status(200).json(data);
+      res.status(200).json(data);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-}
+  }
 
 async function addAddress(req, res) {
     try {
@@ -181,29 +182,6 @@ async function DefaultAddress(req, res) {
     } catch (error) {
         console.log('error coming is ', error);
         res.status(500).json(error)
-    }
-}
-
-async function createPaymentIntent(req, res) {
-    try {
-        // parseFloat(items[0].price * 100)
-        const { items } = req.body;
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: 12,
-            currency: "inr",
-            description: JSON.stringify(items),
-            metadata: {
-                items: JSON.stringify(items),
-            },
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
-
-        res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while creating the payment intent.' });
     }
 }
 
@@ -380,6 +358,10 @@ async function sendTicket(req , res) {
 }
 
 
+
+    
+  
+  
 module.exports = {
     getDetails,
     updateDetails,
@@ -391,7 +373,6 @@ module.exports = {
     addAddress,
     deleteAddress,
     updateAddress,
-    createPaymentIntent,
     getOrders,
     getFaq,
     sendData,
@@ -401,5 +382,6 @@ module.exports = {
     // sendTicket,
     getTicketTitle,
     sendTicket,
+    // getPaymentKeys
     // webPushDetails
 }

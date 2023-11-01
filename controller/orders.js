@@ -79,6 +79,37 @@ async function createOrder(req, res) {
             if (!response) { throw ({ message: 'You already use this coupon' }) }
         }
         const orderCreated = ordersModel(req.body);
+
+        response.shipping=0;
+        if(!response.savings) response.savings=0;
+        if(!response.total) response.total=response.subTotal;
+        res.status(200).json(response);
+        // console.log('body coming is ',req.body," tokenData is ",req.tokenData);
+
+        // req.body.products.forEach(async element => {
+        //     const data=ProductController.fetchProductDetails(element.sku);
+        // });
+        
+        //     req.body.details.forEach(async (element) => {
+        //         let response =await ProductController.fetchProductDetails();
+        //         console.log('response is ',response);
+        //     });
+        // res.status(200).json({message:'Order created Succes'});
+    } catch (error) {
+        console.log('errpr comimg is ,',error);
+            res.status(500).json(error);
+    }
+}
+
+
+async function createOrder(req,res){
+    try {
+        req.body.buyerId=req.tokenData.id;
+        if(req.body.coupon){
+           let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
+           if(!response){ throw({message:'You already use this coupon'})}
+        }
+        const orderCreated=ordersModel(req.body);
         orderCreated.save();
 
         await updateCoupon(req.body.coupon._id, req.tokenData.id);

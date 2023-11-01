@@ -11,6 +11,7 @@ async function JwtVerify(req, res, next) {
         }
         
         req.tokenData = data;
+        console.log('req token data', req.tokenData);
         next();
     } catch (error) {
        

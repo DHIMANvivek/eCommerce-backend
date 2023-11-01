@@ -40,5 +40,15 @@ router.post('/deleteTicketTitle', adminController.deleteTicketTitle);
 router.get('/getAllTicket', adminController.getAllTicket);
 router.post('/updateTicketStatus', adminController.updateTicketStatus);
 router.post('/deleteSupportTicket', adminController.deleteSupportTicket);
+router.get('/getPaymentKeys', adminController.getPaymentKeys);
+
+
+// payment keys
+router.post('/addPaymentKeys', adminController.addPaymentKeys);
+router.post('/updatePaymentKeys', adminController.updatePaymentKeys);
+router.post('/deletePaymentKeys', adminController.deletePaymentKeys);
+
+// paginated data
+router.get('/getPaginatedData/:model', adminController.getPaginatedData);
 
 module.exports = router;

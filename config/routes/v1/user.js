@@ -22,9 +22,7 @@ router.post('/addAddress', userController.addAddress)
 router.post('/deleteAddress', userController.deleteAddress)
 router.post('/updateAdress', userController.updateAddress)
 router.post('/setDefault',userController.DefaultAddress)
-// router.post('/create-payment-intent', userController.createPaymentIntent);
 
-router.post('/create-payment-intent', userController.createPaymentIntent);
 router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
 // router.get('/getPaginatedData/:model', userController.getPaginatedData);
@@ -37,6 +35,7 @@ router.get('/getPaginatedData/:model', userController.getPaginatedData);
 router.get('/getTicketTitle', userController.getTicketTitle);
 router.post('/sendTicket', userController.sendTicket);
 // router.post('/webPushDetails', userController.webPushDetails);
+// router.get('/getPaymentKeys', userController.getPaymentKeys);
 
 
 // router.get('/coupons',userController.getCoupons);

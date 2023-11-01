@@ -65,7 +65,8 @@ async function login(req, res) {
         }
 
         const tokenData = { id: userFound._id, role: userFound.role }
-        console.log(tokenData, 'ks');
+        // console.log(tokenData, 'ks');
+        // console.log('token INSIDE IS ---->', tokenData);
         const token = createToken(tokenData);
 
         res.status(200).json({

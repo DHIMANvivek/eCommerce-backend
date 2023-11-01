@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer")
-const {ForgetTemplate,SignupTemplate, SubscribeTemplate, TicketStatusTemplate}=require('../helpers/INDEX');
+const {ForgetTemplate,SignupTemplate, SubscribeTemplate, TicketStatusTemplate, sendInvoiceTemplate}=require('../helpers/INDEX');
 
 async function sendMail(data, Template) {
   

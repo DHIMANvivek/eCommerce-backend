@@ -29,7 +29,9 @@ async function fetchCart(req, res) {
         
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
+            // console.log(item);
             let product = await productsController.fetchProductDetails(req, res, item.sku);
+
             const fields = ['name', 'assets', 'info', 'price'];
 
             for (let field of fields) {
@@ -70,6 +72,7 @@ async function fetchCart(req, res) {
         res.status(200).json(cart);
     }
     catch (error) {
+        // console.log(error, "rtertertert---------");
         res.status(500).json({
             message: 'Problem while fetching Cart'
         });
@@ -79,12 +82,16 @@ async function fetchCart(req, res) {
 async function addItems(req, res) {
     try {
         let userId = req.tokenData.id;
+
+        // console.log('user id is ',req.tokenData);
         let items = req.body;
 
         let existingCart = await Cart.findOne({ userId: userId });
 
         items = await Promise.all(items.map(async (item) => {
             let product = await productsController.fetchProductDetails(req, res, item.sku);
+
+            // console.log('product is hh',product);
 
             item.quantity = item.quantity ? item.quantity : product.info.orderQuantity[0];
             item.color = item.color ? item.color : product.assets[0].color;
@@ -107,6 +114,7 @@ async function addItems(req, res) {
         })
 
     } catch (error) {
+        // console.log('error comnig is ',error);
         res.status(500).json({
             message: 'Problem while adding item/s to Cart'
         });
@@ -141,12 +149,14 @@ async function updateItem(req, res) {
         const itemId = req.body.index;
         const newQuantity = req.body.quantity;
 
+        // console.log(itemId);
         await Cart.updateOne(
             { userId: userId, 'items._id': itemId },
             { $set: { 'items.$.quantity': newQuantity } }
         );
 
         let cart = (await Cart.findOne({ userId: userId })).items;
+        // console.log(newQuantity, cart);
 
         res.status(200).json({
             message: 'Cart item updated successfully',
