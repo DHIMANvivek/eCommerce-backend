@@ -13,7 +13,8 @@ async function fetchReviews(productId, userId = '') {
             return accumulator += current.rating;
         }, 0)
 
-        avgRating /= reviews.length;
+        let totalReviews = reviews.length;
+        avgRating /= totalReviews;
         avgRating = parseFloat(avgRating.toFixed(1));
 
         let userReview;
@@ -29,6 +30,7 @@ async function fetchReviews(productId, userId = '') {
         return {
             reviews,
             avgRating,
+            totalReviews,
             userReview
         }
 
@@ -42,6 +44,13 @@ async function fetchReviews(productId, userId = '') {
 
 async function addOrUpdateReview(req, res) {
     try {
+
+        if(req.tokenData.role == 'admin'){
+            res.status(403).json({
+                message: 'Admin not allowed to review a product'
+            });
+            return;
+        }
         const userId = req.tokenData.id;
         const input = req.body;
 
@@ -70,7 +79,7 @@ async function addOrUpdateReview(req, res) {
 
         }
         else {
-            // User dpes'nt has a review, add it
+            // User does'nt has a review, add it
             await Reviews.updateOne(
                 { productID: input.productId },
                 {
@@ -116,12 +125,6 @@ async function deleteReview(req, res) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-
-// //bulk temp
-// async function putReviews(req, res) {
-//     console.log(req.body);
-//     Reviews.insertMany(req.body);
-// }
 
 module.exports = {
     fetchReviews,

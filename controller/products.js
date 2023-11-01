@@ -8,13 +8,14 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
         let query = {};
         let user;
+
+        if (req.headers.authorization) {
+            user = verifyToken(req.headers.authorization.split(' ')[1]);
+        }
         if (admincontroller) {
-            user = verifyToken(req.headers.authorization.split(' ')[1])
-            // if (user.role == 'admin') query['sellerID'] = user.id;
+            if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
-        
-        // console.log(user, "hghjghghghg")
         query['sku'] = req.query.sku ? req.query.sku : sku;
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
@@ -28,9 +29,8 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
 
         // getting all the reviews and average
-        // console.log('proidcut is ',product);
         let reviews_rating;
-        if (user && admincontroller) {
+        if (user) {
             reviews_rating = await reviewsController.fetchReviews(
                 product._id,
                 user.id
@@ -69,7 +69,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 async function fetchProducts(req, res) {
     try {
         req.query = req.query ? req.query : req.body;
-        console.log(req.query);
+
         // Search
         let search = req.query.search || '';
         delete req.query.search;
@@ -82,6 +82,11 @@ async function fetchProducts(req, res) {
 
         // aggregation pipe array
         aggregationPipe = [
+            {
+                $match: {
+                    "active": true
+                }
+            },
             {
                 $match: {
                     $or: [
@@ -102,8 +107,12 @@ async function fetchProducts(req, res) {
                     as: "rating",
                 },
             },
-            { $unwind: "$rating" },
-            { $unwind: "$rating.reviews" },
+            {
+                $unwind: {
+                    path: "$rating",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $group: {
                     _id: "$_id",
@@ -115,10 +124,14 @@ async function fetchProducts(req, res) {
                     price: { $first: '$$ROOT.price' },
                     createdAt: { $first: '$$ROOT.createdAt' },
                     avgRating: {
-                        $avg: "$rating.reviews.rating",
+                        $avg: {
+                            $ifNull: [{ $avg: "$rating.reviews.rating" }, 0]
+                        }
                     }
                 },
             },
+
+
         ];
 
         let priceSortValue;
@@ -177,7 +190,7 @@ async function fetchProducts(req, res) {
         };
 
         // fetching the data
-        let products = await Products.aggregate(aggregationPipe); 
+        let products = await Products.aggregate(aggregationPipe);
         matchedProducts.total = products.length;
         matchedProducts.items = await getProductPrice((products));
 
@@ -211,7 +224,13 @@ async function fetchProducts(req, res) {
             matchedProducts.items = matchedProducts.items.splice(skip, limit);
         }
 
+        console.log(matchedProducts);
         res.status(200).json(matchedProducts);
+
+        // new
+        function colorDifference() {
+
+        }
 
         // filter aggregation query helper function
         function getFilterQuery(parameters) {

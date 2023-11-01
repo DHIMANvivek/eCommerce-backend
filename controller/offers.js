@@ -15,7 +15,7 @@ async function createOffer(req, res) {
 async function getOffers(req, res) {
   try {
     const data = await OfferModel.find({ 'status.deleted': false });
-    console.log('data coming is ', data);
+    // console.log('data coming is ', data);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json(error);
@@ -35,9 +35,9 @@ async function deleteOffer(req, res) {
 
 async function updateOffer(req, res) {
   try {
-    console.log('req   body is ', req.body);
+    // console.log('req   body is ', req.body);
     const result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
-    console.log('update offer is ', result);
+    // console.log('update offer is ', result);
     res.status(200).json({ message: 'updated Successfully' });
   } catch (error) {
     console.log('error is ', error);

@@ -3,9 +3,10 @@ const { verifyToken } = require('../helpers/jwt');
 async function AdminVerify(req, res, next) {
     try {
         let data;
-        if (req.headers.authorization)
+        if (req.headers.authorization){
             data = verifyToken(req.headers.authorization.split(' ')[1])
-
+        }
+        console.log(data);
         if (data.role == 'user') {
             throw ({ message: 'You are not eligible for this route' });
         }

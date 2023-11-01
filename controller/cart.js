@@ -104,12 +104,21 @@ async function addItems(req, res) {
         }))
 
         if (existingCart) {
+            items = checkIfSameConfigAlreadyExists(existingCart?.items, items);
+            if(items.length == 0){
+                res.status(200).json({
+                    added: false,
+                    message: "Item with same config already Exists"
+                });
+                return;
+            }
             await Cart.updateOne({ userId: userId }, { $push: { items: items } });
         } else {
             await Cart.create({ userId: userId, items: items });
         }
 
         return res.status(200).json({
+            added: true,
             message: "Item/s successfully added to cart"
         })
 
@@ -119,6 +128,18 @@ async function addItems(req, res) {
             message: 'Problem while adding item/s to Cart'
         });
     }
+}
+
+function checkIfSameConfigAlreadyExists(existingCart, newItems){
+    actualNewItems = newItems.filter(item => {
+        return !(existingCart.some(existingItem => {
+            return (item.sku == existingItem.sku && 
+                item.color == existingItem.color &&
+                item.size == existingItem.size );
+        }))
+    })
+
+    return actualNewItems;
 }
 
 async function removeItem(req, res) {

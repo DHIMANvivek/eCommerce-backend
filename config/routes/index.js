@@ -6,10 +6,9 @@ const mailer = require('../../helpers/nodemailer');
 const { SubscribeTemplate } = require('../../helpers/INDEX');
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
-
-const AdminVerify=require('../../middlewares/adminVerify');
-
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
+
+
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
