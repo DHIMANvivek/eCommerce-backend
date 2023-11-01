@@ -9,14 +9,11 @@ async function AdminVerify(req, res, next) {
         if (data.role == 'user') {
             throw ({ message: 'You are not eligible for this route' });
         }
-        
         req.tokenData = data;
 
         next();
     } catch (error) {
-
         res.status(500).json(error);
-
     }
 }
 

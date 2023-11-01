@@ -6,6 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const faqData = require('../models/faq');
 const Ticket = require('../models/supportTicket');
 const Title = require('../models/createTicket');
+const SKU_generater = require('../helpers/sku');
 
 const productController = require('../controller/products');
 
@@ -24,9 +25,10 @@ async function addProduct(req, res) {
         productObject.data[key] = productObject.data.basicinfo[key];
       });
       productObject.data.sellerID = sellerID;
-      productObject.data.sku = "sku-kurta001";
+      productObject.data.sku = SKU_generater.generateSKU(productObject.data);
       delete productObject.data.basicinfo;
-      const response = await products.create(productObject.data);
+      await products.create(productObject.data);
+
       return res.status(200).json("uploaded");
     }
   } catch (err) {
@@ -47,15 +49,13 @@ async function updateProduct(req, res) {
     delete productObject.data['basicinfo'];
     delete productObject.data['_id'];
 
-    // var received = productObject.data;
-
-    console.log("dataREcieved:: ", productObject.data.assets[0].stockQuantity, _id);
-
     const response = await products.findOneAndUpdate({
       '_id': _id,
 
       'sellerID': sellerID
     }, { $set: productObject.data });
+
+    SKU_generater.generateSKU(productObject.data);
 
     console.log("response:: ", response);
     return res.status(200).json("uploaded");
@@ -214,9 +214,7 @@ async function fetchProductDetail(req, res){
     }catch(err){
       console.log(err);
       return res.status(404).json({message: err});
-
     }
-
 }
 
 async function fetchFeatures(req, res) {

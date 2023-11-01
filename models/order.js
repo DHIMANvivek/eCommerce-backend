@@ -53,6 +53,10 @@ const orderSchema = mongoose.Schema(
                 }
             }
         ],
+        invoice_status: {
+            type: Boolean,
+            default: false
+        },
         orderAmount: {
             type: Number,
         },
@@ -64,7 +68,7 @@ const orderSchema = mongoose.Schema(
         address: address,
         payment_status: {
             type: String,
-            enum: ['confirmed', 'pending', 'cancelled', 'refund'],
+            enum: ['confirmed', 'pending', 'cancelled', 'failed', 'refund'],
             default: 'pending'
         },
         // OTP:{
@@ -100,6 +104,11 @@ const orderSchema = mongoose.Schema(
             type: Number,
             default:this.orderAmount
           },
+
+        active: {
+            type: Boolean,
+            default: true
+        }
        
     },
     {
