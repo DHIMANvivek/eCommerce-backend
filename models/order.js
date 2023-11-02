@@ -30,6 +30,10 @@ const orderSchema = mongoose.Schema(
                     type: String,
                     required: true,
                 },
+                size: {
+                    type: String,
+                    required: true,
+                },
                 //  name , photo, category, color , sku, shipment  status,qty,price
                 amount: {
                     type: Number,
@@ -40,17 +44,32 @@ const orderSchema = mongoose.Schema(
                     type:Number,
                     required:true
                 },
-                status: {
-                    shipment: {
+                shipmentStatus: {
                         type: String,
                         enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
                         default: 'pending',
-                    },
+
                 },
                 name: {
                     type: String,
                     required: true
-                }
+                },
+                //  NEW FIELDS
+                SellerId:{
+                    type: mongoose.Schema.Types.ObjectId,
+                        ref: 'sellerdetails',
+                },
+                image:{
+                    type:String,
+                    required:true
+                },
+                invoice_status:{
+                    type:Boolean,
+                    default:false,
+                },
+                invoiceId:{
+                    type:String,
+                },
             }
         ],
         invoice_status: {
@@ -66,11 +85,26 @@ const orderSchema = mongoose.Schema(
             default: new Date()
         },
         address: address,
+
         payment_status: {
             type: String,
             enum: ['confirmed', 'pending', 'cancelled', 'failed', 'refund'],
             default: 'pending'
         },
+       
+        active:{
+            type:Boolean,
+            default:true,
+        },
+        transactionId:{
+            type:String
+        },
+
+        // METHOD OF PAYMENT
+        MOP:{
+            type:String
+        },
+
         // OTP:{
         //     type:Number,
         //     default:function OtpCreater(){

@@ -4,12 +4,10 @@ const mongoose = require('mongoose')
 async function showWishlists(req, res) {
     try {
         const user = req.tokenData;
-        console.log(user, "showWishlists");
-
         const wishlister = await wishlist.findOne({
             userId: user.id
         })
-        console.log(wishlister, "lol");
+        
         if (wishlister) {
             const wishlists = wishlister.wishlists
             console.log(wishlists, "wishlistssss");
@@ -35,56 +33,61 @@ async function showWishlists(req, res) {
         }
     }
     catch (error) {
-        console.log(error, "showWishlist");
         return res.status(500).json({
             message: "Error in showing wishlists!"
         })
     }
 }
 
-async function addWishlist(req, res) {
-    try {
-        console.log(req.body, "addWishlist func");
-        const input = req.body;
-        const user = req.tokenData;
+// async function addWishlist(req, res) {
+//     try {
+//         const input = req.body;
+//         const user = req.tokenData;
 
-        const wishlister = await wishlist.findOne({
-            userId: user.id
-        })
-        console.log(wishlister, "wishlister");
+//         const wishlister = await wishlist.findOne({
+//             userId: user.id
+//         })
+//         console.log(wishlister, "wishlister");
 
-        const newWishlist = {
-            wishlistName: input.wishlistName,
-            products: []
-        }
-        console.log(wishlister.wishlists, "before adding new wishlist");
-        const add = await wishlister.wishlists.push(newWishlist)
-        wishlister.save()
-        console.log(wishlister.wishlists, "after adding new wishlist");
-        return res.status(200).json({
-            message: "New Wishlist created successfully!"
-        })
-    }
-    catch (error) {
-        console.log(error, "addWishlist")
-        return res.status(500).json({
-            message: "Error in creating new wishlist!"
-        })
-    }
-}
+//         const newWishlist = {
+//             wishlistName: input.wishlistName,
+//             products: []
+//         }
+//         console.log(wishlister.wishlists, "before adding new wishlist");
+//         const add = await wishlister.wishlists.push(newWishlist)
+//         wishlister.save()
+//         console.log(wishlister.wishlists, "after adding new wishlist");
+//         return res.status(200).json({
+//             message: "New Wishlist created successfully!"
+//         })
+//     }
+//     catch (error) {
+//         console.log(error, "addWishlist")
+//         return res.status(500).json({
+//             message: "Error in creating new wishlist!"
+//         })
+//     }
+// }
 
 async function addToWishlist(req, res) {
     try {
-        console.log(req.body, "input");
         const input = req.body;
         const user = req.tokenData;
-
+        console.log('user is ',user);
         const wishlister = await wishlist.findOne({
-            userId: user.id
-        })
-        console.log(wishlister, "wishlister");
+            userId: user.id,
+            'wishlists.wishlistName': input.wishlistName
+        }, { 'wishlists.$': 1 })
 
-        const add = await wishlist.updateOne({
+        if (!wishlister) {
+            const newWishlist = {
+                wishlistName: input.wishlistName,
+                products: []
+            }
+            const response=await wishlist.updateOne({userId:user.id},{$push:{'wishlists':newWishlist}});
+        }
+
+      const add = await wishlist.updateOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
         }, {
@@ -105,32 +108,32 @@ async function addToWishlist(req, res) {
     }
 }
 
-async function removeFromWishlist(req, res) {
-    try {
-        const input = req.body;
-        const user = req.tokenData;
+// async function removeFromWishlist(req, res) {
+//     try {
+//         const input = req.body;
+//         const user = req.tokenData;
 
-        const wishlister = await wishlist.findOne({
-            userId: user.id
-        })
+//         const wishlister = await wishlist.findOne({
+//             userId: user.id
+//         })
 
-        if (wishlister) {
-            const remove = await wishlist.updateOne({
-                userId: user.id,
-                'wishlists.wishlistsName': input.WishlistName
-            }, {
-                $pull: {
-                    'wishlists.products': {
+//         if (wishlister) {
+//             const remove = await wishlist.updateOne({
+//                 userId: user.id,
+//                 'wishlists.wishlistsName': input.WishlistName
+//             }, {
+//                 $pull: {
+//                     'wishlists.products': {
 
-                    }
-                }
-            })
-        }
-    }
-    catch {
+//                     }
+//                 }
+//             })
+//         }
+//     }
+//     catch {
 
-    }
-}
+//     }
+// }
 
 async function deleteWishlist(req, res) {
     try {
@@ -230,22 +233,20 @@ async function showWishlistedData(req, res) {
 
         ])
 
-        console.log('products is =====> ', products);
-
         return res.status(200).json(products)
     }
     catch (error) {
-        console.log('error is ', error);
         return res.status(500).json(products)
     }
 }
 
 async function removeFromWishlist(req, res) {
     try {
+            console.log('inside removeWishlist Service');
         const input = req.body;
         const user = req.tokenData;
 
-        console.log(input, "del data");
+        console.log(input, "del data",user.id);
         // const final =await wishlist.findOne(
         //     {
         //         userId : new mongoose.Types.ObjectId(user.id)
@@ -261,9 +262,10 @@ async function removeFromWishlist(req, res) {
                 $pull: {
                     "wishlists.$.products": input.productId
                 }
-
             }
         )
+
+        console.log('response coming is ',response);
 
         return res.status(200).json(response)
     }
@@ -275,7 +277,7 @@ async function removeFromWishlist(req, res) {
 }
 module.exports = {
     showWishlists,
-    addWishlist,
+    // addWishlist,
     addToWishlist,
     removeFromWishlist,
     deleteWishlist,

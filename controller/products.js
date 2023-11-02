@@ -1,5 +1,7 @@
 const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
+const wishlist = require('../models/wishlist')
+const mongoose = require('mongoose')
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
 
@@ -69,7 +71,6 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 async function fetchProducts(req, res) {
     try {
         req.query = req.query ? req.query : req.body;
-
         // Search
         let search = req.query.search || '';
         delete req.query.search;
@@ -194,6 +195,7 @@ async function fetchProducts(req, res) {
         matchedProducts.total = products.length;
         matchedProducts.items = await getProductPrice((products));
 
+
         if (priceSortValue) {
             matchedProducts.items = matchedProducts.items.sort((a, b) => {
                 if (a.price < b.price) {
@@ -206,14 +208,14 @@ async function fetchProducts(req, res) {
             });
         }
         if (minPrice) {
-            console.log('min is ', minPrice);
+            // console.log('min is ', minPrice);
             matchedProducts.items = JSON.parse(JSON.stringify(matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) >= minPrice;
             })));
 
         }
         if (maxPrice) {
-            console.log('max is ', maxPrice);
+            // console.log('max is ', maxPrice);
             matchedProducts.items = (matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
             }));
@@ -280,11 +282,11 @@ async function fetchProducts(req, res) {
 
 async function fetchUniqueFields(req, res) {
     const input = req.body.parameter;
-    console.log(input, "nv inout");
+    // console.log(input, "nv inout"); 
     const products = await Products.find({});
 
     function getData(products, parameter = input) {
-        console.log(parameter, "parameter");
+        // console.log(parameter, "parameter");
         const uniqueData = {
             category: [],
             brand: [],
@@ -341,7 +343,7 @@ async function fetchUniqueFields(req, res) {
                 }
             }
         });
-        console.log(uniqueData, "unique");
+        // console.log(uniqueData, "unique");
         return uniqueData;
     }
 
@@ -349,6 +351,7 @@ async function fetchUniqueFields(req, res) {
     res.status(200).json({ data });
 
 }
+
 
 async function getProductPrice(products) {
     try {
@@ -365,22 +368,11 @@ async function getProductPrice(products) {
                 return product;
             }))
         }
-
-
-        /* 
-        offers.aggregrate([
-            $match:product.id,
-            
-        ])
-
-
-        */
         return new Promise((res, rej) => {
             res(products);
         })
 
     } catch (error) {
-        res.status(500).json(error);
     }
 
     async function discountQuery(parameter) {
@@ -400,11 +392,6 @@ async function getProductPrice(products) {
             }
             product.discountType = discount.discountType;
             product.discount = Math.floor(discount.discountAmount);
-            // if(product.discount){
-            //     product.oldPrice=product.price;
-            //     product.price=product.price-product.discount;
-
-            // }
             if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
 
                 product.discountPercentage = discount.discountAmount;
@@ -418,19 +405,18 @@ async function getProductPrice(products) {
 
             }
 
-
             if (product.discount) {
                 product.oldPrice = product.price;
                 product.price = product.price - product.discount;
 
             }
-
-            // console.log('product come is-----> ',product);
-
             res(product);
         });
     }
 }
+
+
+
 
 module.exports = {
     fetchProducts,

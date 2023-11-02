@@ -34,12 +34,7 @@ let userSchema = new mongoose.Schema({
 
         }
     },
-    mobile: {
-        type: Number,
-        trim: true,
-        minLength: [10],
-        maxLength: [10]
-    },
+
     info: {
         gender: {
             type: String,
@@ -94,6 +89,18 @@ userSchema.pre("save", async function (next) {
     if (this.password) {
         this.password = bcrypt.hashSync(this.password);
     }
+   
+
+    // const wishlistFound= await wishlist.findOne({userId :this._id});
+    // console.log('wishlist Found is ',wishlistFound);
+    // console.log('wishfount si ');
+    
+    next();
+});
+
+
+userSchema.post('save', async function (){
+    console.log('id is ',this._id);
     const defaultWishlist = {
         wishlistName : 'My Wishlist',
         products : []
@@ -101,8 +108,7 @@ userSchema.pre("save", async function (next) {
     await wishlist.create({
         userId : this._id,
         wishlists : [defaultWishlist]
-    })
-    next();
-});
+    });
+})
 
 module.exports = mongoose.model('users', userSchema);

@@ -4,7 +4,8 @@ const { getProductPrice } = require('../controller/products');
 const { checkCoupon, updateCoupon, } = require('../controller/offers');
 const ProductController = require('../controller/products');
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
+const productsModel=require('./../models/products');
+
 
 async function getOrders(req, res) {
     try {
@@ -102,15 +103,28 @@ async function createOrder(req, res) {
 }
 
 
-async function createOrder(req,res){
+async function createOrder(req,res) {
     try {
         req.body.buyerId=req.tokenData.id;
         if(req.body.coupon){
            let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
            if(!response){ throw({message:'You already use this coupon'})}
         }
+
+       
+     await Promise.all(req.body.products.map(async (element) => {
+                const matchedProduct = await productsModel.findOne({sku:element.sku},{sellerID:1});
+                // console.log('mathcnedProcut si ',matchedProduct);
+                element.sellerID = matchedProduct.sellerID;
+                return element;
+        }));
+
         const orderCreated=ordersModel(req.body);
-        orderCreated.save();
+      await  orderCreated.save();
+
+      await req.body.products.forEach((el)=>{
+
+      })
 
         await updateCoupon(req.body.coupon._id, req.tokenData.id);
         res.status(200).json('order created success');

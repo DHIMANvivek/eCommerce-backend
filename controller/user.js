@@ -14,11 +14,12 @@ const paginateResults = require('../helpers/pagination');
 const ProductController = require('../controller/products');
 const PaymentKeys = require('../models/paymentKeys');
 async function getDetails(req, res) {
-
+    console.log('getDetails caleld---->');
     try {
         const basicDetails = await Users.findById(req.tokenData.id);
         res.status(200).json(basicDetails)
     } catch (error) {
+        console.log('erorr coming is ',error);
         res.status(500).json(error);
     }
 }
@@ -36,7 +37,6 @@ async function updateDetails(req, res) {
 async function getActiveAddresses(req,res){
 
 try {
-    console.log('tokendata is ',req.tokenData);
       const data=await Users.aggregate([
         {$match:{_id:new mongoose.Types.ObjectId( req.tokenData.id)}},
         {$unwind:'$info.address'},
@@ -79,6 +79,7 @@ async function getAddress(req, res) {
     // ])
 
     const data=await getActiveAddresses(req);
+    // const data=await Users.findOne()
         res.status(200).json(data[0]);
     }
     catch (error) {
@@ -109,17 +110,19 @@ if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
     throw({message:'You cannot add more than 3 addresses'});
 }
 
-const updateAddress=await Users.findByIdAndUpdate({_id:req.tokenData.id},{$push:{'info.address':req.body}});
-        res.status(200).json({message:'Successfully added address'});
+const result=await Users.findByIdAndUpdate({_id:req.tokenData.id},{$push:{'info.address':req.body}});
+const response=await getActiveAddresses(req,res);
+console.log('response is ',response);
+res.status(200).json(response.addresses);
     }
     catch (error) {
-        console.log('error is ',error);
         res.status(500).json(error)
     }
 }
 
 async function deleteAddress(req, res) {
     try {
+        console.log('infoadress id  is ',req.body.address_id," token data is ",req.tokenData.id);
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
             'info.address._id': req.body.address_id
@@ -129,6 +132,7 @@ async function deleteAddress(req, res) {
             }
         });
 
+        console.log('update address is ',updatedValue);
         res.status(200).json(updatedValue);
     } catch (error) {
         console.log('errpr is ', error);
@@ -139,7 +143,6 @@ async function deleteAddress(req, res) {
 async function updateAddress(req, res) {
     try {
         const address_id = req.body._id;
-        console.log('body comingi is ',req.body);
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
             'info.address._id': new mongoose.Types.ObjectId(address_id)
@@ -156,28 +159,14 @@ async function updateAddress(req, res) {
 
 async function DefaultAddress(req, res) {
     try {
-        // await Users.updateMany({
-        //     _id: req.tokenData.id,
-        // },{
-        //     $set: {
-        //         'info.address.$[].defaultAddress': false
-        //     }
-        // });
-        // const updatedValue= await Users.updateOne({
-        //     _id: req.tokenData.id,
-        //     'info.address._id': req.body.address_id
-        // },{
-        //     $set: {
-        //         'info.address.$.defaultAddress': true
-        //     }
-        // });
+let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
+FindAddress.info.address.push(FindAddress[0]);
+FindAddress.info.address[0]=(req.body);
+await FindAddress.save();
+// console.log('reqbodu si ',req.body);
 
-        // const FindAllAddress=await Users.find({
-        //     _id:req.tokenData.id,
-
-        // },{'info.address':1,_id:0})
-        // console.log('updateAddress is ',updatedValue);
-        // res.status(200).json(FindAllAddress)
+// const getAllAddress=await this.getActiveAddresses();
+// res.status(200).json(getAllAddress);
 
     } catch (error) {
         console.log('error coming is ', error);

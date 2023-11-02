@@ -10,11 +10,9 @@ const wishlistModel = require('../models/wishlist')
 
 
 async function login(req, res) {
-    try {
-        
+    try { 
         const input = req.body;
         if (input.token) {
-            console.log("login google");
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
                 idToken: req.body.token.credential
@@ -25,14 +23,12 @@ async function login(req, res) {
                 firstname: googleToken.getPayload().given_name,
                 lastname: googleToken.getPayload().family_name
             }
-
-            // const firstName = req.body.name.firstname; 
         }
 
         const userFound = await usersModel.findOne({
             email: input.email
         })
-        console.log(userFound);
+        
         const firstName = userFound?.name.firstname
 
         if (!userFound) {
@@ -68,13 +64,11 @@ async function login(req, res) {
         // console.log(tokenData, 'ks');
         // console.log('token INSIDE IS ---->', tokenData);
         const token = createToken(tokenData);
-
         res.status(200).json({
             message: "Login Successful",
             token, firstName
         })
     } catch (error) {
-        console.log("ERROR IS ", error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -84,7 +78,6 @@ async function login(req, res) {
 
 async function signup(req, res) {
     try {
-        console.log('SINGUP CALLEDD--------');
         if (req.body.token) {
             const googleOathClient = new OAuth2Client();
             const ticket = await googleOathClient.verifyIdToken({
@@ -111,30 +104,21 @@ async function signup(req, res) {
         if (leadFound) {
             userCreated.Lead = leadFound;
         }
-
-        // userCreated.x=fals
-
         await userCreated.save();
-
-
-
         const mailData = {
             email: req.body.email,
             subject: "We're Thrilled to Have You, Welcome to Trade Vogue!",
         }
         const mailSent = await mailer(mailData, SignupTemplate)
-
-
         const tokenData = {
             id: userCreated._id,
             role: userCreated.role
         }
         const token = createToken(tokenData);
-
         res.status(200).json({ token, message: 'Signup Successful!', firstName });
 
     } catch (error) {
-        console.log("Error in Signup", error)
+        console.log('error comins i s ',error);
         if (error.message) {
             res.status(500).json(error);
             return;
