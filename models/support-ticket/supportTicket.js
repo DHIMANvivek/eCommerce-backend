@@ -33,10 +33,10 @@ const ticketSchema = new mongoose.Schema({
     default: Date.now,
   },
   ticketType: [childSchema],  
-  notificationDetails: {
+  notificationDetails: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'supportNotifications',
-  },
+  }],
 });
 
 module.exports = mongoose.model('Ticket', ticketSchema);
