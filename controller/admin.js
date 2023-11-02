@@ -72,18 +72,15 @@ async function deleteProductInventory(req, res) {
   const reqData = req.body;
 
   try {
-    // console.log(reqData.data.map((productID)=>{
-    //     return products.updateOne({'sellerID': sellerID, '_id': productID}, {$set: {'active': false}});
-    // }));
     let response;
+    
     if (Array.isArray(reqData.data)) {
       response = await products.updateMany({ 'sellerID': sellerID, _id: { $in: reqData.data } }, { $set: { 'active': false } });
+      return res.status(200).json({ message: 'Products Deleted' })
     }
+
     response = await products.updateOne({ 'sellerID': sellerID, _id: reqData.data }, { $set: { 'active': false } });
 
-    // const response = await Promise.all(reqData.data.map((productID)=>{
-    //     return products.updateOne({'sellerID': sellerID, '_id': productID}, {$set: {'active': false}});
-    // }));
     console.log(response);
     if (!response) throw "Unable to Delete";
 

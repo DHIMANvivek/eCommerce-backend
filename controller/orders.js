@@ -230,7 +230,7 @@ async function getSellerOrderDetails(req, res) {
                 createdAt: 0,
                 updatedAt: 0
             }
-        ).populate( 'buyerId',
+        ).populate('buyerId',
             {
                 'name': 1,
                 'email': 1,
@@ -240,12 +240,11 @@ async function getSellerOrderDetails(req, res) {
 
         let order = JSON.parse(JSON.stringify(response))
         // const response = await ordersModel.find({_id: OrderID, 'products.sellerID': sellerID}, {'products.sellerID.$': 1, buyerId: 1}).populate('buyerId');
-        if(req.tokenData.role == 'admin'){
-            const sellerAddress = await userModel.findById({_id: sellerID}, {'info.address': 1, _id: 0});
-            order['sellerAddress'] = sellerAddress.info.address[0];
-            console.log(order);
+        if (req.tokenData.role == 'admin') {
+            const sellerAddress = await userModel.findById({ _id: sellerID }, { 'info.address': 1, email: 1, _id: 0 });
+            order['sellerAddress'] = sellerAddress;
             res.status(200).json(order);
-        }    
+        }
     } catch (err) {
         console.log(err)
     }
