@@ -24,37 +24,37 @@ const productSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  
+
   assets: [
-    
+
     {
-    color: {
-      type: String,
-      required: true
-    },
-    stockQuantity: [{
-      size: {
+      color: {
         type: String,
-        unique: true,
-        enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
         required: true
       },
-      quantity: {
-        type: Number,
-        default: 0,
+      stockQuantity: [{
+        size: {
+          type: String,
+          unique: true,
+          enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+          required: true
+        },
+        quantity: {
+          type: Number,
+          default: 0,
+          required: true
+        },
+        unitSold: {
+          type: Number,
+          default: 0,
+        }
+      }],
+      photo: [{
+        type: String,
+        min: 2,
         required: true
-      },
-      unitSold: {
-        type: Number,
-        default: 0,
-      }
+      }]
     }],
-    photo: [{
-      type: String,
-      min: 2, 
-      required: true
-    }]
-  }],
   info: {
     code: {
       type: String,
@@ -66,7 +66,7 @@ const productSchema = mongoose.Schema({
     },
     gender: {
       type: String,
-      lowercase: true, 
+      lowercase: true,
       enum: ['male', 'female', 'unisex'],
       required: true
     },

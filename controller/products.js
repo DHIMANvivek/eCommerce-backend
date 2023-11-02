@@ -1,7 +1,5 @@
 const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
-const wishlist = require('../models/wishlist')
-const mongoose = require('mongoose')
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
 
@@ -26,9 +24,6 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
                 updatedAt: 0
             }
         )));
-
-        // console.log(product, "product")
-
 
         // getting all the reviews and average
         let reviews_rating;
@@ -75,11 +70,15 @@ async function fetchProducts(req, res) {
         let search = req.query.search || '';
         delete req.query.search;
 
+        // minimum and max price
         let minPrice = Number(req.query.minPrice) || '';
         delete req.query.minPrice;
-
         let maxPrice = Number(req.query.maxPrice) || '';
         delete req.query.maxPrice;
+
+        // colors
+        let colors = req.query.color;
+        delete req.query.color;
 
         // aggregation pipe array
         aggregationPipe = [
@@ -163,20 +162,7 @@ async function fetchProducts(req, res) {
         let page = Number(req.query.page) || 1;
         let skip = (page - 1) * limit;
 
-        if (req.query.limit) {
-
-            // if(!(minPrice || maxPrice)){
-            //     aggregationPipe.push({
-            //         $skip: skip
-            //     });
-            //     aggregationPipe.push({
-            //         $limit: limit
-            //     });
-            // }
-
-            delete req.query.limit;
-            delete req.query.page;
-        }
+        if (req.query.limit) delete req.query.limit;
         if (req.query.page) delete req.query.page;
 
         if ((Object.keys(req.query)).length > 0) {
@@ -208,31 +194,25 @@ async function fetchProducts(req, res) {
             });
         }
         if (minPrice) {
-            // console.log('min is ', minPrice);
             matchedProducts.items = JSON.parse(JSON.stringify(matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) >= minPrice;
             })));
-
         }
         if (maxPrice) {
-            // console.log('max is ', maxPrice);
             matchedProducts.items = (matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
             }));
         }
-
+        
+        if (colors){
+            matchedProducts.items = colorDistance(matchedProducts.items);
+        }
 
         if (limit) {
             matchedProducts.items = matchedProducts.items.splice(skip, limit);
         }
 
-        console.log(matchedProducts);
         res.status(200).json(matchedProducts);
-
-        // new
-        function colorDifference() {
-
-        }
 
         // filter aggregation query helper function
         function getFilterQuery(parameters) {
@@ -241,13 +221,7 @@ async function fetchProducts(req, res) {
 
             keys.forEach((key) => {
                 if (Array.isArray(parameters[key])) {
-                    if (key === 'color') {
-                        const colorConditions = parameters[key].map(color => ({
-                            'assets.color': { $regex: new RegExp(`^${color}$`, 'i') }
-                        }));
-                        query.push({ $or: colorConditions });
-                    }
-                    else if (key === 'size') {
+                    if (key === 'size') {
                         const sizeConditions = parameters[key].map(size => ({
                             'assets.stockQuantity.size': { $regex: new RegExp(`^${size}$`, 'i') }
                         }));
@@ -257,10 +231,7 @@ async function fetchProducts(req, res) {
                         query.push({ [`info.${key}`]: { $in: parameters[key].map(value => new RegExp(`^${value}$`, 'i')) } });
                     }
                 } else {
-                    if (key === 'color') {
-                        query.push({ [`assets.color`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
-                    }
-                    else if (key === 'size') {
+                    if (key === 'size') {
                         query.push({ [`assets.stockQuantity.size`]: { $regex: new RegExp(`^${parameters[key]}$`, 'i') } });
                     }
                     else {
@@ -272,6 +243,38 @@ async function fetchProducts(req, res) {
             return { $and: query };
         }
 
+        // find matching nearby colors
+        function colorDistance(products) {
+            if(!(Array.isArray(colors))){
+                let color = colors;
+                colors = [];
+                colors.push(color);
+            }
+
+            products = products.filter((product)=>{
+                if(product.assets.some(asset=>{
+                    let assetColorRGB = hexToRgb(asset.color);
+                    if (colors.some(color =>{
+                        let colorRGB = hexToRgb(color);
+
+                        let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
+                        
+                        if(eucleadianDistance <= 120){
+                            return true;
+                        }
+                        return false;
+                    })){
+                        return true;
+                    }
+                    return false;
+                })){
+                    return product;
+                }
+            });
+
+            return products;
+        }
+        
     } catch (error) {
         console.log('error coming is ', error);
         res.status(500).json({
@@ -282,11 +285,9 @@ async function fetchProducts(req, res) {
 
 async function fetchUniqueFields(req, res) {
     const input = req.body.parameter;
-    // console.log(input, "nv inout"); 
     const products = await Products.find({});
 
     function getData(products, parameter = input) {
-        // console.log(parameter, "parameter");
         const uniqueData = {
             category: [],
             brand: [],
@@ -343,7 +344,6 @@ async function fetchUniqueFields(req, res) {
                 }
             }
         });
-        // console.log(uniqueData, "unique");
         return uniqueData;
     }
 
@@ -351,7 +351,6 @@ async function fetchUniqueFields(req, res) {
     res.status(200).json({ data });
 
 }
-
 
 async function getProductPrice(products) {
     try {
@@ -416,7 +415,13 @@ async function getProductPrice(products) {
 }
 
 
-
+const hexToRgb = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    
+    return { r, g, b };
+}
 
 module.exports = {
     fetchProducts,
