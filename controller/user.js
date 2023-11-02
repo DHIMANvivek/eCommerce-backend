@@ -14,12 +14,10 @@ const paginateResults = require('../helpers/pagination');
 const ProductController = require('../controller/products');
 const PaymentKeys = require('../models/custom-website-elements/paymentKeys');
 async function getDetails(req, res) {
-    console.log('getDetails caleld---->');
     try {
         const basicDetails = await Users.findById(req.tokenData.id);
         res.status(200).json(basicDetails)
     } catch (error) {
-        console.log('erorr coming is ',error);
         res.status(500).json(error);
     }
 }
@@ -112,8 +110,7 @@ if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
 
 const result=await Users.findByIdAndUpdate({_id:req.tokenData.id},{$push:{'info.address':req.body}});
 const response=await getActiveAddresses(req,res);
-console.log('response is ',response);
-res.status(200).json(response.addresses);
+res.status(200).json(response[0].addresses);
     }
     catch (error) {
         res.status(500).json(error)
@@ -122,7 +119,6 @@ res.status(200).json(response.addresses);
 
 async function deleteAddress(req, res) {
     try {
-        console.log('infoadress id  is ',req.body.address_id," token data is ",req.tokenData.id);
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
             'info.address._id': req.body.address_id
@@ -131,11 +127,8 @@ async function deleteAddress(req, res) {
                 'info.address.$.status': false
             }
         });
-
-        console.log('update address is ',updatedValue);
         res.status(200).json(updatedValue);
     } catch (error) {
-        console.log('errpr is ', error);
         res.status(500).json(error);
     }
 }
@@ -151,6 +144,8 @@ async function updateAddress(req, res) {
                 'info.address.$': req.body
             }
         });
+
+
         res.status(200).json(req.body);
     } catch (error) {
         res.status(500).json(error)
@@ -159,14 +154,17 @@ async function updateAddress(req, res) {
 
 async function DefaultAddress(req, res) {
     try {
+        console.log('body coming is ',req.body);
 let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
 FindAddress.info.address.push(FindAddress[0]);
 FindAddress.info.address[0]=(req.body);
 await FindAddress.save();
+const result=await this.getActiveAddresses();
+
 // console.log('reqbodu si ',req.body);
 
 // const getAllAddress=await this.getActiveAddresses();
-// res.status(200).json(getAllAddress);
+res.status(200).json(result);
 
     } catch (error) {
         console.log('error coming is ', error);

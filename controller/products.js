@@ -2,6 +2,7 @@ const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
+const { default: mongoose } = require('mongoose');
 
 async function fetchProductDetails(req, res, sku = null, admincontroller = null) {
     try {
@@ -203,8 +204,8 @@ async function fetchProducts(req, res) {
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
             }));
         }
-        
-        if (colors){
+
+        if (colors) {
             matchedProducts.items = colorDistance(matchedProducts.items);
         }
 
@@ -245,36 +246,36 @@ async function fetchProducts(req, res) {
 
         // find matching nearby colors
         function colorDistance(products) {
-            if(!(Array.isArray(colors))){
+            if (!(Array.isArray(colors))) {
                 let color = colors;
                 colors = [];
                 colors.push(color);
             }
 
-            products = products.filter((product)=>{
-                if(product.assets.some(asset=>{
+            products = products.filter((product) => {
+                if (product.assets.some(asset => {
                     let assetColorRGB = hexToRgb(asset.color);
-                    if (colors.some(color =>{
+                    if (colors.some(color => {
                         let colorRGB = hexToRgb(color);
 
                         let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
-                        
-                        if(eucleadianDistance <= 120){
+
+                        if (eucleadianDistance <= 120) {
                             return true;
                         }
                         return false;
-                    })){
+                    })) {
                         return true;
                     }
                     return false;
-                })){
+                })) {
                     return product;
                 }
             });
 
             return products;
         }
-        
+
     } catch (error) {
         console.log('error coming is ', error);
         res.status(500).json({
@@ -419,10 +420,56 @@ const hexToRgb = (hex) => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    
+
     return { r, g, b };
 }
 
+async function ReduceProductQuantity() {
+    let product = {
+        sku: 'sku-tshirt002',
+        size: 'XS',
+        color: '#ffffff',
+        quantity: 50,
+        _id: '65433903aa8b20cf070a07dd',
+        name: 'Looney Tunes Merchandise',
+        assets: [Array],
+        info: [Object],
+        price: 599,
+        image: 'http://drive.google.com/uc?export=view&id=1yza1I23yCyvDXKjhSSRapHt30RoKIWMw'
+    };
+
+    try {
+        const findProduct = await Products.updateOne(
+            {
+              _id: '652d42dcb8fde95e78d23dd2',
+              'assets.color': '#ff00d0',
+              'assets.stockQuantity.size': 'XS'
+            },
+            {
+              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -1 }
+            },
+            {
+              arrayFilters: [
+                { "outer.color": "#ff00d0" }, 
+                { "inner.size": "XS" } 
+              ]
+            }
+          );
+        
+        return new Promise((res)=>{
+            res(findProduct);
+        })
+          
+    }
+    catch (error) {
+        console.log('erorr is ', error);
+    }
+
+}
+
+
+
+// ReduceProductQuantity();
 module.exports = {
     fetchProducts,
     fetchProductDetails,

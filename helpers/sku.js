@@ -8,21 +8,17 @@ async function generateSKU(model, category, ){
     }).sort({'createdAt': -1});
 
     const sku = data[0].sku.split(product.info.category);
-    const count = sku[sku.length - 1];
-    
-    const length = count.length - Number(count).length;
-    if(length == 0){
+    const count = Number(sku[sku.length - 1]);
 
-    }else{
-
-        // if()
-    }
-
-    let code = `SKU-${product.info.category}+-+count`;
+    let code = `SKU-${product.info.category}-${count}`;
 
     return code;
 }
 
+
+async function generateOrderId(model,category){
+    
+}
 module.exports = {
     generateSKU
 }

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const address = require('./address');
-
+const Products = require('../models/products');
 const orderSchema = mongoose.Schema(
     {
         buyerId: {
@@ -11,11 +11,11 @@ const orderSchema = mongoose.Schema(
 
         products: [
             {
-                // productId: {
-                //     type: mongoose.Schema.Types.ObjectId,
-                //     ref: 'products',
-                //     required: true,
-                // },
+                _id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'products',
+                    required: true,
+                },
 
                 //  one order has limitedprodcut or split the products in one order like 15 products split in 3 product
                 quantity: {
@@ -63,19 +63,24 @@ const orderSchema = mongoose.Schema(
                     type:String,
                     required:true
                 },
-                invoice_status:{
-                    type:Boolean,
-                    default:false,
-                },
-                invoiceId:{
-                    type:String,
-                },
+                // invoice_status:{
+                //     type:Boolean,
+                //     default:false,
+                // },
+                // invoiceId:{
+                //     type:String,
+                // },
+
             }
         ],
         invoice_status: {
             type: Boolean,
-            default: false
+            default: false 
         },
+        orderID:{
+            type:String,
+        },
+
         orderAmount: {
             type: Number,
         },
@@ -89,15 +94,15 @@ const orderSchema = mongoose.Schema(
         payment_status: {
             type: String,
             enum: ['confirmed', 'pending', 'cancelled', 'failed', 'refund'],
-            default: 'pending'
+            default: 'failed'
         },
-       
         active:{
             type:Boolean,
             default:true,
         },
         transactionId:{
-            type:String
+            type:String,
+            
         },
 
         // METHOD OF PAYMENT
@@ -121,6 +126,8 @@ const orderSchema = mongoose.Schema(
         //         message: 'Your field must be a number with a minimum of 6 digits.',
         //       },
         // },
+
+
         coupon:{
         //   type:String
         type: mongoose.Schema.Types.ObjectId,
@@ -160,14 +167,41 @@ orderSchema.pre('save', function (next) {
 
     if (!this.coupon) {
         this.orderValueAfterDiscount = this.orderAmount;
-      }
-    
-      if(this.coupon){
-        // console.log('coupon applied is ',this.couponApplied);
+    }
+
+    if(this.coupon){
         this.orderValueAfterDiscount =this.orderAmount-this.discount;
       }
-    
+
     next();
 });
 
+
+
+orderSchema.post('save',async function (){
+
+    
+
+    this.products.forEach(async (el)=>{
+        console.log('el come is ',el);
+        const findProduct = await Products.updateOne(
+            {
+              sku: el.sku,
+              'assets.color': el.color,
+              'assets.stockQuantity.size': el.size
+            },
+            {
+              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': el.quantity }
+            },
+            {
+              arrayFilters: [
+                { "outer.color": el.color }, 
+                { "inner.size": el.size } 
+              ]
+            }
+          );
+    })
+ 
+    
+})
 module.exports = mongoose.model('orders', orderSchema);

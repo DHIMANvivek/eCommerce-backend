@@ -26,7 +26,6 @@ async function verifyOrderSummary(req, res) {
         let response = {};
         let result = await Promise.all(req.body.details.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
-            // console.log('elemnt is ',element);
             return new Promise((res, rej) => {
                 if (response.info.orderQuantity.includes(element.quantity)) {
                     return res(response.price * element.quantity);
@@ -74,6 +73,10 @@ async function verifyOrderSummary(req, res) {
 
 async function createOrder(req, res) {
     try {
+
+        console.log('reqbody coming is ',req.body);
+
+        res.status(200).json('created suces');
         req.body.buyerId = req.tokenData.id;
         if (req.body.coupon) {
             let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
@@ -105,6 +108,9 @@ async function createOrder(req, res) {
 
 async function createOrder(req,res) {
     try {
+
+
+        
         req.body.buyerId=req.tokenData.id;
         if(req.body.coupon){
            let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
@@ -114,7 +120,6 @@ async function createOrder(req,res) {
        
      await Promise.all(req.body.products.map(async (element) => {
                 const matchedProduct = await productsModel.findOne({sku:element.sku},{sellerID:1});
-                // console.log('mathcnedProcut si ',matchedProduct);
                 element.sellerID = matchedProduct.sellerID;
                 return element;
         }));
@@ -122,11 +127,14 @@ async function createOrder(req,res) {
         const orderCreated=ordersModel(req.body);
       await  orderCreated.save();
 
-      await req.body.products.forEach((el)=>{
 
-      })
-
+      if(req.body.payment_status=='confirmed'){
         await updateCoupon(req.body.coupon._id, req.tokenData.id);
+        await ProductController.ReduceProductQuantity();
+
+      }
+
+
         res.status(200).json('order created success');
 
     } catch (error) {
@@ -150,7 +158,6 @@ async function getSellerOrdersInventory(req, res) {
     let parameters = req.body;
 
     try {
-
 
         let aggregationPipe = [
             { $unwind: { path: '$products' } },
