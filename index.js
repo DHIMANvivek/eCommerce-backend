@@ -39,28 +39,28 @@ app.post('/send-notification', (req, res) => {
 });
 
 
-// const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
-// const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
+const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
+const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
 
-// webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
-// app.post('/subscribe', (req, res) => {
-//   const subscription = req.body;
+webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
+app.post('/subscribe', (req, res) => {
+  const subscription = req.body;
 
-//   const payload = JSON.stringify({ title: req.body.title ,
-//   body: req.body.body,
-// icon: req.body.icon,
-// to: req.body.to });
+  const payload = JSON.stringify({ title: req.body.title ,
+  body: req.body.body,
+icon: req.body.icon,
+to: req.body.to });
 
-//   webpush.sendNotification(subscription, payload)
-//       .then(() => {
-//           console.log('Push notification sent');
-//           res.status(201).json({ message: 'Push notification sent successfully' });
-//       })
-//       .catch((err) => {
-//           console.error(err);
-//           res.status(500).json({ error: 'Failed to send push notification' });
-//       });
-// });
+  webpush.sendNotification(subscription, payload)
+      .then(() => {
+          console.log('Push notification sent');
+          res.status(201).json({ message: 'Push notification sent successfully' });
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: 'Failed to send push notification' });
+      });
+});
 
 
 

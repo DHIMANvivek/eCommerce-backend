@@ -27,9 +27,9 @@ router.get('/getAdminDetails', adminController.getAdminDetails);
 // router.get('/getProductPrice',adminController.getProductPrice)
 
 // FAQs
-router.post('/deleteFaq', adminController.deleteFaq);
-router.post('/updateFaq', adminController.updateFaq);
-router.post('/addFaq', adminController.addFaq);
+// router.post('/deleteFaq', adminController.deleteFaq);
+// router.post('/updateFaq', adminController.updateFaq);
+// router.post('/addFaq', adminController.addFaq);
 
 // router.get('/getFaq', adminController.getFaq);
 router.post('/setTicketTitle', adminController.setTicketTitle);
@@ -40,13 +40,13 @@ router.post('/deleteTicketTitle', adminController.deleteTicketTitle);
 router.get('/getAllTicket', adminController.getAllTicket);
 router.post('/updateTicketStatus', adminController.updateTicketStatus);
 router.post('/deleteSupportTicket', adminController.deleteSupportTicket);
-router.get('/getPaymentKeys', adminController.getPaymentKeys);
+// router.get('/getPaymentKeys', adminController.getPaymentKeys);
 
 
 // payment keys
-router.post('/addPaymentKeys', adminController.addPaymentKeys);
-router.post('/updatePaymentKeys', adminController.updatePaymentKeys);
-router.post('/deletePaymentKeys', adminController.deletePaymentKeys);
+// router.post('/addPaymentKeys', adminController.addPaymentKeys);
+// router.post('/updatePaymentKeys', adminController.updatePaymentKeys);
+// router.post('/deletePaymentKeys', adminController.deletePaymentKeys);
 
 // paginated data
 router.get('/getPaginatedData/:model', adminController.getPaginatedData);

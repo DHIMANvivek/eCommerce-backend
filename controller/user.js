@@ -1,18 +1,18 @@
 const Users = require('../models/users');
 const Reviews = require('../models/reviews');
-const faqData = require('../models/faq');
+const faqData = require('../models/custom-website-elements/faq');
 
 const Title = require('../models/createTicket');
-const Ticket = require('../models/supportTicket');
+const Ticket = require('../models/support-ticket/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
 const OffersModel = require('../models/offers');
-const webPush = require('../models/supportNotifications');
+const webPush = require('../models/support-ticket/supportNotifications');
 // const OffersModel=require('../models/offers');
 const paginateResults = require('../helpers/pagination');
 const ProductController = require('../controller/products');
-const PaymentKeys = require('../models/paymentKeys');
+const PaymentKeys = require('../models/custom-website-elements/paymentKeys');
 async function getDetails(req, res) {
     console.log('getDetails caleld---->');
     try {
@@ -93,7 +93,7 @@ async function getPaginatedData(req, res) {
     const pageSize = parseInt(req.query.pageSize, 3) || 10;
 
     try {
-      const Model = require(`../models/${modelName}`); 
+      const Model = require(`../models/custom-website-elements/${modelName}`); 
       const data = await paginateResults(Model, page, pageSize);
 
       res.status(200).json(data);
@@ -256,22 +256,6 @@ async function UserCoupon(req,res){
     }
 }
 
-async function getPaginatedData(req, res) {
-    const modelName = req.params.model; 
-    const page = parseInt(req.query.page, 1) || 1;
-    const pageSize = parseInt(req.query.pageSize) ? 10 : 10;
-  
-    try {
-      const Model = require(`../models/${modelName}`); 
-      const data = await paginateResults(Model, page, pageSize);
-  
-      res.status(200).json(data);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  }
-
 async function getFaq(req , res) {
     try {
         const page = req.query.page || 1;
@@ -346,6 +330,27 @@ async function sendTicket(req , res) {
       }
 }
 
+async function webPushDetails(req, res) {
+    try {
+        const { email, token } = req.body;
+        console.log('email is ', email, 'token is ', token);
+    
+        const supportNotification = await webPush.findOne({});
+    
+        if (supportNotification) {
+            supportNotification.tokenDetail.push({ token, email });
+          await supportNotification.save();
+          res.status(200).json(supportNotification);
+        } else {
+          // If the document doesn't exist, you can create a new one or handle this case as needed
+          res.status(404).json({ error: 'SupportNotifications document not found' });
+        }
+      } catch (error) {
+        console.error('Error saving user details:', error);
+        return res.status(500).json({ error: 'An error occurred while saving user details' });
+      }
+  }
+
 
 
     
@@ -372,5 +377,5 @@ module.exports = {
     getTicketTitle,
     sendTicket,
     // getPaymentKeys
-    // webPushDetails
+    webPushDetails
 }

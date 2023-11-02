@@ -23,9 +23,8 @@ router.post('/deleteAddress', userController.deleteAddress)
 router.post('/updateAdress', userController.updateAddress)
 router.post('/setDefault',userController.DefaultAddress)
 
-router.get('/getFaq', userController.getFaq);
+// router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
-// router.get('/getPaginatedData/:model', userController.getPaginatedData);
 // router.get('/coupons',userController.getCoupons);
 // router.get('/coupons',userController.GetCoupons);
 
@@ -34,7 +33,7 @@ router.get('/getPaginatedData/:model', userController.getPaginatedData);
 // support ticket
 router.get('/getTicketTitle', userController.getTicketTitle);
 router.post('/sendTicket', userController.sendTicket);
-// router.post('/webPushDetails', userController.webPushDetails);
+router.post('/webPushDetails', userController.webPushDetails);
 // router.get('/getPaymentKeys', userController.getPaymentKeys);
 
 

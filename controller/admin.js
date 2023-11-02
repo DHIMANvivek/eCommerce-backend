@@ -3,11 +3,11 @@ const products = require('../models/products');
 const sellerInfo = require('../models/sellerDetails');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const faqData = require('../models/faq');
-const Ticket = require('../models/supportTicket');
+const faqData = require('../models/custom-website-elements/faq');
+const Ticket = require('../models/support-ticket/supportTicket');
 const Title = require('../models/createTicket');
 const SKU_generater = require('../helpers/sku');
-const PaymentKeys = require('../models/paymentKeys');
+const PaymentKeys = require('../models/custom-website-elements/paymentKeys');
 const paginateResults = require('../helpers/pagination');
 
 const productController = require('../controller/products');
@@ -356,78 +356,78 @@ async function getAdminDetails(req, res) {
 // }
 
 
-async function updateFaq(req, res) {
-  console.log(req.body)
-  try {
-    const updateFaqData = req.body;
-    const itemId = updateFaqData._id;
-    const updatedTitle = updateFaqData.title;
-    const updatedContent = updateFaqData.content;
+// async function updateFaq(req, res) {
+//   console.log(req.body)
+//   try {
+//     const updateFaqData = req.body;
+//     const itemId = updateFaqData._id;
+//     const updatedTitle = updateFaqData.title;
+//     const updatedContent = updateFaqData.content;
 
 
-    const result = await faqData.findOneAndUpdate(
-      { 'childrens._id': itemId },
-      {
-        $set: {
-          'childrens.$.title': updatedTitle,
-          'childrens.$.content': updatedContent,
-        },
-      },
-      { new: true }
-    );
+//     const result = await faqData.findOneAndUpdate(
+//       { 'childrens._id': itemId },
+//       {
+//         $set: {
+//           'childrens.$.title': updatedTitle,
+//           'childrens.$.content': updatedContent,
+//         },
+//       },
+//       { new: true }
+//     );
 
-    if (!result) {
-      return res.status(404).json({ error: 'FAQ item not found' });
-    }
+//     if (!result) {
+//       return res.status(404).json({ error: 'FAQ item not found' });
+//     }
 
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
-  }
-}
+//     res.json(result);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
+//   }
+// }
 
-async function addFaq(req, res) {
-  try {
-    const { title, children } = req.body;
+// async function addFaq(req, res) {
+//   try {
+//     const { title, children } = req.body;
 
-    const category = await faqData.findOne({ title });
+//     const category = await faqData.findOne({ title });
 
-    if (!category) {
-      return res.status(404).json({ success: false, message: 'Category not found' });
-    }
+//     if (!category) {
+//       return res.status(404).json({ success: false, message: 'Category not found' });
+//     }
 
-    category.childrens.push(...children);
+//     category.childrens.push(...children);
 
-    await category.save();
+//     await category.save();
 
-    return res.status(200).json({ success: true, message: 'Children added to the category' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
-  }
-}
+//     return res.status(200).json({ success: true, message: 'Children added to the category' });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
+//   }
+// }
 
-async function deleteFaq(req, res) {
-  try {
-    const itemId = req.body._id;
-    console.log(itemId)
-    const result = await faqData.findOneAndUpdate(
-      { 'childrens._id': itemId },
-      {
-        $pull: {
-          childrens: { _id: itemId },
-        },
-      },
-      { new: true }
-    );
-    console.log(result)
-  }
-  catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'An error occurred while deleting the FAQ item' });
-  }
-}
+// async function deleteFaq(req, res) {
+//   try {
+//     const itemId = req.body._id;
+//     console.log(itemId)
+//     const result = await faqData.findOneAndUpdate(
+//       { 'childrens._id': itemId },
+//       {
+//         $pull: {
+//           childrens: { _id: itemId },
+//         },
+//       },
+//       { new: true }
+//     );
+//     console.log(result)
+//   }
+//   catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'An error occurred while deleting the FAQ item' });
+//   }
+// }
 
 async function setTicketTitle(req, res) {
   try {
@@ -628,15 +628,15 @@ async function deleteSupportTicket(req, res) {
 }
 
 
-async function getPaymentKeys(req, res) {
-  try {
-    const paymentKeys = await PaymentKeys.find({}).populate('keys.adminId');
-    res.status(200).json(paymentKeys);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json(error);
-  }
-}
+// async function getPaymentKeys(req, res) {
+//   try {
+//     const paymentKeys = await PaymentKeys.find({}).populate('keys.adminId');
+//     res.status(200).json(paymentKeys);
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json(error);
+//   }
+// }
 
 
 
@@ -653,68 +653,68 @@ async function getPaymentKeys(req, res) {
 // }
 
 
-async function addPaymentKeys(req, res) {
-  try {
-    const { publicKey, privateKey } = req.body;
-    const decodedPayload = atob(req.body.adminId);
-    const admin = JSON.parse(decodedPayload);
-    const adminId = admin.id;
-    console.log(adminId, "admin Id Is");
+// async function addPaymentKeys(req, res) {
+//   try {
+//     const { publicKey, privateKey } = req.body;
+//     const decodedPayload = atob(req.body.adminId);
+//     const admin = JSON.parse(decodedPayload);
+//     const adminId = admin.id;
+//     console.log(adminId, "admin Id Is");
 
-    let adminKeys = await PaymentKeys.findOne({});
+//     let adminKeys = await PaymentKeys.findOne({});
     
-    if (!adminKeys) {
-      adminKeys = new PaymentKeys({
-        keys: [{ adminId, publicKey, privateKey }]
-      });
-    } else {
-      adminKeys.keys.push({ adminId, publicKey, privateKey });
-    }
+//     if (!adminKeys) {
+//       adminKeys = new PaymentKeys({
+//         keys: [{ adminId, publicKey, privateKey }]
+//       });
+//     } else {
+//       adminKeys.keys.push({ adminId, publicKey, privateKey });
+//     }
     
-    await adminKeys.save();
-    res.status(200).json({ message: 'Payment Keys added Successfully' });
-  } catch (error) {
-    console.log('error is ', error);
-    res.status(500).json(error);
-  }
-}
+//     await adminKeys.save();
+//     res.status(200).json({ message: 'Payment Keys added Successfully' });
+//   } catch (error) {
+//     console.log('error is ', error);
+//     res.status(500).json(error);
+//   }
+// }
 
-async function updatePaymentKeys(req , res) {
-  try {
-    const { publicKey, privateKey, id , enable} = req.body;
-    const adminId = id;
-    console.log(adminId, privateKey, publicKey , id , enable, "admin Id Is");
+// async function updatePaymentKeys(req , res) {
+//   try {
+//     const { publicKey, privateKey, id , enable} = req.body;
+//     const adminId = id;
+//     console.log(adminId, privateKey, publicKey , id , enable, "admin Id Is");
 
-    const adminKeys = await PaymentKeys.findOneAndUpdate(
-      { 'keys._id': adminId }, 
-      { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': enable } }, // Update the fields
-      { new: true }
-    )
-      .then(updatedKeys => {
-        console.log(updatedKeys);
-      })
-      .catch(err => {
-        console.error(err);
-      });
-    if (adminKeys) {
-      console.log('Document Updated:', adminKeys);
-    } else {
-      console.log('No matching document found for the given query.');
-    }
-    res.status(200).json({ message: 'Payment Keys updated Successfully' });
-  } catch (error) {
-    console.log('error is ', error);
-    res.status(500).json(error);
-  }
-}
+//     const adminKeys = await PaymentKeys.findOneAndUpdate(
+//       { 'keys._id': adminId }, 
+//       { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': enable } }, // Update the fields
+//       { new: true }
+//     )
+//       .then(updatedKeys => {
+//         console.log(updatedKeys);
+//       })
+//       .catch(err => {
+//         console.error(err);
+//       });
+//     if (adminKeys) {
+//       console.log('Document Updated:', adminKeys);
+//     } else {
+//       console.log('No matching document found for the given query.');
+//     }
+//     res.status(200).json({ message: 'Payment Keys updated Successfully' });
+//   } catch (error) {
+//     console.log('error is ', error);
+//     res.status(500).json(error);
+//   }
+// }
 
-async function deletePaymentKeys(req , res) {
-  const { id } = req.body;
-  console.log(id);
-  const data = await PaymentKeys.deleteOne({ 'keys._id': id });
-  console.log(data);
-  res.status(200).json({ message: 'Payment Keys deleted Successfully'});
-}
+// async function deletePaymentKeys(req , res) {
+//   const { id } = req.body;
+//   console.log(id);
+//   const data = await PaymentKeys.deleteOne({ 'keys._id': id });
+//   console.log(data);
+//   res.status(200).json({ message: 'Payment Keys deleted Successfully'});
+// }
 
 async function getPaginatedData(req, res) {
   const modelName = req.params.model; 
@@ -722,7 +722,7 @@ async function getPaginatedData(req, res) {
   const pageSize = parseInt(req.query.pageSize, 3) || 10;
 
   try {
-    const Model = require(`../models/${modelName}`); 
+    const Model = require(`../models/custom-website-elements/${modelName}`); 
     const data = await paginateResults(Model, page, pageSize);
 
     res.status(200).json(data);
@@ -742,13 +742,6 @@ module.exports = {
   updateFeatures,
   updateDetails,
   getAdminDetails,
-  // createOffer,
-  // getOffers,
-  // deleteOffer,
-  // getProductPrice,
-  updateFaq,
-  deleteFaq,
-  addFaq,
   setTicketTitle,
   createTicketTitle,
   updateTicketTitle,
@@ -757,14 +750,21 @@ module.exports = {
   getAllTicket,
   updateTicketStatus,
   deleteSupportTicket,
+  getPaginatedData
   // updateOffer
   // getProductPrice
   // updateOffer,
   // getProductPrice,
-  addPaymentKeys,
-  getPaymentKeys,
-  updatePaymentKeys,
-  deletePaymentKeys,
-  getPaginatedData
+  // addPaymentKeys,
+  // getPaymentKeys,
+  // updatePaymentKeys,
+  // deletePaymentKeys,
+    // createOffer,
+  // getOffers,
+  // deleteOffer,
+  // getProductPrice,
+  // updateFaq,
+  // deleteFaq,
+  // addFaq,
 }
 
