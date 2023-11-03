@@ -6,7 +6,6 @@ async function createOffer(req, res) {
     await offer.save();
     res.status(200).json(offer);
   } catch (error) {
-    console.log('error is ', error);
     res.status(500).json(error);
   }
 }
@@ -15,7 +14,6 @@ async function createOffer(req, res) {
 async function getOffers(req, res) {
   try {
     const data = await OfferModel.find({ 'status.deleted': false });
-    // console.log('data coming is ', data);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json(error);
@@ -35,10 +33,8 @@ async function deleteOffer(req, res) {
 
 async function updateOffer(req, res) {
   try {
-    // console.log('req   body is ', req.body);
     const result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
-    // console.log('update offer is ', result);
-    res.status(200).json({ message: 'updated Successfully' });
+    res.status(200).json(result);
   } catch (error) {
     console.log('error is ', error);
     res.status(500).json(error);
@@ -48,20 +44,17 @@ async function updateOffer(req, res) {
 
 async function getCoupons(req, res) {
   try {
-    //{ userUsed: { $nin: [req.tokenData.id] } }
     const getAllCoupons = await OfferModel.find({ $and: [{ OfferType: 'coupon' },{ "status.active": true },{ "status.deleted": false} ,{ startDate: { $lte: (new Date()) } }, {endDate:{$gte:(new Date())}}] });
-    // console.log('getAllcoupon is ',getAllCoupons);
     res.status(200).json(getAllCoupons);
 
   } catch (error) {
-    console.log('eror is ',error);
     res.status(500).json(error);
   }
 }
 
 async function checkCoupon(couponId,userId){
   try {
-    const response=await OfferModel.findOne({ $and:[{ OfferType: 'coupon' },{_id:couponId},{ userUsed:{$nin: [userId]}}]});
+    const response=await OfferModel.findOne({ $and:[{ OfferType: 'coupon' },{_id:couponId},{ userUsed:{$nin: [userId]}},{$gte:{'couponUsersLimit':1}}]});
     return new Promise((res,rej)=>{
       if(!response) res(0);
       res(response);
@@ -82,6 +75,7 @@ async function updateCoupon(couponId,userId){
   } catch (error) {
   }
 }
+
 
 module.exports = {
   createOffer,

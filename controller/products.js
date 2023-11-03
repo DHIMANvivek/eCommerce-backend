@@ -380,12 +380,33 @@ async function getProductPrice(products) {
         let product = JSON.parse(JSON.stringify(parameter));
 
         return new Promise(async (res, rej) => {
-            let discount = await OffersModel.findOne({
-                $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
-                { "ExtraInfo.brands": { $in: [product.info.brand] } },
-                ], OfferType: 'discount'
-            }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
+            let query;
+            const latestOffer=await OffersModel.findOne({  OfferType: 'discount'}).sort({'createdAt': -1});
+            if( latestOffer.ExtraInfo.categories && latestOffer.ExtraInfo.brands && latestOffer.ExtraInfo.categories.length>0 && latestOffer.ExtraInfo.brands.length>0) {
+                query={
+                    OfferType: 'discount',
+                    "ExtraInfo.brands": { $in: [product.info.brand] },
+                    "ExtraInfo.categories": { $in: [product.info.category] },
+                }
+            }
 
+            else if(latestOffer.ExtraInfo.categories  &&  latestOffer.ExtraInfo.brands &&  latestOffer.ExtraInfo.categories.length==0 || latestOffer.ExtraInfo.brands.length==0){
+                query={
+                    OfferType: 'discount',
+                   $or:[{"ExtraInfo.brands": { $in: [product.info.brand] },
+                    "ExtraInfo.categories": { $in: [product.info.category] },
+                   }]
+                }
+                
+            }
+
+    
+            let discount = await OffersModel.findOne(
+                query, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1, 'ExtraInfo': 1 }
+            )
+   
+            console.log('discount come up is ---------> ', discount, "prodfuct brand is ", product.info.brand, " product category is ", product.info.category);
+            
             if (discount == null) {
                 res(product);
                 return;
@@ -441,25 +462,25 @@ async function ReduceProductQuantity() {
     try {
         const findProduct = await Products.updateOne(
             {
-              _id: '652d42dcb8fde95e78d23dd2',
-              'assets.color': '#ff00d0',
-              'assets.stockQuantity.size': 'XS'
+                _id: '652d42dcb8fde95e78d23dd2',
+                'assets.color': '#ff00d0',
+                'assets.stockQuantity.size': 'XS'
             },
             {
-              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -1 }
+                $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -1 }
             },
             {
-              arrayFilters: [
-                { "outer.color": "#ff00d0" }, 
-                { "inner.size": "XS" } 
-              ]
+                arrayFilters: [
+                    { "outer.color": "#ff00d0" },
+                    { "inner.size": "XS" }
+                ]
             }
-          );
-        
-        return new Promise((res)=>{
+        );
+
+        return new Promise((res) => {
             res(findProduct);
         })
-          
+
     }
     catch (error) {
         console.log('erorr is ', error);

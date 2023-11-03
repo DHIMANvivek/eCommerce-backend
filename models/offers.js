@@ -9,9 +9,6 @@ let offerSchema = mongoose.Schema({
         enum: ['coupon', 'discount']
     },
 
-
-    
-
     couponcode: {
         type: String,
         required:   function validate() {
@@ -22,7 +19,6 @@ let offerSchema = mongoose.Schema({
             if (this.OfferType == 'coupon') return true;
         },
     },
-
 
     Title: {
         type: String,
@@ -42,14 +38,14 @@ let offerSchema = mongoose.Schema({
         required: true
     },
 
-    DiscountPercentageType:{
-        type:String,
-        // enum:['fixed','variable'],
-        required:function validate() {
-            if (this.discountType == 'percentage') return true;
+    // DiscountPercentageType:{
+    //     type:String,
+    //     // enum:['fixed','variable'],
+    //     required:function validate() {
+    //         if (this.discountType == 'percentage') return true;
 
-        }
-    },
+    //     }
+    // },
 
     discountAmount: {
         type: Number,
@@ -58,10 +54,8 @@ let offerSchema = mongoose.Schema({
         validate: {
             validator: function() {
                 if (this.discountType === 'percentage') {
-                    // Set the maximum value for percentage
                     return this.discountAmount >= 0 && this.discountAmount <= 100;
                 }
-
                 return true;
             },
             message: 'Invalid discount amount for the selected discount type'
@@ -69,7 +63,16 @@ let offerSchema = mongoose.Schema({
     },
     startDate: {
         type: Date,
-        required: true
+        required: true,
+        validate: {
+            validator: function() {
+                if (this.start === 'percentage') {
+                    return this.discountAmount >= 0 && this.discountAmount <= 100;
+                }
+                return true;
+            },
+            message: 'Invalid discount amount for the selected discount type'
+        }
     },
     endDate: {
         type: Date,
@@ -114,17 +117,12 @@ let offerSchema = mongoose.Schema({
     }
     ],
     
-    userId:[{
-
-    
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+    email:{
+        type: String,
         required:function validate(){
             if (this.OfferType == 'coupon' && this.couponType=='custom') return true;
         }
-
-    }
-    ],
+    },
     couponUsersLimit: {
         type: Number,
         required: function validate() {

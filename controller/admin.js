@@ -225,7 +225,7 @@ async function fetchFeatures(req, res) {
     data.forEach((field) => {
       query[field] = 1
     });
-
+    
     if (sellerID)
       response = await sellerInfo.findOne({ 'sellerID': sellerID }, query);
     else

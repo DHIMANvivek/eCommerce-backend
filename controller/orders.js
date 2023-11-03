@@ -42,8 +42,8 @@ async function verifyOrderSummary(req, res) {
 
         response.subTotal = totalAmount;
         if (req.body.CouponApplied) {
-            // let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
-            let coupon = req.body.CouponApplied;
+            let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
+            // let coupon = req.body.CouponApplied;
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
             let discount = 0;
@@ -66,7 +66,6 @@ async function verifyOrderSummary(req, res) {
         if (!response.total) response.total = response.subTotal;
         res.status(200).json(response);
     } catch (error) {
-        console.log('errpr comimg is ,', error);
         res.status(500).json(error);
     }
 }
