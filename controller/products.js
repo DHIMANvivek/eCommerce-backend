@@ -446,18 +446,18 @@ const hexToRgb = (hex) => {
 }
 
 async function ReduceProductQuantity() {
-    let product = {
-        sku: 'sku-tshirt002',
-        size: 'XS',
-        color: '#ffffff',
-        quantity: 50,
-        _id: '65433903aa8b20cf070a07dd',
-        name: 'Looney Tunes Merchandise',
-        assets: [Array],
-        info: [Object],
-        price: 599,
-        image: 'http://drive.google.com/uc?export=view&id=1yza1I23yCyvDXKjhSSRapHt30RoKIWMw'
-    };
+//     let product = {
+//         sku: 'sku-tshirt002',
+//         size: 'XS',
+//         color: '#ffffff',
+//         quantity: 50,
+//         _id: '65433903aa8b20cf070a07dd',
+//         name: 'Looney Tunes Merchandise',
+//         assets: [Array],
+//         info: [Object],
+//         price: 599,
+//         image: 'http://drive.google.com/uc?export=view&id=1yza1I23yCyvDXKjhSSRapHt30RoKIWMw'
+//     };
 
     try {
         const findProduct = await Products.updateOne(
@@ -485,6 +485,32 @@ async function ReduceProductQuantity() {
     catch (error) {
         console.log('erorr is ', error);
     }
+//     try {
+//         const findProduct = await Products.updateOne(
+//             {
+//               _id: '652d42dcb8fde95e78d23dd2',
+//               'assets.color': '#ff00d0',
+//               'assets.stockQuantity.size': 'XS'
+//             },
+//             {
+//               $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -1 }
+//             },
+//             {
+//               arrayFilters: [
+//                 { "outer.color": "#ff00d0" }, 
+//                 { "inner.size": "XS" } 
+//               ]
+//             }
+//           );
+        
+//         return new Promise((res)=>{
+//             res(findProduct);
+//         })
+          
+//     }
+//     catch (error) {
+//         console.log('erorr is ', error);
+//     }
 
 }
 

@@ -5,7 +5,9 @@ const { checkCoupon, updateCoupon, } = require('../controller/offers');
 const ProductController = require('../controller/products');
 const mongoose = require('mongoose');
 const productsModel=require('./../models/products');
+const jwt=require('jsonwebtoken');
 
+require('dotenv').config();
 
 async function getOrders(req, res) {
     try {
@@ -19,6 +21,49 @@ async function getOrders(req, res) {
         return res.status(500).json(error);
     }
 }
+
+async function getLatestOrderDetail(req, res) {
+    try {
+        const token = req.body.buyerId; 
+
+        const decoded = jwt.verify(token, process.env.secretKey); 
+    
+        const buyerId = decoded.id;
+
+        console.log(buyerId , "latest buyer Id");
+
+        
+        const { newPaymentStatus , transactionId , MOP } = req.body;
+        
+        
+        const latestOrder = await ordersModel
+          .findOne({ buyerId: buyerId })
+          .sort({ orderDate: -1 })
+          .exec();
+    
+        if (latestOrder) {
+          const result = await ordersModel.updateOne(
+            { _id: latestOrder._id },
+            {
+                $set: {
+                  payment_status: newPaymentStatus,
+                  transactionId: transactionId,
+                  MOP: MOP
+                }
+            }
+          );
+    
+          console.log('Latest order payment status updated successfully:', result);
+          res.status(200).json({ message: 'Latest order payment status updated successfully' });
+        } else {
+          res.status(404).json({ error: 'No orders found for the user' });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update latest order payment status' });
+      }
+    }
+        
 
 async function verifyOrderSummary(req, res) {
     try {
@@ -276,5 +321,6 @@ module.exports = {
     verifyOrderSummary,
     getParicularUserOrders,
     getSellerOrdersInventory,
-    getSellerOrderDetails
+    getSellerOrderDetails,
+    getLatestOrderDetail
 }

@@ -93,7 +93,7 @@ const orderSchema = mongoose.Schema(
 
         payment_status: {
             type: String,
-            enum: ['confirmed', 'pending', 'cancelled', 'failed', 'refund'],
+            enum: ['succeeded', 'pending', 'cancelled', 'failed', 'refund'],
             default: 'failed'
         },
         active:{
@@ -191,7 +191,7 @@ orderSchema.post('save',async function (){
               'assets.stockQuantity.size': el.size
             },
             {
-              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': el.quantity }
+              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity }
             },
             {
               arrayFilters: [
