@@ -22,7 +22,7 @@ async function getOrders(req, res) {
     }
 }
 
-async function getLatestOrderDetail(req, res) {
+async function updateLatestOrderDetail(req, res) {
     try {
         const token = req.body.buyerId; 
 
@@ -64,6 +64,31 @@ async function getLatestOrderDetail(req, res) {
       }
     }
         
+    async function getLatestProductForBuyer(req, res) {
+        try {
+          const token = req.body.buyerId;
+          const decoded = jwt.verify(token, process.env.secretKey);
+          const buyerId = decoded.id;
+      
+          console.log(buyerId, "latest buyer Id");
+      
+          const latestProduct = await ordersModel
+            .findOne({ buyerId: buyerId })
+            .sort({ createdAt: -1 })
+            .exec();
+      
+          if (latestProduct) {
+            console.log('Latest product details:', latestProduct);
+            res.status(200).json({ latestProduct });
+          } else {
+            res.status(404).json({ error: 'No products found for the user' });
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
+        }
+      }
+      
 
 async function verifyOrderSummary(req, res) {
     try {
@@ -86,8 +111,11 @@ async function verifyOrderSummary(req, res) {
         })
 
         response.subTotal = totalAmount;
+        console.log('req.body is ',req.body," req token id ");
+          
         if (req.body.CouponApplied) {
-            let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
+              let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
+              console.log('couon is ',coupon);
             // let coupon = req.body.CouponApplied;
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
@@ -111,6 +139,7 @@ async function verifyOrderSummary(req, res) {
         if (!response.total) response.total = response.subTotal;
         res.status(200).json(response);
     } catch (error) {
+        console.log('error coming is ', error);
         res.status(500).json(error);
     }
 }
@@ -322,5 +351,6 @@ module.exports = {
     getParicularUserOrders,
     getSellerOrdersInventory,
     getSellerOrderDetails,
-    getLatestOrderDetail
+    updateLatestOrderDetail,
+    getLatestProductForBuyer
 }

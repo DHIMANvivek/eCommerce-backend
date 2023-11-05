@@ -6,25 +6,21 @@ const mailer = require('../../helpers/nodemailer');
 const { SubscribeTemplate } = require('../../helpers/INDEX');
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
-
-// const AdminVerify=require('../../middlewares/adminVerify');
-
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
+const paginateResults = require('../../helpers/pagination');
+
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
 router.use('/reviews', require('./v1/reviews'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
-router.use('/offer',require('./v1/offer'));
+router.use('/offer', require('./v1/offer'));
 router.use('/wishlist', jwtVerify, require('./v1/wishlist'))
 router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
-// router.use('/payIntent', require('./v1/stripe/stripe'));
 
-// const PaymentKeys = require('../../models/custom-website-elements/paymentKeys');
-const paginateResults = require('../../helpers/pagination');
 
 // check type of user (Used for purpose of Authguard)
 router.get('/checkUser', (req, res) => {
@@ -59,13 +55,13 @@ router.post('/sendMail', async (req, res) => {
 })
 
 // payment intent
-router.post('/create-payment-intent', async (req, res)=>{
+router.post('/create-payment-intent', async (req, res) => {
 
     const response = await fetch('http://localhost:1000/paymentKeys/get');
 
     if (!response.ok) {
         throw new Error('Network response was not ok');
-      }
+    }
 
     const data = await response.json();
     const privateKey = data[0].keys[0].privateKey;
@@ -94,59 +90,24 @@ router.post('/create-payment-intent', async (req, res)=>{
     }
 })
 
-// payment keys
-// router.get('/getPaymentKeys', async (req, res)=>{
-//     try {
-//         const paymentKeys = await PaymentKeys.aggregate([
-//           {
-//             $unwind: "$keys" 
-//           },
-//           {
-//             $match: {
-//               "keys.enable": true 
-//             }
-//           },
-//           {
-//             $lookup: {
-//               from: "users", 
-//               localField: "keys.adminId",
-//               foreignField: "_id",
-//               as: "keys.admin" 
-//             }
-//           },
-//           {
-//             $group: {
-//               _id: "$_id",
-//               keys: { $push: "$keys" } 
-//             }
-//           }
-//         ]);
-    
-//         res.status(200).json(paymentKeys);
-//       } catch (error) {
-//         console.error('Error:', error);
-//         res.status(500).json(error);
-//       }
-// })
-
 // getPaginated Data
 router.get('/getPaginatedData/:model', getPaginatedData);
 
 async function getPaginatedData(req, res) {
-    const modelName = req.params.model; 
+    const modelName = req.params.model;
     const page = parseInt(req.query.page, 1) || 1;
     const pageSize = parseInt(req.query.pageSize, 3) || 10;
 
     try {
-      const Model = require(`../../models/custom-website-elements/${modelName}`); 
-      const data = await paginateResults(Model, page, pageSize);
+        const Model = require(`../../models/custom-website-elements/${modelName}`);
+        const data = await paginateResults(Model, page, pageSize);
 
-      res.status(200).json(data);
+        res.status(200).json(data);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-  }
+}
 
 // ticket status
 router.post('/ticketStatus', async (req, res) => {
@@ -167,11 +128,11 @@ router.post('/ticketStatus', async (req, res) => {
 })
 
 // email invoice 
-router.post('/invoiceSend', async (req, res)=>{
-  console.log(req.body)
+router.post('/invoiceSend', async (req, res) => {
+    console.log(req.body)
     const mailData = {
-        email : req.body.receipt_email,
-        subject : "Invoice",
+        email: req.body.receipt_email,
+        subject: "Invoice",
         invoice: req.body
     }
     const emailTemplate = sendInvoiceTemplate(mailData.invoice);
@@ -179,7 +140,7 @@ router.post('/invoiceSend', async (req, res)=>{
 
     res.status(200).json({
         message: "done"
-    })   
+    })
 })
 
 router.use(function (req, res) {
