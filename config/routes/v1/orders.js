@@ -14,5 +14,8 @@ router.post('/sellerOrders', adminVerify, orderController.getSellerOrdersInvento
 router.get('/sellerOrderDetail', adminVerify, orderController.getSellerOrderDetails);
 router.post('/updateOrderStatus', orderController.updateLatestOrderDetail); 
 router.post('/latestOrder', orderController.getLatestProductForBuyer);
+router.get('/getOrderOverallData', adminVerify, orderController.getOverallOrderData);
+
+router.post('/updateOrderStatus', orderController.getLatestOrderDetail); 
 
 module.exports = router;

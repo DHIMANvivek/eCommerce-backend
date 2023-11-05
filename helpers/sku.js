@@ -1,17 +1,22 @@
 const productModel = require('../models/products');
 
-async function generateSKU(model, category, ){
+async function generateSKU(product){
 
     const data = await productModel.find({
-        'info.category': product.info.category,
+        'info.category': { $regex: product.info.category, $options: 'i' },
         'createdAt': { $lte: Date.now() }
     }).sort({'createdAt': -1});
 
-    const sku = data[0].sku.split(product.info.category);
-    const count = Number(sku[sku.length - 1]);
+    let code;
 
-    let code = `SKU-${product.info.category}-${count}`;
-
+    if(!data[0]){
+        code = `SKU-${product.info.category}-0`; 
+    }else{
+        const sku = (data[0].sku).split('-');
+        const count = Number(sku[sku.length - 1]);
+        code = `sku-${(product.info.category).toLowerCase()}-${count+1}`;
+    }
+    
     return code;
 }
 

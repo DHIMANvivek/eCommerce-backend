@@ -3,6 +3,8 @@ const router = express.Router();
 
 const adminController = require('../../../controller/admin')
 
+router.get('/getOverallInfo', adminController.getOverallInfo);
+
 // Product 
 router.post('/addProduct',adminController.addProduct);
 router.post('/updateProduct',adminController.updateProduct);

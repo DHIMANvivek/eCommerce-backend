@@ -13,6 +13,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             user = verifyToken(req.headers.authorization.split(' ')[1]);
         }
         if (admincontroller) {
+
             if (user.role == 'admin') query['sellerID'] = user.id;
         }
 

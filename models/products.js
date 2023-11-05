@@ -97,6 +97,12 @@ const productSchema = mongoose.Schema({
     default: 0,
     min: 0,
   },
+  costPrice: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0,
+  },
   active: {
     type: Boolean,
     default: true

@@ -4,8 +4,8 @@ const { getProductPrice } = require('../controller/products');
 const { checkCoupon, updateCoupon, } = require('../controller/offers');
 const ProductController = require('../controller/products');
 const mongoose = require('mongoose');
-const productsModel=require('./../models/products');
-const jwt=require('jsonwebtoken');
+const productsModel = require('./../models/products');
+const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
@@ -24,71 +24,70 @@ async function getOrders(req, res) {
 
 async function updateLatestOrderDetail(req, res) {
     try {
-        const token = req.body.buyerId; 
+        const token = req.body.buyerId;
 
-        const decoded = jwt.verify(token, process.env.secretKey); 
-    
+        const decoded = jwt.verify(token, process.env.secretKey);
+
         const buyerId = decoded.id;
 
-        console.log(buyerId , "latest buyer Id");
+        console.log(buyerId, "latest buyer Id");
 
-        
-        const { newPaymentStatus , transactionId , MOP } = req.body;
-        
-        
+
+        const { newPaymentStatus, transactionId, MOP } = req.body;
+
+
         const latestOrder = await ordersModel
-          .findOne({ buyerId: buyerId })
-          .sort({ orderDate: -1 })
-          .exec();
-    
+            .findOne({ buyerId: buyerId })
+            .sort({ orderDate: -1 })
+            .exec();
+
         if (latestOrder) {
-          const result = await ordersModel.updateOne(
-            { _id: latestOrder._id },
-            {
-                $set: {
-                  payment_status: newPaymentStatus,
-                  transactionId: transactionId,
-                  MOP: MOP
+            const result = await ordersModel.updateOne(
+                { _id: latestOrder._id },
+                {
+                    $set: {
+                        payment_status: newPaymentStatus,
+                        transactionId: transactionId,
+                        MOP: MOP
+                    }
                 }
-            }
-          );
-    
-          console.log('Latest order payment status updated successfully:', result);
-          res.status(200).json({ message: 'Latest order payment status updated successfully' });
+            );
+
+            console.log('Latest order payment status updated successfully:', result);
+            res.status(200).json({ message: 'Latest order payment status updated successfully' });
         } else {
-          res.status(404).json({ error: 'No orders found for the user' });
+            res.status(404).json({ error: 'No orders found for the user' });
         }
-      } catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to update latest order payment status' });
-      }
     }
-        
-    async function getLatestProductForBuyer(req, res) {
-        try {
-          const token = req.body.buyerId;
-          const decoded = jwt.verify(token, process.env.secretKey);
-          const buyerId = decoded.id;
-      
-          console.log(buyerId, "latest buyer Id");
-      
-          const latestProduct = await ordersModel
+}
+async function getLatestProductForBuyer(req, res) {
+    try {
+        const token = req.body.buyerId;
+        const decoded = jwt.verify(token, process.env.secretKey);
+        const buyerId = decoded.id;
+
+        console.log(buyerId, "latest buyer Id");
+
+        const latestProduct = await ordersModel
             .findOne({ buyerId: buyerId })
             .sort({ createdAt: -1 })
             .exec();
-      
-          if (latestProduct) {
+
+        if (latestProduct) {
             console.log('Latest product details:', latestProduct);
             res.status(200).json({ latestProduct });
-          } else {
+        } else {
             res.status(404).json({ error: 'No products found for the user' });
-          }
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
         }
-      }
-      
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
+    }
+}
+
 
 async function verifyOrderSummary(req, res) {
     try {
@@ -111,11 +110,11 @@ async function verifyOrderSummary(req, res) {
         })
 
         response.subTotal = totalAmount;
-        console.log('req.body is ',req.body," req token id ");
-          
+        console.log('req.body is ', req.body, " req token id ");
+
         if (req.body.CouponApplied) {
-              let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
-              console.log('couon is ',coupon);
+            let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
+            console.log('couon is ', coupon);
             // let coupon = req.body.CouponApplied;
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
@@ -147,7 +146,7 @@ async function verifyOrderSummary(req, res) {
 async function createOrder(req, res) {
     try {
 
-        console.log('reqbody coming is ',req.body);
+        console.log('reqbody coming is ', req.body);
 
         res.status(200).json('created suces');
         req.body.buyerId = req.tokenData.id;
@@ -157,55 +156,55 @@ async function createOrder(req, res) {
         }
         const orderCreated = ordersModel(req.body);
 
-        response.shipping=0;
-        if(!response.savings) response.savings=0;
-        if(!response.total) response.total=response.subTotal;
+        response.shipping = 0;
+        if (!response.savings) response.savings = 0;
+        if (!response.total) response.total = response.subTotal;
         res.status(200).json(response);
         // console.log('body coming is ',req.body," tokenData is ",req.tokenData);
 
         // req.body.products.forEach(async element => {
         //     const data=ProductController.fetchProductDetails(element.sku);
         // });
-        
+
         //     req.body.details.forEach(async (element) => {
         //         let response =await ProductController.fetchProductDetails();
         //         console.log('response is ',response);
         //     });
         // res.status(200).json({message:'Order created Succes'});
     } catch (error) {
-        console.log('errpr comimg is ,',error);
-            res.status(500).json(error);
+        console.log('errpr comimg is ,', error);
+        res.status(500).json(error);
     }
 }
 
 
-async function createOrder(req,res) {
+async function createOrder(req, res) {
     try {
 
 
-        
-        req.body.buyerId=req.tokenData.id;
-        if(req.body.coupon){
-           let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
-           if(!response){ throw({message:'You already use this coupon'})}
+
+        req.body.buyerId = req.tokenData.id;
+        if (req.body.coupon) {
+            let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
+            if (!response) { throw ({ message: 'You already use this coupon' }) }
         }
 
-       
-     await Promise.all(req.body.products.map(async (element) => {
-                const matchedProduct = await productsModel.findOne({sku:element.sku},{sellerID:1});
-                element.sellerID = matchedProduct.sellerID;
-                return element;
+
+        await Promise.all(req.body.products.map(async (element) => {
+            const matchedProduct = await productsModel.findOne({ sku: element.sku }, { sellerID: 1 });
+            element.sellerID = matchedProduct.sellerID;
+            return element;
         }));
 
-        const orderCreated=ordersModel(req.body);
-      await  orderCreated.save();
+        const orderCreated = ordersModel(req.body);
+        await orderCreated.save();
 
 
-      if(req.body.payment_status=='confirmed'){
-        await updateCoupon(req.body.coupon._id, req.tokenData.id);
-        await ProductController.ReduceProductQuantity();
+        if (req.body.payment_status == 'confirmed') {
+            await updateCoupon(req.body.coupon._id, req.tokenData.id);
+            await ProductController.ReduceProductQuantity();
 
-      }
+        }
 
 
         res.status(200).json('order created success');
@@ -293,12 +292,7 @@ async function getSellerOrdersInventory(req, res) {
             { $skip: (parameters.page - 1) * parameters.limit },
             { $limit: parameters.limit }
         );
-
-        console.log(aggregationPipe);
-
         const response = await ordersModel.aggregate(aggregationPipe);
-
-        console.log("response", response);
 
         if (response) {
             return res.status(200).json(response);
@@ -344,13 +338,66 @@ async function getSellerOrderDetails(req, res) {
     }
 }
 
+async function getOverallOrderData(req, res) {
+    const sellerID = req.tokenData.id;
+
+    try {
+        const statistics = await ordersModel.aggregate([
+            { $unwind: '$products' },
+
+            {
+                $group: {
+                    _id: {
+                        paymentStatus: '$payment_status',
+                        shipmentStatus: "$products.shipmentStatus"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    paymentStatus: '$_id.paymentStatus',
+                    shipmentStatus: "$_id.shipmentStatus",
+                    count: 1
+                }
+            }
+        ]);
+
+
+        if (!statistics) {
+            return res.status(401).send();
+        }
+        console.log("Statistics", statistics);
+        statistics.forEach((stats) => {
+            if (stats.paymentStatus == 'success' || stats.paymentStatus == 'pending') {
+                if (stats.shipmentStatus == 'pending') {
+                    stats['status'] = 'confirmed';
+                } else if (stats.shipmentStatus == 'cancelled' || stats.shipmentStatus == 'declined') {
+                    stats['status'] = 'cancelled';
+                } else
+                    stats['status'] = stats.shipmentStatus;
+            } else if (stats.paymentStatus == 'cancelled' && stats.shipmentStatus == 'cancelled') {
+                stats['status'] = 'cancelled';
+            } else { }
+        });
+        return res.status(200).json(statistics);
+    } catch (err) {
+        res.status(500).json({ "message": "Error Occureed" });
+    }
+}
+
 module.exports = {
     getOrders,
     createOrder,
     verifyOrderSummary,
     getParicularUserOrders,
+
+
     getSellerOrdersInventory,
     getSellerOrderDetails,
     updateLatestOrderDetail,
-    getLatestProductForBuyer
+    getLatestProductForBuyer,
+    getOverallOrderData,
+    getLatestOrderDetail
 }
