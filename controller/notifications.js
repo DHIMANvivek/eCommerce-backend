@@ -1,0 +1,2 @@
+const notifications = require('../models/notifications')
+

@@ -6,12 +6,87 @@ const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
 const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
-const wishlistModel = require('../models/wishlist')
 
 
+// async function login(req, res) {
+//     try {
+//         console.log("login function start");
+//         const input = req.body;
+//         console.log(input, "login req body");
+//         const userFound = await usersModel.findOne({
+//             email: input.email
+//         })
+//         if (input.token) {
+//             console.log("login google");
+//             const googleOathClient = new OAuth2Client();
+//             const googleToken = await googleOathClient.verifyIdToken({
+//                 idToken: req.body.token.credential
+//             });
+//             input.email = googleToken.getPayload().email;
+//             input.provider = 'GOOGLE';
+//             req.body.name = {
+//                 firstname: googleToken.getPayload().given_name,
+//                 lastname: googleToken.getPayload().family_name
+//             }
+
+//             // const firstName = req.body.name.firstname; 
+//         }
+//         console.log(userFound.email, "user found email ??");
+//         console.log(input.email, "input.email ?");
+//         console.log(userFound, "userfound");
+//         const firstName = userFound?.name.firstname
+
+//         if (!userFound) {
+//             throw ({ message: 'User not found! Kindly sign in.' })
+//         }
+
+
+//         // PURE GOOGLE LOGIN
+//         if (userFound.provider == 'GOOGLE' && input.token) {
+//             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
+//             const token = createToken(tokenData);
+//             res.status(200).json({ message: 'login sucece', token, firstName });
+//             return;
+//         }
+
+//         // GOOGLE USER TRYING TO LOGIN MANUALLY.
+//         if (userFound.provider == 'GOOGLE') {
+//             throw ({ message: 'Try login with Google, you already have account registered with it.' });
+//         }
+
+//         // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
+//         if (userFound.provider == 'direct' && input.token) {
+//             throw ({ message: 'Try to login manually.' });
+//         }
+
+//         // PURE MANUAL LOGIN
+//         const compare = await bcryptjs.compare(input.password, userFound.password);
+//         if (!compare) {
+//             throw ({ message: 'Incorrect Password!' })
+//         }
+
+//         const tokenData = { id: userFound._id, role: userFound.role }
+//         console.log(tokenData, 'ks');
+//         const token = createToken(tokenData);
+
+//         res.status(200).json({
+//             message: "Login Successful",
+//             token, firstName
+//         })
+//     } catch (error) {
+//         console.log("ERROR IS ", error);
+//         if (error.message) {
+//             res.status(500).json(error);
+//             return;
+//         }
+//     }
+// }
 async function login(req, res) {
-    try { 
+
+    try {
+        console.log("here?");
         const input = req.body;
+        console.log(input, "input");
         if (input.token) {
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
@@ -28,13 +103,13 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
-        
+        console.log(userFound, "user?");
         const firstName = userFound?.name.firstname
 
         if (!userFound) {
             throw ({ message: 'User not found! Kindly sign in.' })
         }
-
+        console.log("bhai?");
 
         // PURE GOOGLE LOGIN
         if (userFound.provider == 'GOOGLE' && input.token) {
@@ -55,14 +130,15 @@ async function login(req, res) {
         }
 
         // PURE MANUAL LOGIN
+        console.log("yar?");
         const compare = await bcryptjs.compare(input.password, userFound.password);
+        console.log(compare, "compare");
         if (!compare) {
             throw ({ message: 'Incorrect Password!' })
         }
 
         const tokenData = { id: userFound._id, role: userFound.role }
-        // console.log(tokenData, 'ks');
-        // console.log('token INSIDE IS ---->', tokenData);
+
         const token = createToken(tokenData);
         res.status(200).json({
             message: "Login Successful",
@@ -78,6 +154,7 @@ async function login(req, res) {
 
 async function signup(req, res) {
     try {
+        console.log(req.body, "signup input");
         if (req.body.token) {
             const googleOathClient = new OAuth2Client();
             const ticket = await googleOathClient.verifyIdToken({
@@ -99,12 +176,13 @@ async function signup(req, res) {
         }
 
         const leadFound = await leadModel.findOne({ email: req.body.email });
-        const userCreated =  usersModel(req.body);
+        const userCreated = usersModel(req.body);
 
         if (leadFound) {
             userCreated.Lead = leadFound;
         }
         await userCreated.save();
+        console.log(userCreated._id, "new fresh id");
         const mailData = {
             email: req.body.email,
             subject: "We're Thrilled to Have You, Welcome to Trade Vogue!",
@@ -118,7 +196,7 @@ async function signup(req, res) {
         res.status(200).json({ token, message: 'Signup Successful!', firstName });
 
     } catch (error) {
-        console.log('error comins i s ',error);
+        console.log('error comins i s ', error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -164,7 +242,7 @@ async function forgotPassword(req, res) {
             email: user.email,
             subject: "Password Reset",
         }
-        const mailSent = await mailer(mailData, ForgetTemplate(passwordToken) )
+        const mailSent = await mailer(mailData, ForgetTemplate(passwordToken))
         res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {

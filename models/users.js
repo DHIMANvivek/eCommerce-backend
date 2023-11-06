@@ -88,16 +88,9 @@ let userSchema = new mongoose.Schema({
 userSchema.pre("save", async function (next) {
     if (this.password) {
         this.password = bcrypt.hashSync(this.password);
-    }
-   
-
-    // const wishlistFound= await wishlist.findOne({userId :this._id});
-    // console.log('wishlist Found is ',wishlistFound);
-    // console.log('wishfount si ');
-    
+    }    
     next();
 });
-
 
 userSchema.post('save', async function (){
     console.log('id is ',this._id);
@@ -105,6 +98,7 @@ userSchema.post('save', async function (){
         wishlistName : 'My Wishlist',
         products : []
     }
+    console.log(this._id, "id assigned");
     await wishlist.create({
         userId : this._id,
         wishlists : [defaultWishlist]

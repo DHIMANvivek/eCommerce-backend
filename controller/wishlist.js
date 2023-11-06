@@ -1,16 +1,18 @@
+const { db } = require('../models/users');
 const wishlist = require('../models/wishlist')
 const mongoose = require('mongoose')
 
 async function showWishlists(req, res) {
     try {
+        // console.log("here?");
         const user = req.tokenData;
         const wishlister = await wishlist.findOne({
             userId: user.id
         })
-        
+        // console.log(wishlister, "wishlister");
         if (wishlister) {
             const wishlists = wishlister.wishlists
-            console.log(wishlists, "wishlistssss");
+            // console.log(wishlists, "wishlistssss");
             const count = (await wishlist.aggregate([
                 {
                     $match: { 'userId': new mongoose.Types.ObjectId(user.id) }
@@ -74,12 +76,15 @@ async function addToWishlist(req, res) {
         const input = req.body;
         const user = req.tokenData;
         console.log('user is ',user);
+        console.log(input, "add to wishlist input");
         const wishlister = await wishlist.findOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
         }, { 'wishlists.$': 1 })
+        console.log(wishlister, "wishlisterrr");
 
         if (!wishlister) {
+            console.log("here inside");
             const newWishlist = {
                 wishlistName: input.wishlistName,
                 products: []
@@ -96,6 +101,7 @@ async function addToWishlist(req, res) {
             }
         });
 
+        console.log("hogya product addd");
         return res.status(200).json({
             message: "Product successfully added to wishlist!"
         })
@@ -138,6 +144,7 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
+        console.log(input, "input/?/");
         const user = req.tokenData;
 
         const wishlister = await wishlist.findOne({
@@ -147,6 +154,7 @@ async function deleteWishlist(req, res) {
             const del = await wishlister.wishlists.splice(input.index, 1);
         }
         wishlister.save()
+        console.log(wishlister.wishlists, "after deletion");
         return res.status(200).json({
             message: "Wishlist deleted successfully!"
         })
@@ -161,37 +169,47 @@ async function deleteWishlist(req, res) {
 
 async function showWishlistCount(req, res) {
     try {
-        const input = req.body;
         const user = req.tokenData;
+        console.log("hello", user.id);
+        const result = await wishlist.findOne({ userId: new mongoose.Types.ObjectId('6541ea9c937b999d318165d7') })
+        .populate('wishlists.products', { 'sku': 1, _id: 0 });
+        console.log(result, 'dddd');
+        let ans = result.wishlists.some((el) => {
+            return el.products.some(e => { e.sku == 'sku-kurti003' })
+        })
 
-        // const wishlister = await wishlist.findOne({
-        //     userId : user.id
-        // })
-        // const wishlistsArray = wishlister.wishlists
-        // // console.log(wishlister.wishlists, "wishlistsss");
-        // let count = 0;
+        res.status(200).json(result);
 
-        // wishlistsArray.forEach(wishlist => {
-        //     let length = wishlist.products.length
-        //     count += length;
-        // });
+        // const input = req.body;
 
-        const count = (await wishlist.aggregate([
-            {
-                $match: { 'userId': new mongoose.Types.ObjectId(user.id) }
-            },
-            {
-                $unwind: '$wishlists'
-            },
-            {
-                $unwind: '$wishlists.products'
-            }
-        ])).length;
+        // // const wishlister = await wishlist.findOne({
+        // //     userId : user.id
+        // // })
+        // // const wishlistsArray = wishlister.wishlists
+        // // // console.log(wishlister.wishlists, "wishlistsss");
+        // // let count = 0;
 
-        // console.log(count, "my count")
-        return res.status(200).json(
-            count
-        )
+        // // wishlistsArray.forEach(wishlist => {
+        // //     let length = wishlist.products.length
+        // //     count += length;
+        // // });
+
+        // const count = (await wishlist.aggregate([
+        //     {
+        //         $match: { 'userId': new mongoose.Types.ObjectId(user.id) }
+        //     },
+        //     {
+        //         $unwind: '$wishlists'
+        //     },
+        //     {
+        //         $unwind: '$wishlists.products'
+        //     }
+        // ])).length;
+
+        // // console.log(count, "my count")
+        // return res.status(200).json(
+        //     count
+        // )
     }
     catch (error) {
         console.log('error is ', error);
@@ -275,6 +293,7 @@ async function removeFromWishlist(req, res) {
         console.log('erroris ', error);
     }
 }
+
 module.exports = {
     showWishlists,
     // addWishlist,

@@ -20,6 +20,8 @@ router.use('/wishlist', jwtVerify, require('./v1/wishlist'))
 router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
+// router.use('/payIntent', require('./v1/stripe/stripe'));
+router.use('/banners', require('./v1/custom-website-elements/banners'))
 
 
 // check type of user (Used for purpose of Authguard)

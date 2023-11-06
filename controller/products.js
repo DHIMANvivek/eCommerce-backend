@@ -298,7 +298,7 @@ async function fetchUniqueFields(req, res) {
         let filterObject;
 
         if (parameter != 'all') {
-            console.log("even here");
+            // console.log("even here");
             filterObject2 = { male: uniqueData, female: uniqueData };
         }
         else {

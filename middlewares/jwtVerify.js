@@ -11,7 +11,6 @@ async function JwtVerify(req, res, next) {
             data = verifyToken(req.body.tokenData)
         }
         req.tokenData = data;
-        // console.log('req token data', req.tokenData);
         next();
     } catch (error) {
         res.status(500).json(error);
