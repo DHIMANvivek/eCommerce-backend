@@ -9,6 +9,9 @@ const ObjectId = mongoose.Types.ObjectId;
 // // const faqData = require('../models/faq');
 // const Ticket = require('../models/supportTicket');
 // const Title = require('../models/createTicket');
+const faqData = require('../models/custom-website-elements/faq');
+const Ticket = require('../models/support-ticket/supportTicket');
+const Title = require('../models/support-ticket/createTicket');
 const SKU_generater = require('../helpers/sku');
 // const PaymentKeys = require('../models/paymentKeys');
 // const paginateResults = require('../helpers/pagination');
@@ -817,15 +820,13 @@ async function deleteTicketTitle(req, res) {
 
 async function getAllTicket(req, res) {
   try {
-
-    const response = await Ticket.find({}).populate([
-      {
+    const response = await Ticket.find({})
+      .populate({
         path: 'ticketType.title',
-      },
-      {
-        path: 'notificationDetails',
-      }
-    ]);
+      })
+      .populate({
+        path: 'notificationDetails'
+      });
     if (response) {
       return res.status(200).json(response);
     }
@@ -835,6 +836,8 @@ async function getAllTicket(req, res) {
     return res.status(404).send();
   }
 }
+
+
 
 async function updateTicketStatus(req, res) {
   try {

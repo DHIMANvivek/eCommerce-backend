@@ -2,7 +2,7 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/custom-website-elements/faq');
 
-const Title = require('../models/createTicket');
+const Title = require('../models/support-ticket/createTicket');
 const Ticket = require('../models/support-ticket/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');

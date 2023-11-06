@@ -1,11 +1,14 @@
 const ordersModel = require('./../models/order');
 const userModel = require('./../models/users');
+const {verifyToken}=require('../helpers/jwt');
 const { getProductPrice } = require('../controller/products');
 const { checkCoupon, updateCoupon, } = require('../controller/offers');
+const  Products = require('../models/products')
 const ProductController = require('../controller/products');
 const mongoose = require('mongoose');
-const productsModel = require('./../models/products');
-const jwt = require('jsonwebtoken');
+const productsModel=require('./../models/products');
+const jwt=require('jsonwebtoken');
+var buyId  = '';
 
 require('dotenv').config();
 
@@ -22,56 +25,59 @@ async function getOrders(req, res) {
     }
 }
 
-async function updateLatestOrderDetail(req, res) {
-    try {
-        const token = req.body.buyerId;
+// async function updateLatestOrderDetail(req, res) {
+//     try {
+//         const token = req.body.buyerId; 
 
-        const decoded = jwt.verify(token, process.env.secretKey);
+//         const decoded = jwt.verify(token, process.env.secretKey); 
+    
+//         const buyerId = decoded.id;
 
-        const buyerId = decoded.id;
+//         console.log(buyerId , "latest buyer Id");
 
-        console.log(buyerId, "latest buyer Id");
+        
+//         const { newPaymentStatus , transactionId , MOP } = req.body;
 
-
-        const { newPaymentStatus, transactionId, MOP } = req.body;
-
-
-        const latestOrder = await ordersModel
-            .findOne({ buyerId: buyerId })
-            .sort({ orderDate: -1 })
-            .exec();
-
-        if (latestOrder) {
-            const result = await ordersModel.updateOne(
-                { _id: latestOrder._id },
-                {
-                    $set: {
-                        payment_status: newPaymentStatus,
-                        transactionId: transactionId,
-                        MOP: MOP
-                    }
-                }
-            );
-
-            console.log('Latest order payment status updated successfully:', result);
-            res.status(200).json({ message: 'Latest order payment status updated successfully' });
-        } else {
-            res.status(404).json({ error: 'No orders found for the user' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to update latest order payment status' });
-    }
-}
-async function getLatestProductForBuyer(req, res) {
-    try {
-        const token = req.body.buyerId;
-        const decoded = jwt.verify(token, process.env.secretKey);
-        const buyerId = decoded.id;
-
-        console.log(buyerId, "latest buyer Id");
-
-        const latestProduct = await ordersModel
+//         console.log(newPaymentStatus , transactionId , MOP)
+        
+        
+//         const latestOrder = await ordersModel
+//           .findOne({ buyerId: buyerId })
+//           .sort({ orderDate: -1 })
+//           .exec();
+    
+//         if (latestOrder) {
+//           const result = await ordersModel.updateOne(
+//             { _id: latestOrder._id },
+//             {
+//                 $set: {
+//                   payment_status: newPaymentStatus,
+//                   transactionId: transactionId,
+//                   MOP: MOP
+//                 }
+//             }
+//           );
+    
+//           console.log('Latest order payment status updated successfully:', result);
+//           res.status(200).json({ message: 'Latest order payment status updated successfully' });
+//         } else {
+//           res.status(404).json({ error: 'No orders found for the user' });
+//         }
+//       } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Failed to update latest order payment status' });
+//       }
+//     }
+        
+    async function getLatestProductForBuyer(req, res) {
+        try {
+          const token = req.body.buyerId;
+          const decoded = jwt.verify(token, process.env.secretKey);
+          const buyerId = decoded.id;
+      
+          console.log(buyerId, "latest buyer Id");
+      
+          const latestProduct = await ordersModel
             .findOne({ buyerId: buyerId })
             .sort({ createdAt: -1 })
             .exec();
@@ -81,13 +87,104 @@ async function getLatestProductForBuyer(req, res) {
             res.status(200).json({ latestProduct });
         } else {
             res.status(404).json({ error: 'No products found for the user' });
+          }
+        } catch (error) {
+            console.log('errorcoming is ',error);
+          res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
         }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
     }
-}
 
+
+
+    async function updateLatestOrderDetail(req, res) {
+        try {
+            const token = req.body.buyerId;
+    
+            const decoded = verifyToken(token);
+            const buyerId = decoded.id;
+            console.log('buyer id is ', buyerId);
+            const { newPaymentStatus, transactionId, MOP } = req.body;
+            console.log(newPaymentStatus , "--------------" , MOP)
+    
+            const latestOrder = await ordersModel
+                .findOne({ buyerId: buyerId })
+                .sort({ orderDate: -1 })
+                .exec();
+    
+                if (!latestOrder) {
+                    return res.status(404).json({ error: 'No orders found for the user' });
+                }
+
+                const previousOrder = await ordersModel
+                    .findOne({ buyerId: buyerId, payment_status: 'success' })
+                    .sort({ orderDate: -1 })
+                    .exec();
+
+                    buyId =  buyerId.slice(buyerId.length-4 , buyerId.length);
+
+                    // console.log("edited buyid is ", buyId)
+    
+                let orderId = 0;
+    
+                    if (previousOrder) {
+                        const prevOrderId = previousOrder.orderID.split('-');
+                        orderId = parseInt(prevOrderId[1]) + 1;
+                    }
+                
+                const result = await ordersModel.updateOne(
+                    { _id: latestOrder._id },
+                    {
+                        $set: {
+                            payment_status: newPaymentStatus,
+                            transactionId: transactionId,
+                            MOP: MOP,
+                            orderID: `${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
+                        }
+                    }
+                );
+    
+                console.log('new user status is ', newPaymentStatus);
+    
+                latestOrder.products.forEach(async (el) => {
+
+                    console.log('el quantity is ------------> ',el.quantity);
+                    const findQuantity = await Products.findOne({
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
+                    if (el.quantity > findQuantity) el.quantity = findQuantity;
+                    else el.quantity = el.quantity;
+                   
+                    const updateProduct = await Products.updateOne(
+                        {
+                            sku: el.sku,
+                            'assets.color': el.color,
+                            'assets.stockQuantity.size': el.size
+                        },
+    
+                        {
+                            $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                        },
+                        {
+                            arrayFilters: [
+                                { "outer.color": el.color },
+                                { "inner.size": el.size }
+                            ]
+                        }
+                    );
+                })
+    
+                res.status(200).json({ message: 'Latest order payment status updated successfully' });
+            
+        } catch (error) {
+            console.log('error coming is ------------------->', error);
+            res.status(500).json({ error: 'Failed to update the latest order payment status' });
+        }
+    }
+    
+    
+    
 
 async function verifyOrderSummary(req, res) {
     try {
@@ -387,6 +484,27 @@ async function getOverallOrderData(req, res) {
     }
 }
 
+
+async function cancelOrderedProduct(req, res) {
+    const { orderId, productId } = req.body;
+    try {
+        const order = await ordersModel.findById(orderId);
+        const product = order?.products.id(productId);
+
+        if (!product || product.shipmentStatus !== 'pending') {
+            return res.status(404).json({ message: !product ? 'Order or Product not found' : 'Product cannot be cancelled' });
+        }
+
+        product.shipmentStatus = 'cancelled';
+        await order.save();
+        return res.status(200).json({ message: 'Product cancelled successfully' });
+    } catch (error) {
+        console.log(error, "error in deleting ---------");
+        return res.status(500).json({ message: 'Error cancelling the product' });
+    }
+}
+
+
 module.exports = {
     getOrders,
     createOrder,
@@ -399,5 +517,5 @@ module.exports = {
     updateLatestOrderDetail,
     getLatestProductForBuyer,
     getOverallOrderData,
-    getLatestOrderDetail
+    cancelOrderedProduct
 }

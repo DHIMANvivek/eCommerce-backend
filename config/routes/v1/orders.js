@@ -16,6 +16,6 @@ router.post('/updateOrderStatus', orderController.updateLatestOrderDetail);
 router.post('/latestOrder', orderController.getLatestProductForBuyer);
 router.get('/getOrderOverallData', adminVerify, orderController.getOverallOrderData);
 
-router.post('/updateOrderStatus', orderController.getLatestOrderDetail); 
 
+router.post('/cancelOrder', orderController.cancelOrderedProduct );
 module.exports = router;
