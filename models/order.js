@@ -180,18 +180,23 @@ orderSchema.pre('save', function (next) {
 
 orderSchema.post('save',async function (){
 
-    
-
     this.products.forEach(async (el)=>{
-        console.log('el come is ',el);
-        const findProduct = await Products.updateOne(
+        const findQuantity=await Products.findOne({
+                sku: el.sku,
+                'assets.color': el.color,
+                'assets.stockQuantity.size': el.size
+        }, {'assets.stockQuantity.quantity':1,_id:0});
+        if(el.quantity>findQuantity) el.quantity=findQuantity;
+        else el.quantity=el.quantity;
+        const updateProduct = await Products.updateOne(
             {
               sku: el.sku,
               'assets.color': el.color,
               'assets.stockQuantity.size': el.size
             },
+            
             {
-              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity }
+              $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
             },
             {
               arrayFilters: [
@@ -201,7 +206,6 @@ orderSchema.post('save',async function (){
             }
           );
     })
- 
-    
+  
 })
 module.exports = mongoose.model('orders', orderSchema);

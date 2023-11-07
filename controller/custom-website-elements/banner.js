@@ -6,7 +6,6 @@ async function setBanners(req, res) {
         // console.log("mai idhar aya?");
         const input = req.body;
         // console.log(input);
-
         // console.log(input.banner, "input.banner hai yeh");
         const insertBanners = await banners.insertMany(input.banner);
         // console.log("haye finally", insertBanners);

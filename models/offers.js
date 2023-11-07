@@ -64,15 +64,6 @@ let offerSchema = mongoose.Schema({
     startDate: {
         type: Date,
         required: true,
-        validate: {
-            validator: function() {
-                if (this.start === 'percentage') {
-                    return this.discountAmount >= 0 && this.discountAmount <= 100;
-                }
-                return true;
-            },
-            message: 'Invalid discount amount for the selected discount type'
-        }
     },
     endDate: {
         type: Date,
@@ -81,7 +72,7 @@ let offerSchema = mongoose.Schema({
 
     maximumDiscount: {
         type: Number,
-        required: true,
+        // required: true,
         min:0
     },
     minimumPurchaseAmount: {
@@ -94,13 +85,15 @@ let offerSchema = mongoose.Schema({
     },
 
     ExtraInfo:{
-        type: Object,
-        lowercase: true
+    //    type: Object,
+    //     lowercase: true 
+    categories:[{type:String,}],
+    brands:[{type:String}]    
     },
 
     status:{
         type:Boolean,
-        default:false
+        default:true
     },
     couponType: {
         type: String,
@@ -117,16 +110,19 @@ let offerSchema = mongoose.Schema({
     }
     ],
     
-    email:{
-        type: String,
-        required:function validate(){
-            if (this.OfferType == 'coupon' && this.couponType=='custom') return true;
+    UserEmails:[
+
+        {     type:Object,
+            required:function validate(){
+                if (this.OfferType == 'coupon' && this.couponType=='custom') return true;
+            }
         }
-    },
+       
+    ],
     couponUsersLimit: {
         type: Number,
         required: function validate() {
-            if (this.OfferType == 'coupon') return true;
+            if (this.OfferType == 'coupon' && this.couponType!='custom') return true;
 
         },
         min:0

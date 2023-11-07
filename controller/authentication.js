@@ -82,9 +82,7 @@ const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
 //     }
 // }
 async function login(req, res) {
-
     try {
-        console.log("here?");
         const input = req.body;
         console.log(input, "input");
         if (input.token) {
@@ -103,7 +101,6 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
-        console.log(userFound, "user?");
         const firstName = userFound?.name.firstname
 
         if (!userFound) {
@@ -145,10 +142,10 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
+        res.status(500).json({
+            message: 'No User found'
+        });
+        return;
     }
 }
 

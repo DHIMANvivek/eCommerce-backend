@@ -210,8 +210,7 @@ async function verifyOrderSummary(req, res) {
         console.log('req.body is ', req.body, " req token id ");
 
         if (req.body.CouponApplied) {
-            let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
-            console.log('couon is ', coupon);
+            let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
             // let coupon = req.body.CouponApplied;
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
@@ -233,9 +232,9 @@ async function verifyOrderSummary(req, res) {
         response.shipping = 0;
         if (!response.savings) response.savings = 0;
         if (!response.total) response.total = response.subTotal;
+    createOrderId();
         res.status(200).json(response);
     } catch (error) {
-        console.log('error coming is ', error);
         res.status(500).json(error);
     }
 }
@@ -243,7 +242,7 @@ async function verifyOrderSummary(req, res) {
 async function createOrder(req, res) {
     try {
 
-        console.log('reqbody coming is ', req.body);
+        console.log('reqbody coming is ',req.body);
 
         res.status(200).json('created suces');
         req.body.buyerId = req.tokenData.id;
@@ -253,24 +252,24 @@ async function createOrder(req, res) {
         }
         const orderCreated = ordersModel(req.body);
 
-        response.shipping = 0;
-        if (!response.savings) response.savings = 0;
-        if (!response.total) response.total = response.subTotal;
+        response.shipping=0;
+        if(!response.savings) response.savings=0;
+        if(!response.total) response.total=response.subTotal;
         res.status(200).json(response);
         // console.log('body coming is ',req.body," tokenData is ",req.tokenData);
 
         // req.body.products.forEach(async element => {
         //     const data=ProductController.fetchProductDetails(element.sku);
         // });
-
+        
         //     req.body.details.forEach(async (element) => {
         //         let response =await ProductController.fetchProductDetails();
         //         console.log('response is ',response);
         //     });
         // res.status(200).json({message:'Order created Succes'});
     } catch (error) {
-        console.log('errpr comimg is ,', error);
-        res.status(500).json(error);
+        console.log('errpr comimg is ,',error);
+            res.status(500).json(error);
     }
 }
 
@@ -279,11 +278,11 @@ async function createOrder(req, res) {
     try {
 
 
-
-        req.body.buyerId = req.tokenData.id;
-        if (req.body.coupon) {
-            let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
-            if (!response) { throw ({ message: 'You already use this coupon' }) }
+        
+        req.body.buyerId=req.tokenData.id;
+        if(req.body.coupon){
+           let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
+           if(!response){ throw({message:'You already use this coupon'})}
         }
 
 
@@ -293,13 +292,18 @@ async function createOrder(req, res) {
             return element;
         }));
 
-        const orderCreated = ordersModel(req.body);
-        await orderCreated.save();
 
 
-        if (req.body.payment_status == 'confirmed') {
-            await updateCoupon(req.body.coupon._id, req.tokenData.id);
-            await ProductController.ReduceProductQuantity();
+
+
+
+        const orderCreated=ordersModel(req.body);
+      await  orderCreated.save();
+
+
+      if(req.body.payment_status=='confirmed'){
+        await updateCoupon(req.body.coupon._id, req.tokenData.id);
+        await ProductController.ReduceProductQuantity();
 
         }
 
@@ -310,6 +314,19 @@ async function createOrder(req, res) {
         console.log('error coming is ', error);
         res.status(500).json(error);
     }
+}
+
+
+async function createOrderId(){
+try {
+    const findLatestOrder=await ordersModel.findOne().sort({$natural:-1});
+    if(!findLatestOrder.orderID){
+        
+    }
+    console.log('findLatest ORder is ',findLatestOrder);
+} catch (error) {
+    
+}
 }
 
 async function getParicularUserOrders(req, res) {

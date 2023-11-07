@@ -26,6 +26,8 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             }
         )));
 
+
+       product= await getProductPrice((product));
         // getting all the reviews and average
         let reviews_rating;
         if (user) {
@@ -39,6 +41,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
                 product._id
             );
         }
+
 
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
@@ -379,21 +382,38 @@ async function getProductPrice(products) {
 
         let product = JSON.parse(JSON.stringify(parameter));
 
+        product.info.brand=product.info.brand.charAt(0).toUpperCase() + product.info.brand.slice(1);
+        product.info.category=product.info.category.charAt(0).toUpperCase() + product.info.category.slice(1);
         return new Promise(async (res, rej) => {
-            let discount = await OffersModel.findOne({
-                $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
-                { "ExtraInfo.brands": { $in: [product.info.brand] } },
-                ], OfferType: 'discount'
-            }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
+
+            const allOffers=await OffersModel.find({OfferType: 'discount','status.active':true});
+            let discount;
+            for(let offer of allOffers){
+                if(offer.ExtraInfo?.brand?.includes( [product.info.brand]) && offer.ExtraInfo?.categories?.includes( [product.info.category])){
+                        discount=offer;
+                        break;
+                }
+
+                else if(offer.ExtraInfo?.brand?.includes( [product.info.brand]) && !offer.ExtraInfo?.categories?.includes( [product.info.category])){
+                        discount=offer;
+                }
+                else if(!offer.ExtraInfo?.brand?.includes( [product.info.brand]) && offer.ExtraInfo?.categories?.includes( [product.info.category])){
+                    discount=offer;
+            }
+
+            }
+            //  discount = await OffersModel.findOne({
+            //     $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
+            //     { "ExtraInfo.brands": { $in: [product.info.brand] } },
+            //     ], OfferType: 'discount','status.active':true
+            // }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
 
             if (discount == null) {
                 res(product);
                 return;
             }
-            product.discountType = discount.discountType;
-            product.discount = Math.floor(discount.discountAmount);
-            if (discount.discountType == 'percentage' && discount.DiscountPercentageType == 'fixed') {
-
+            product.discount=discount.discountAmount;
+            if (discount.discountType == 'percentage') {
                 product.discountPercentage = discount.discountAmount;
                 product.discount = Math.floor((product.price / 100) * discount.discountAmount);
 
@@ -407,9 +427,11 @@ async function getProductPrice(products) {
 
             if (product.discount) {
                 product.oldPrice = product.price;
-                product.price = product.price - product.discount;
+                product.price = (product.price - product.discount)<=0?0:(product.price - product.discount)
 
             }
+
+            // console.log('product discount is ',product.discount," product category is ",product.info.category);
             res(product);
         });
     }
