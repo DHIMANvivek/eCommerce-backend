@@ -22,6 +22,7 @@ router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
 // router.use('/payIntent', require('./v1/stripe/stripe'));
 router.use('/banners', require('./v1/custom-website-elements/banners'))
+router.use('/sales', require('./v1/custom-website-elements/sales'))
 
 router.use('/deals', require('./v1/custom-website-elements/deals'))
 
