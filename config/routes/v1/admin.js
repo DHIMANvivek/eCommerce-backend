@@ -4,10 +4,16 @@ const router = express.Router();
 const adminController = require('../../../controller/admin')
 
 router.get('/getOverallInfo', adminController.getOverallInfo);
+router.get('/fetchSalesData', adminController.fetchProductSalesData);
+router.get('/fetchCategoryData', adminController.fetchCategorySalesData);
+router.get('/fetchReviewData', adminController.fetchReviewStats);
+router.get('/fetchPopularProducts', adminController.fetchPopularProducts);
 
 // Product 
 router.post('/addProduct',adminController.addProduct);
 router.post('/updateProduct',adminController.updateProduct);
+router.post('/updatehighlightProduct',adminController.updateHighlightProduct);
+
 router.get('/fetchProductDetails', adminController.fetchProductDetail);
 router.post('/fetchProducts', adminController.fetchProductInventory);
 router.post('/deleteProducts', adminController.deleteProductInventory);

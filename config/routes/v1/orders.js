@@ -13,7 +13,7 @@ router.get('/getparticularUserOrders',orderController.getParicularUserOrders);
 router.post('/sellerOrders', adminVerify, orderController.getSellerOrdersInventory);
 router.get('/sellerOrderDetail', adminVerify, orderController.getSellerOrderDetails);
 router.post('/updateOrderStatus', orderController.updateLatestOrderDetail); 
-router.post('/latestOrder', orderController.getLatestProductForBuyer);
+router.post('/latestOrder', orderController.getLatestProductForBuyer);  
 router.get('/getOrderOverallData', adminVerify, orderController.getOverallOrderData);
 
 router.post('/cancelOrder', orderController.cancelOrderedProduct );

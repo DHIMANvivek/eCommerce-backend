@@ -26,7 +26,6 @@ const productSchema = mongoose.Schema({
   },
 
   assets: [
-
     {
       color: {
         type: String,
@@ -62,6 +61,7 @@ const productSchema = mongoose.Schema({
     },
     category: {
       type: String,
+      lowercase: true,
       required: true
     },
     gender: {
@@ -72,6 +72,7 @@ const productSchema = mongoose.Schema({
     },
     brand: {
       type: String,
+      lowercase: true,
       required: true
     },
     weight: {
@@ -84,6 +85,7 @@ const productSchema = mongoose.Schema({
     },
     tags: [{
       type: String,
+      lowercase: true,
       required: true
     }],
     orderQuantity: [{
@@ -106,6 +108,11 @@ const productSchema = mongoose.Schema({
   active: {
     type: Boolean,
     default: true
+  },
+  highlight: {
+    type: Boolean,
+    lowercase: true,
+    default: ''
   }
 },
   {

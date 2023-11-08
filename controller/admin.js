@@ -20,114 +20,294 @@ const productController = require('../controller/products');
 
 const OffersModel = require('../models/offers');
 
-async function fetchProductSalesData(req, res, type = '') {
+async function getOverallInfo(req, res) {
+  try {
+    let result = {};
 
+    // Review Data
+    req['controller'] = true;
+    result['customerReview'] = await fetchReviewStats(req, res);
+    result['salesStats'] = await fetchProductSalesData(req, res);
+    result['categorySales'] = await fetchCategorySalesData(req, res);
+    result['popularStats'] = await fetchPopularProducts(req, res);
+
+    const customerCount = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
+    result['customerCount'] = customerCount;
+
+    const orderCount = await orders.find({}).count();
+    result['orderCount'] = orderCount;
+
+    const alertStats = await products.aggregate([
+      {
+        $unwind: {
+          path: "$assets",
+          includeArrayIndex: "string",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$assets.stockQuantity",
+          includeArrayIndex: "string",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          alertCount: {
+            $sum: {
+              $cond: [
+                {
+                  $lte: [
+                    "$assets.stockQuantity.quantity",
+                    {
+                      $arrayElemAt: [
+                        "$$ROOT.info.orderQuantity",
+                        0]
+                    },
+                  ]
+                }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    result['alertCount'] = alertStats[0].alertCount;
+
+
+    // const customerCountChange = await users.aggregate(
+    //   [
+    //     {
+    //       $match: {
+    //         'role': { $not: { $eq: 'admin' } },
+    //         'createdAt': {
+    //           $lte: new Date(),
+    //           $gte: new Date(new Date().getFullYear(), new Date().getMonth() - 1)
+    //         }
+    //       }
+    //     },
+    //     {
+    //       $group: {
+    //         _id: {
+    //           year: { $year: '$createdAt' },
+    //           month: { $month: '$createdAt' }
+    //         },
+    //         count: { $sum: 1 }
+    //       }
+    //     },
+    //     {
+    //       $sort: { '_id:': -1}
+    //     }
+    //   ]
+    // );
+    // const change = ((customerCountChange[0].count - customerCountChange[1].count)/ customerCountChange[1].count)*100;
+    res.status(200).json(result);
+
+  } catch (err) {
+
+  }
+}
+
+async function fetchProductSalesData(req, res) {
+  let controller = req.controller ? true : false;
   const data = req.tokenData;
 
   try {
     if (data.role == 'admin') {
 
-      await orders.aggregate([
-        // {
-        //   $match: {"payment_status": 'success'}
-        // },
+      const salesStats = await orders.aggregate([
         {
-          $unwind: '$products'
+          $match: {
+            payment_status: "success",
+          },
+        },
+        {
+          $unwind: "$products",
         },
         {
           $lookup: {
-            from: 'products',
-            localField: 'products._id',
-            foreignField: '_id',
-            as: 'info'
-          }
+            from: "products",
+            localField: "products.sku",
+            foreignField: "sku",
+            as: "products.info",
+          },
+        },
+        {
+          $unwind: {
+            path: "$products.info",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$orderDate" },
+              month: { $month: "$orderDate" },
+            },
+            overallDiscount: { $sum: "$discount" },
+            totalsales: {
+              $sum: "$products.amount",
+            },
+            totalExpenses: {
+              $sum: {
+                $multiply: [
+                  "$products.info.costPrice",
+                  "$products.quantity",
+                ],
+              }
+            }
+          },
         },
         {
           $project: {
-            year: { $year: '$orderTime' },
-            month: { $month: '$orderTime' },
-            'products': 1,
-            'discount': 1
+            _id: 1,
+            totalSales: {
+              $subtract: ['$totalsales', '$overallDiscount'],
+            },
+            totalExpenses: 1,
+            totalProfit: {
+              $subtract: [
+                { $subtract: ['$totalsales', '$overallDiscount'] },
+                '$totalExpenses'
+              ]
+            }
           }
-        }
+        },
+        { $sort: { _id: 1 } }
       ]);
+      if (!salesStats) throw 401;
+
+      if (controller) {
+        return salesStats;
+      }
+
+      return res.status(200).json(salesStats);
 
     }
 
   } catch (err) {
+    console.log(err);
+    return res.status(401).send();
 
   }
-
-  // const productInfo = await products.aggregate([
-  //   {
-  //     $unwind: {
-  //       path: '$assets',
-  //       includeArrayIndex: 'string',
-  //       preserveNullAndEmptyArrays: true
-  //     }
-  //   },
-  //   {
-  //     $unwind: {
-  //       path: '$assets.stockQuantity',
-  //       includeArrayIndex: 'string',
-  //       preserveNullAndEmptyArrays: true
-  //     }
-  //   },
-  //   {
-
-  //     $facet: {
-  //       sales_profit:
-  //         [{
-  //           $group: {
-  //             _id: '$_id',
-  //             qtySold: {
-  //               $sum: '$assets.stockQuantity.unitSold'
-  //             },
-  //             CP: { $first: '$$ROOT.costPrice' },
-  //             SP: { $first: '$$ROOT.price' },
-  //             alertCount: {
-  //               $sum: {
-  //                 $cond: [
-  //                   {
-  //                     $lt: [
-  //                       {
-  //                         $subtract: [
-  //                           "$assets.stockQuantity.quantity",
-  //                           "$assets.stockQuantity.unitSold",
-  //                         ],
-  //                       },
-  //                       { $arrayElemAt: ["$$ROOT.info.orderQuantity", 0] },
-  //                     ],
-  //                   }, 1, 0],
-  //               }
-  //             }
-  //           }
-  //         },
-  //       ],
-  //       category_sales_profit: [
-  //         {
-  //           $group: {
-  //             _id: "$info.category",
-  //             sales: {
-  //               $sum: {
-  //                 $multiply: ['$price', '$assets.stockQuantity.unitSold']
-  //               }
-  //             }
-  //           }
-  //         }
-  //       ]
-  //     },
-  //   }
-  // ]);
-
 }
 
-async function getOverallInfo(req, res) {
+async function fetchPopularProducts(req, res) {
+  let controller = req.controller ? true : false;
   try {
 
-    let result = {};
+    const popularProductStats = await orders.aggregate([
+      {
+        $match: {
+          payment_status: "success",
+        },
+      },
+      {
+        $unwind: "$products",
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.sku",
+          foreignField: "sku",
+          as: "products.info",
+        },
+      },
+      {
+        $unwind: {
+          path: "$products.info",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$products.info._id",
+          revenue: { $sum: "$products.amount" },
+          profit: {
+            $sum: {
+              $subtract: ["$products.amount", { $multiply: ["$products.quantity", "$products.info.costPrice"] }],
+            },
+          },
+          name: { $first: "$products.name" },
+          category: { $first: "$products.info.info.category" },
+          brand: { $first: "$products.info.info.brand" },
+          photo: { $first: "$products.image" }
+        },
+      },
+      { $sort: { revenue: -1 } },
+      { $limit: 3 }
+    ]);
 
-    const ratingOverView = await reviews.aggregate([
+    if (!popularProductStats) throw '401';
+    if (controller) return popularProductStats;
+    return res.status(200).json(popularProductStats);
+
+  } catch (err) {
+    return res.status(401).send();
+  }
+}
+
+async function fetchCategorySalesData(req, res) {
+  let controller = req.controller ? true : false;
+  try {
+    const categoryStats = await orders.aggregate([
+      {
+        $match: {
+          payment_status: "success",
+        },
+      },
+      {
+        $unwind: "$products",
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.sku",
+          foreignField: "sku",
+          as: "products.info",
+        },
+      },
+      {
+        $unwind: {
+          path: "$products.info",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$products.info.info.category",
+          sales: {
+            $sum: {
+              $multiply: [
+                "$products.price",
+                "$products.quantity",
+              ],
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          sales: -1,
+        },
+      },
+    ]);
+    if (!categoryStats) throw '401'; // throw error if aggregationPipe Fails
+    if (controller) return categoryStats; // return calculated data if it arrives from controller
+
+    return res.status(200).json({ 'categoryStats': categoryStats });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function fetchReviewStats(req, res) {
+  let sellerData = req.tokenData;
+  let controller = req.controller ? true : false;
+  try {
+    let aggregationPipe = [
       { $unwind: '$reviews' },
       {
         $group: {
@@ -146,97 +326,30 @@ async function getOverallInfo(req, res) {
       {
         $project: { _id: 0 }
       }
-    ]);
+    ];
 
-    result['customer_review'] = ratingOverView[0];
-
-    const customer_count = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
-    result['customer'] = customer_count;
-
-    const order_count = await orders.find({}).count();
-    result['orders'] = order_count;
-
-    const discount = await orders.aggregate([
-      {
-        $group: {
-          _id: null,
-          discount: {
-            $sum: '$discount'
-          }
+    if (sellerData == 'seller') {
+      aggregationPipe.unshift({ $match: { 'productInfo.sellerID': sellerData.id } });
+      aggregationPipe.unshift({
+        $lookup: {
+          from: 'products',
+          localField: 'productID',
+          foreignField: '_id',
+          as: 'productInfo'
         }
-      },
-      {
-        $project: { _id: 0 }
-      }
-    ]);
-    result['totalDiscount'] = discount;
+      })
+    }
+    const ratingOverView = await reviews.aggregate(aggregationPipe);
 
-    const productInfo = await products.aggregate([
-      {
-        $unwind: {
-          path: '$assets',
-          includeArrayIndex: 'string',
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
-        $unwind: {
-          path: '$assets.stockQuantity',
-          includeArrayIndex: 'string',
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
+    console.log(controller);
+    if (!ratingOverView) throw '401'; // throw error if aggregationPipe Fails
+    if (controller) return ratingOverView[0]; // return calculated data if it arrives from controller
 
-        $facet: {
-          sales_profit:
-            [{
-              $group: {
-                _id: '$_id',
-                qtySold: {
-                  $sum: '$assets.stockQuantity.unitSold'
-                },
-                CP: { $first: '$$ROOT.costPrice' },
-                SP: { $first: '$$ROOT.price' },
-                alertCount: {
-                  $sum: {
-                    $cond: [
-                      {
-                        $lt: [
-                          {
-                            $subtract: [
-                              "$assets.stockQuantity.quantity",
-                              "$assets.stockQuantity.unitSold",
-                            ],
-                          },
-                          { $arrayElemAt: ["$$ROOT.info.orderQuantity", 0] },
-                        ],
-                      }, 1, 0],
-                  }
-                }
-              }
-            },
-            ],
-          category_sales_profit: [
-            {
-              $group: {
-                _id: "$info.category",
-                sales: {
-                  $sum: {
-                    $multiply: ['$price', '$assets.stockQuantity.unitSold']
-                  }
-                }
-              }
-            }
-          ]
-        },
-      }
-    ]);
-    result['productInfo'] = productInfo;
-    res.status(200).json(result);
+    console.log("ddddd", ratingOverView);
+    res.status(200).json(ratingOverView[0]);
 
   } catch (err) {
-
+    res.status(401).send();
   }
 }
 
@@ -275,6 +388,33 @@ async function addProduct(req, res) {
   }
 }
 
+async function updateHighlightProduct(req, res) {
+  const sellerID = req.tokenData.id;
+  const highlight = req.body;
+  console.log(highlight, sellerID);
+  try {
+    const response = await products.updateOne(
+      {
+        '_id': new ObjectId(highlight._id),
+        'sellerID': sellerID
+      },
+      {
+        $set: { 'highlight': highlight.status }
+      });
+    
+      const highlightCount = await products.find({'highlight': true}).count();
+
+    console.log("RES", response);
+
+    if (!response) throw "Unable to Update";
+    return res.status(200).json({'highlightCount': highlightCount});
+    
+  } catch (err) {
+    console.log(err);
+    return res.status(401).send();
+  }
+}
+
 async function updateProduct(req, res) {
   const sellerID = req.tokenData.id;
   const productObject = req.body;
@@ -303,7 +443,6 @@ async function updateProduct(req, res) {
 }
 
 async function deleteProductInventory(req, res) {
-  console.log(req.body);
   const sellerID = req.tokenData.id;
   const reqData = req.body;
 
@@ -326,7 +465,6 @@ async function deleteProductInventory(req, res) {
   }
 }
 
-
 // Fetch All Products specific to seller/Admin
 async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
@@ -334,7 +472,6 @@ async function fetchProductInventory(req, res) {
 
   try {
     aggregationPipe = [
-
       {
         $match: {
           $or: [
@@ -353,12 +490,7 @@ async function fetchProductInventory(req, res) {
               $group: {
                 _id: "$_id",
                 inventory: {
-                  $sum: {
-                    $subtract: [
-                      "$assets.stockQuantity.quantity",
-                      "$assets.stockQuantity.unitSold",
-                    ],
-                  },
+                  $sum: "$assets.stockQuantity.quantity"
                 },
                 unitSold: {
                   $sum: { $cond: [{ $lte: ["$assets.stockQuantity.unitSold", 0] }, 0, "$assets.stockQuantity.unitSold"] },
@@ -396,13 +528,14 @@ async function fetchProductInventory(req, res) {
                 inventory: { $first: "$$ROOT.inventory" },
                 unitSold: { $first: "$$ROOT.unitSold" },
               }
-            }
+            },
           ],
           pageInfo: [
             {
               $group:
               {
                 _id: null,
+                highlightCount: { $sum: {$cond: [{$eq: ['$highlight', true]}, 1, 0]}},
                 count: { $sum: 1 },
               }
             },
@@ -414,12 +547,9 @@ async function fetchProductInventory(req, res) {
 
     Object.keys(parameters.filter).forEach((key) => {
       if (parameters.filter[key]) {
-
         if (key == 'categories') {
-          console.log("Hello");
           aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i' } } });
         }
-
         if (key == 'rating') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'avgRating': parameters.filter[key] } });
         }
@@ -432,19 +562,28 @@ async function fetchProductInventory(req, res) {
 
     aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } });
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: "productInfo"
+        }
+      },
+      {
+        $unwind: '$productInfo'
+      },
+      {
+        $sort: { 'productInfo.name': 1 }
+      },
       { $skip: (parameters.page - 1) * parameters.limit },
-      { $limit: parameters.limit }
+      { $limit: parameters.limit },
     );
 
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
-    // Fetching Product Details after Aggreagtion operation -> unwind using _id 
-    response[0].data = await Promise.all(response[0].data.map(async (data) => {
-      data.productInfo = await products.findOne({ _id: data._id });
-      return data;
-    }));
-
     res.status(200).json(response[0]);
+
   } catch (err) {
     console.log(err);
   }
@@ -983,9 +1122,16 @@ async function getPaginatedData(req, res) {
 }
 
 module.exports = {
+  // Stats Data
   getOverallInfo,
+  fetchCategorySalesData,
+  fetchProductSalesData,
+  fetchReviewStats,
+  fetchPopularProducts,
+
   addProduct,
   updateProduct,
+  updateHighlightProduct,
   deleteProductInventory,
   fetchProductInventory,
   fetchProductDetail,

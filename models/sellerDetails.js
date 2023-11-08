@@ -8,10 +8,12 @@ const sellerSchema = mongoose.Schema({
     },
     categories: [{
         type: String,
+        lowercase: true,
         unique: true
     }],
     brands: [{
         type: String,
+        lowercase: true,
         unique: true
     }],
     sizes: [{
@@ -20,6 +22,7 @@ const sellerSchema = mongoose.Schema({
     }],
     tags: [{
         type: String,
+        lowercase: true,
         unique: true
     }],
     payment: {
