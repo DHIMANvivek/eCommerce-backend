@@ -289,7 +289,7 @@ async function sendData(req, res) {
 
 async function getTicketTitle(req, res) {
     try {
-        const response = await Title.find({});
+        const response = await Title.find({})
         if (response) {
             return res.status(200).json(response);
         }
@@ -304,7 +304,8 @@ async function sendTicket(req , res) {
     console.log(req.body)
     try {
         const ticketType = await Title.findOne({ title: req.body.selectedTicket});
-    
+        const webPushId = await webPush.find({});
+        
         if (!ticketType) {
           return res.status(404).json({ error: 'TicketType not found' });
         }
@@ -317,6 +318,7 @@ async function sendTicket(req , res) {
           ticketTypes: req.body.selectedTicket,
           message: req.body.message,
           ticketType: {title: ticketType},
+          notificationDetails: webPushId
         });
     
         const savedTicket = await newTicket.save();

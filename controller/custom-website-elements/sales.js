@@ -74,6 +74,19 @@ async function updateItem(req, res) {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  async function deleteSale(req, res) {
+    const { _id } = req.body;
+    try {
+        const deletedSale = await Sales.findByIdAndDelete(_id);
+        console.log("Deleted:", deletedSale);
+        res.status(200).json({ message: 'Sale deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while deleting the sale' });
+    }
+}
+
   
   
   
@@ -82,5 +95,6 @@ module.exports = {
     setSales,
     getSales,
     updateItem,
-    toggle
+    toggle,
+    deleteSale
 };

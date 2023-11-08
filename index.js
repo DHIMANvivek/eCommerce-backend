@@ -46,8 +46,8 @@ webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, pr
 app.post('/subscribe', (req, res) => {
   const subscription = req.body;
 
-  const payload = JSON.stringify({ title: req.body.title ,
-  body: req.body.body,
+  const payload = JSON.stringify({ title: req.body.title,
+body: req.body.body,
 icon: req.body.icon,
 to: req.body.to });
 

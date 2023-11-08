@@ -7,5 +7,6 @@ router.post('/setSales', salesController.setSales)
 router.get('/getSales', salesController.getSales )
 router.post('/toggle' , adminVerify , salesController.toggle)
 router.post('/update' , adminVerify , salesController.updateItem)
+router.post('/delete', adminVerify ,salesController.deleteSale)
 
 module.exports = router;
