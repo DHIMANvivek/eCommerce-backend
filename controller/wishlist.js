@@ -1,18 +1,16 @@
 const { db } = require('../models/users');
 const wishlist = require('../models/wishlist')
 const mongoose = require('mongoose')
+const users = require('../models/users')
 
 async function showWishlists(req, res) {
     try {
-        // console.log("here?");
         const user = req.tokenData;
         const wishlister = await wishlist.findOne({
             userId: user.id
         })
-        // console.log(wishlister, "wishlister");
         if (wishlister) {
             const wishlists = wishlister.wishlists
-            // console.log(wishlists, "wishlistssss");
             const count = (await wishlist.aggregate([
                 {
                     $match: { 'userId': new mongoose.Types.ObjectId(user.id) }
@@ -31,7 +29,7 @@ async function showWishlists(req, res) {
             )
         }
         else {
-            console.log("User not found.")
+            console.log("Wishlister not found. Please signup.")
         }
     }
     catch (error) {
@@ -75,12 +73,11 @@ async function addToWishlist(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
-        console.log('user is ',user);
-        console.log(input, "add to wishlist input");
+
         const wishlister = await wishlist.findOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
-        }, { 'wishlists.$': 1 })
+        })
         console.log(wishlister, "wishlisterrr");
 
         if (!wishlister) {
@@ -89,10 +86,10 @@ async function addToWishlist(req, res) {
                 wishlistName: input.wishlistName,
                 products: []
             }
-            const response=await wishlist.updateOne({userId:user.id},{$push:{'wishlists':newWishlist}});
+            const response = await wishlist.updateOne({ userId: user.id }, { $push: { 'wishlists': newWishlist } });
         }
 
-      const add = await wishlist.updateOne({
+        const add = await wishlist.updateOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
         }, {
@@ -156,7 +153,7 @@ async function deleteWishlist(req, res) {
         wishlister.save()
         console.log(wishlister.wishlists, "after deletion");
         return res.status(200).json({
-            message: "Wishlist deleted successfully!"
+            message: "Wishlist deleted!"
         })
     }
     catch (error) {
@@ -172,7 +169,7 @@ async function showWishlistCount(req, res) {
         const user = req.tokenData;
         console.log("hello", user.id);
         const result = await wishlist.findOne({ userId: new mongoose.Types.ObjectId('6541ea9c937b999d318165d7') })
-        .populate('wishlists.products', { 'sku': 1, _id: 0 });
+            .populate('wishlists.products', { 'sku': 1, _id: 0 });
         console.log(result, 'dddd');
         let ans = result.wishlists.some((el) => {
             return el.products.some(e => { e.sku == 'sku-kurti003' })
@@ -260,17 +257,12 @@ async function showWishlistedData(req, res) {
 
 async function removeFromWishlist(req, res) {
     try {
-            console.log('inside removeWishlist Service');
+        console.log('inside removeWishlist Service');
+        console.log(req.body, "del input");
         const input = req.body;
         const user = req.tokenData;
 
-        console.log(input, "del data",user.id);
-        // const final =await wishlist.findOne(
-        //     {
-        //         userId : new mongoose.Types.ObjectId(user.id)
-        //     }
-        // );
-
+        console.log(input, "del data", user.id);
         const response = await wishlist.updateOne(
             {
                 userId: user.id,
@@ -282,10 +274,11 @@ async function removeFromWishlist(req, res) {
                 }
             }
         )
-
-        console.log('response coming is ',response);
-
-        return res.status(200).json(response)
+        console.log('response coming is ', response);
+        return res.status(200).json({
+            message: "Product removed from wishlist!",
+            response
+        })
     }
 
 
@@ -293,6 +286,44 @@ async function removeFromWishlist(req, res) {
         console.log('erroris ', error);
     }
 }
+
+// async function insertWishlists(req, res) {
+//     try {
+
+//         let findAllusersId = await users.find({}, { _id: 1 });
+//         findAllusersId = JSON.parse(JSON.stringify(findAllusersId));
+//         findAllusersId = Promise.all(findAllusersId.map(async (el) => {
+//             // return { userId: el._id };
+
+//             const ab = await wishlist.updateMany({userId:el._id},
+//                 {
+    
+//                     $set: {
+//                         'wishlists': [{
+//                             'wishlistName': 'My Wishlist',
+//                             'products': []
+//                         }]
+//                     }
+//                 },
+//                 {
+//                     "upsert": true
+//                 }
+//             )
+//         }))
+//         console.log(findAllusersId, "-----");
+
+//         // return;
+
+      
+
+//         console.log('inserWishlist is ', insertWishlists);
+//     }
+
+
+//     catch (error) {
+//         console.log(error, "error in inserting wihlists");
+//     }
+// }
 
 module.exports = {
     showWishlists,
@@ -302,5 +333,5 @@ module.exports = {
     deleteWishlist,
     showWishlistCount,
     showWishlistedData,
-    removeFromWishlist
+    // insertWishlists,
 }

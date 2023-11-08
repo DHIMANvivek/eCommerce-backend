@@ -8,14 +8,12 @@ const bannerSchema = new mongoose.Schema(
         },
         title: {
             type: String,
-            require: true,
         },
         subTitle: {
             type: String,
         },
         buttonText: {
             type: String,
-            require: true,
         },
         buttonLink: {
             type: String,
@@ -35,6 +33,10 @@ const bannerSchema = new mongoose.Schema(
             buttonColor: {
                 type: String,
             }
+        },
+        active : {
+            type: Boolean,
+            default : true
         }
     }
 )
