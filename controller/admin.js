@@ -148,7 +148,28 @@ async function fetchProductSalesData(req, res) {
             },
             overallDiscount: { $sum: "$discount" },
             totalsales: {
-              $sum: "$products.amount",
+              $sum: {
+                $cond: [
+                  {
+                    $or: [
+                      {
+                        $ne: [
+                          "$products.shipmentStatus",
+                          "cancelled",
+                        ],
+                      },
+                      {
+                        $ne: [
+                          "$products.shipmentStatus",
+                          "declined",
+                        ],
+                      },
+                    ],
+                  },
+                  "$products.amount",
+                  0,
+                ],
+              },
             },
             totalExpenses: {
               $sum: {
@@ -178,15 +199,10 @@ async function fetchProductSalesData(req, res) {
         { $sort: { _id: 1 } }
       ]);
       if (!salesStats) throw 401;
-
-      if (controller) {
-        return salesStats;
-      }
+      if (controller) return salesStats;
 
       return res.status(200).json(salesStats);
-
     }
-
   } catch (err) {
     console.log(err);
     return res.status(401).send();
@@ -201,11 +217,31 @@ async function fetchPopularProducts(req, res) {
     const popularProductStats = await orders.aggregate([
       {
         $match: {
-          payment_status: "success",
-        },
+          $expr: {
+            $eq: [
+              { $month: "$orderDate" },
+              { $month: new Date() },
+            ]
+          }
+        }
       },
       {
         $unwind: "$products",
+      },
+      {
+        $match: {
+          payment_status: "success",
+          $expr: {
+            $ne: [
+              "$products.shipmentStatus",
+              "cancelled",
+            ],
+            $ne: [
+              "$products.shipmentStatus",
+              "declined",
+            ],
+          },
+        },
       },
       {
         $lookup: {
@@ -227,17 +263,29 @@ async function fetchPopularProducts(req, res) {
           revenue: { $sum: "$products.amount" },
           profit: {
             $sum: {
-              $subtract: ["$products.amount", { $multiply: ["$products.quantity", "$products.info.costPrice"] }],
+              $subtract: [
+                "$products.amount",
+                {
+                  $multiply: [
+                    "$products.quantity",
+                    "$products.info.costPrice",
+                  ],
+                },
+              ],
             },
           },
           name: { $first: "$products.name" },
-          category: { $first: "$products.info.info.category" },
-          brand: { $first: "$products.info.info.brand" },
-          photo: { $first: "$products.image" }
+          category: {
+            $first: "$products.info.info.category",
+          },
+          brand: {
+            $first: "$products.info.info.brand",
+          },
+          photo: { $first: "$products.image" },
         },
       },
-      { $sort: { revenue: -1 } },
-      { $limit: 3 }
+      { $sort: { profit: -1 } },
+      { $limit: 3 },
     ]);
 
     if (!popularProductStats) throw '401';
@@ -401,14 +449,14 @@ async function updateHighlightProduct(req, res) {
       {
         $set: { 'highlight': highlight.status }
       });
-    
-      const highlightCount = await products.find({'highlight': true}).count();
+
+    const highlightCount = await products.find({ 'highlight': true }).count();
 
     console.log("RES", response);
 
     if (!response) throw "Unable to Update";
-    return res.status(200).json({'highlightCount': highlightCount});
-    
+    return res.status(200).json({ 'highlightCount': highlightCount });
+
   } catch (err) {
     console.log(err);
     return res.status(401).send();
@@ -535,7 +583,7 @@ async function fetchProductInventory(req, res) {
               $group:
               {
                 _id: null,
-                highlightCount: { $sum: {$cond: [{$eq: ['$highlight', true]}, 1, 0]}},
+                highlightCount: { $sum: { $cond: [{ $eq: ['$highlight', true] }, 1, 0] } },
                 count: { $sum: 1 },
               }
             },
