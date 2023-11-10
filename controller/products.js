@@ -27,7 +27,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         )));
 
 
-       product= await getProductPrice((product));
+        product = await getProductPrice((product));
         // getting all the reviews and average
         let reviews_rating;
         if (user) {
@@ -134,9 +134,13 @@ async function fetchProducts(req, res) {
                     }
                 },
             },
-
-
         ];
+
+        popularQuery = {
+            $match: {
+                'higlight': true
+            }
+        }
 
         let priceSortValue;
         if (req.query.sort) {
@@ -173,12 +177,19 @@ async function fetchProducts(req, res) {
             aggregationPipe.unshift(
                 {
                     $match: getFilterQuery(req.query)
-                })
+                }
+            )
         }
 
         let matchedProducts = {
             total: 0
         };
+
+        aggregationPipe.push(
+            {
+                $sort: { 'name': 1 }
+            }
+        );
 
         // fetching the data
         let products = await Products.aggregate(aggregationPipe);
@@ -207,8 +218,8 @@ async function fetchProducts(req, res) {
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
             }));
         }
-        
-        if (colors){
+
+        if (colors) {
             matchedProducts.items = colorDistance(matchedProducts.items);
         }
 
@@ -249,36 +260,36 @@ async function fetchProducts(req, res) {
 
         // find matching nearby colors
         function colorDistance(products) {
-            if(!(Array.isArray(colors))){
+            if (!(Array.isArray(colors))) {
                 let color = colors;
                 colors = [];
                 colors.push(color);
             }
 
-            products = products.filter((product)=>{
-                if(product.assets.some(asset=>{
+            products = products.filter((product) => {
+                if (product.assets.some(asset => {
                     let assetColorRGB = hexToRgb(asset.color);
-                    if (colors.some(color =>{
+                    if (colors.some(color => {
                         let colorRGB = hexToRgb(color);
 
                         let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
-                        
-                        if(eucleadianDistance <= 120){
+
+                        if (eucleadianDistance <= 120) {
                             return true;
                         }
                         return false;
-                    })){
+                    })) {
                         return true;
                     }
                     return false;
-                })){
+                })) {
                     return product;
                 }
             });
 
             return products;
         }
-        
+
     } catch (error) {
         console.log('error coming is ', error);
         res.status(500).json({
@@ -382,24 +393,24 @@ async function getProductPrice(products) {
 
         let product = JSON.parse(JSON.stringify(parameter));
 
-        product.info.brand=product.info.brand.charAt(0).toUpperCase() + product.info.brand.slice(1);
-        product.info.category=product.info.category.charAt(0).toUpperCase() + product.info.category.slice(1);
+        product.info.brand = product.info.brand.charAt(0).toUpperCase() + product.info.brand.slice(1);
+        product.info.category = product.info.category.charAt(0).toUpperCase() + product.info.category.slice(1);
         return new Promise(async (res, rej) => {
 
-            const allOffers=await OffersModel.find({OfferType: 'discount','status.active':true});
+            const allOffers = await OffersModel.find({ OfferType: 'discount', 'status.active': true });
             let discount;
-            for(let offer of allOffers){
-                if(offer.ExtraInfo?.brand?.includes( [product.info.brand]) && offer.ExtraInfo?.categories?.includes( [product.info.category])){
-                        discount=offer;
-                        break;
+            for (let offer of allOffers) {
+                if (offer.ExtraInfo?.brand?.includes([product.info.brand]) && offer.ExtraInfo?.categories?.includes([product.info.category])) {
+                    discount = offer;
+                    break;
                 }
 
-                else if(offer.ExtraInfo?.brand?.includes( [product.info.brand]) && !offer.ExtraInfo?.categories?.includes( [product.info.category])){
-                        discount=offer;
+                else if (offer.ExtraInfo?.brand?.includes([product.info.brand]) && !offer.ExtraInfo?.categories?.includes([product.info.category])) {
+                    discount = offer;
                 }
-                else if(!offer.ExtraInfo?.brand?.includes( [product.info.brand]) && offer.ExtraInfo?.categories?.includes( [product.info.category])){
-                    discount=offer;
-            }
+                else if (!offer.ExtraInfo?.brand?.includes([product.info.brand]) && offer.ExtraInfo?.categories?.includes([product.info.category])) {
+                    discount = offer;
+                }
 
             }
             //  discount = await OffersModel.findOne({
@@ -412,7 +423,7 @@ async function getProductPrice(products) {
                 res(product);
                 return;
             }
-            product.discount=discount.discountAmount;
+            product.discount = discount.discountAmount;
             if (discount.discountType == 'percentage') {
                 product.discountPercentage = discount.discountAmount;
                 product.discount = Math.floor((product.price / 100) * discount.discountAmount);
@@ -427,7 +438,7 @@ async function getProductPrice(products) {
 
             if (product.discount) {
                 product.oldPrice = product.price;
-                product.price = (product.price - product.discount)<=0?0:(product.price - product.discount)
+                product.price = (product.price - product.discount) <= 0 ? 0 : (product.price - product.discount)
 
             }
 
@@ -442,7 +453,7 @@ const hexToRgb = (hex) => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    
+
     return { r, g, b };
 }
 
