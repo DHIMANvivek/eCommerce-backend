@@ -1,8 +1,6 @@
 const express = require('express')
 const router = express.Router();
-
 const adminController = require('../../../controller/admin')
-
 router.get('/getOverallInfo', adminController.getOverallInfo);
 router.get('/fetchSalesData', adminController.fetchProductSalesData);
 router.get('/fetchCategoryData', adminController.fetchCategorySalesData);

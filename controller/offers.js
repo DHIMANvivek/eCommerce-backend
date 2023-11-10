@@ -1,90 +1,117 @@
 const OfferModel = require('../models/offers');
-const moongoose=require('mongoose');
+const moongoose = require('mongoose');
 
-function createQuery(req){
+function createQuery(req) {
   let query;
-  req.body=JSON.parse(JSON.stringify(req.body));
-  if(req.body.ExtraInfo.categories && req.body.ExtraInfo.categories.length==0){
-    req.body.ExtraInfo.categories=null;
+  req.body = JSON.parse(JSON.stringify(req.body));
+  if (req.body.ExtraInfo.categories && req.body.ExtraInfo.categories.length == 0) {
+    req.body.ExtraInfo.categories = null;
   }
 
-  if(req.body.ExtraInfo.brands && req.body.ExtraInfo.brands.length==0){
-    req.body.ExtraInfo.brands=null;
+  if (req.body.ExtraInfo.brands && req.body.ExtraInfo.brands.length == 0) {
+    req.body.ExtraInfo.brands = null;
   }
-  if(req.body.ExtraInfo.brands && req.body.ExtraInfo.categories){
-    query={
+  if (req.body.ExtraInfo.brands && req.body.ExtraInfo.categories) {
+    query = {
       $and: [
-                  { 'ExtraInfo.brands': { $in: req.body.ExtraInfo.brands } },  // At least one of these brands must be present
-                  { 'ExtraInfo.categories':  { $in: req.body.ExtraInfo.categories } },
-              ]
+        { 'ExtraInfo.brands': { $in: req.body.ExtraInfo.brands } },  // At least one of these brands must be present
+        { 'ExtraInfo.categories': { $in: req.body.ExtraInfo.categories } },
+      ]
     }
   }
 
-  else if(req.body.ExtraInfo.brands && !req.body.ExtraInfo.categories){
-    query={
-              $and: [
-                { 'ExtraInfo.brands': { $in: req.body.ExtraInfo.brands } },  // At least one of these brands must be present
-                { 'ExtraInfo.categories': req.body.ExtraInfo.categories  }
-            ]
-       }
-  }
-
-  else if(!req.body.ExtraInfo.brands && req.body.ExtraInfo.categories){
-    query={
-              $and: [
-                { 'ExtraInfo.brands':  req.body.ExtraInfo.brands  },  // At least one of these brands must be present
-                { 'ExtraInfo.categories': { $in: req.body.ExtraInfo.categories }  }
-            ]
-       }
-  }
-
-  else{
-    query={
+  else if (req.body.ExtraInfo.brands && !req.body.ExtraInfo.categories) {
+    query = {
       $and: [
-        { 'ExtraInfo.brands':  req.body.ExtraInfo.brands  }, 
-        { 'ExtraInfo.categories': req.body.ExtraInfo.categories }
-    ]
-}
+        { 'ExtraInfo.brands': { $in: req.body.ExtraInfo.brands } },  // At least one of these brands must be present
+        // { 'ExtraInfo.categories': req.body.ExtraInfo.categories }
+      ]
+    }
   }
 
-  
+  else if (!req.body.ExtraInfo.brands && req.body.ExtraInfo.categories) {
+    query = {
+      $and: [
+        // { 'ExtraInfo.brands': req.body.ExtraInfo.brands }, 
+        { 'ExtraInfo.categories': { $in: req.body.ExtraInfo.categories } }
+      ]
+    }
+  }
+
+  //   else{
+  //     query={
+  //       $and: [
+  //         { 'ExtraInfo.brands':  req.body.ExtraInfo.brands  }, 
+  //         { 'ExtraInfo.categories': req.body.ExtraInfo.categories }
+  //     ]
+  // }
+  //   }
+
+
+  if (!query) {
+    query = {};
+    query.global = true;
+  }
   // query.endDate={$gte:req.body.startDate};
   // query['status.active']=true;
   // query.startDate={$or:[{$gte:req.body.startDate},{$lte:req.body.endDate}]}
   // query.endDate={$or:[{$gte:req.body.startDate},{$lte:req.body.endDate}]}
-  query.startDate={$lte:req.body.startDate};
+  // query.startDate = { $lte: req.body.startDate };
+  // query.endDate = { $gte: req.body.startDate };
+
+  let newquery={
+    $or:[
+      {startDate:{$gte:req.body.startDate,$lte:req.body.endDate}},
+      {endDate:{$gte:req.body.startDate,$lte:req.body.endDate}}
+    ]
+  }
+
+  Object.assign(query, newquery);
+
   return query;
 }
-async function createOffer(req,res){
+async function createOffer(req, res) {
   try {
+    let result;
+    if (req.body.OfferType == 'discount') {
+      let query = createQuery(req);
+      if (query.global) {
+        let extraKey = {
+          OfferType: 'discount',
+          'ExtraInfo.categories': {$eq: null}, 'ExtraInfo.brands': {$eq: null}
+        }
+        delete query.global;
+        Object.assign(query, extraKey);
+        result = await OfferModel.findOne(query);
+      }
+      else {
+        query.OfferType='discount';
+        console.log('quer coming is ------> ',query);
+        result = await OfferModel.findOne(query);
+      }
 
-    if(req.body.OfferType=='discount'){
-      let query=createQuery(req);
-      const result=await OfferModel.findOne(query);
-      // if(result.length>0){
-      //   throw{message:'This is conflict point please try to create another date points '};
-      // }  
-      if(result){
-        throw{message:'This is conflict point please try to create another date points '};
+      if (result) {
+        throw { message: 'This is conflict point please try to create another date points ' };
       }
 
     }
 
-    const newOffer =  OfferModel(req.body);
+    const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
   } catch (error) {
-        res.status(500).json(error);
+    console.log('error coming is ', error);
+    res.status(500).json(error);
   }
 }
 
 
 async function getOffers(req, res) {
   try {
-    const data = await OfferModel.find({ 'status.deleted': false }).sort({createdAt:-1});
+    const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
     res.status(200).json(data);
   } catch (error) {
-    console.log('error si ',error);
+    console.log('error si ', error);
     res.status(500).json(error);
   }
 }
@@ -92,15 +119,15 @@ async function getOffers(req, res) {
 
 async function deleteOffer(req, res) {
   try {
-    if(Array.isArray(req.body)){
-      await OfferModel.updateMany({_id: {$in: req.body}},{ $set: { "status.deleted": true } });
+    if (Array.isArray(req.body)) {
+      await OfferModel.updateMany({ _id: { $in: req.body } }, { $set: { "status.deleted": true } });
     }
 
-    else{
+    else {
       await OfferModel.updateOne({ _id: req.body.id }, { $set: { "status.deleted": true } });
     }
 
-    const data = await OfferModel.find({ 'status.deleted': false }).sort({createdAt:-1});
+    const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
 
     return res.status(200).json(data);
   } catch (error) {
@@ -109,16 +136,54 @@ async function deleteOffer(req, res) {
 }
 
 
+function generateLink(req){
+  let link='http://localhost:4200/explore?'
+  for(let i=0;i<req.body.ExtraInfo?.brands?.length;i++){
+    let value=req.body.ExtraInfo.brands[i];
+    value=value[0].toLowerCase()+value.slice(1)
+    if(value.includes(' ')){
+      value=value.split(' ');
+      value=value[0]+'%20'+value.slice(1);
+    }
+    if(i==0){
+      link+='brand'+'='+value;
+    }
+    else{
+      link+='&'+value;
+    }
+  }
+
+  for(let i=0;i<req.body.ExtraInfo?.categories?.length;i++){
+    let value=req.body.ExtraInfo.categories[i];
+    value=value[0].toLowerCase()+value.slice(1)
+
+    if(link.includes('brand') && i==0){
+      link+='&';
+    }
+    if(value.includes(' ')){
+      value=value.split(' ');
+      value=value[0]+'%20'+value.slice(1);
+    }
+    if(i==0){
+      link+='category'+'='+value;
+    }
+    else{
+      link+='&'+value;
+    }
+  }
+
+  return link;
+}
+
+
 async function updateOffer(req, res) {
   try {
-    // const query=createQuery(req);
-    // let result=await OfferModel.findOne(query); 
-    // result=JSON.parse(JSON.stringify(result));
-    // if( result && result._id!=req.body.id){
-    //   throw{message:'This is conflict point please try to create another date points '};
-    // }
-
-     result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
+    
+    if(req.body.OfferType=='discount'){
+      req.Link=generateLink(req);
+      console.log('req linke is ',req.Link);
+    }
+    result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
     res.status(200).json(result);
   } catch (error) {
     console.log('error is ', error);
@@ -127,28 +192,40 @@ async function updateOffer(req, res) {
 }
 
 
-async function updateOfferStatus(req,res){
+async function updateOfferStatus(req, res) {
   try {
-    let status=req.body.status;
-    req.body=req.body.data;
-    if(req.body.OfferType=='discount'){
-      let query=createQuery(req);
-    query['status.active']=true;
-    console.log('quer is -------> ',query);
-      let result=await OfferModel.findOne(query);
-      result=JSON.parse(JSON.stringify(result));
-      console.log('result come up si ',result," req bodycome us ",req.body);
-      if( result && result._id!=req.body._id){
-        throw{message:'This is conflict point please try to create another date points '};
-      } 
+    let status = req.body.status;
+    req.body = req.body.data;
+    if (req.body.OfferType == 'discount') {
+      // console.log('discount coming is ----------------> ',req.body.OfferType);
+      let query = createQuery(req);
+      query['status.active'] = true;
+      
+      if (query.global) {
+        let extraKey = {
+          OfferType: 'discount',
+          'ExtraInfo.categories': {$eq: null}, 'ExtraInfo.brands': {$eq: null}
+        }
+        delete query.global;
+        Object.assign(query, extraKey);
+        // result = await OfferModel.findOne(query);
+      }
+
+      console.log('query cone up is >',query);
+      let result = await OfferModel.findOne(query);
+      result = JSON.parse(JSON.stringify(result));
+      console.log('result come up si ', result, " req bodycome us ", req.body);
+      if (result && result._id != req.body._id) {
+        throw { message: 'This is conflict point please try to create another date points ' };
+      }
     }
 
-    const updateOfferStatus=await OfferModel.updateOne({_id:req.body._id},{
-      $set:{'status.active':status}
+    const updateOfferStatus = await OfferModel.updateOne({ _id: req.body._id }, {
+      $set: { 'status.active': status }
     })
-    res.status(200).json({message:'offer status updated sucess'})
+    res.status(200).json({ message: 'offer status updated sucess' })
   } catch (error) {
-    console.log('error coming si ',error);
+    console.log('error coming si ', error);
     res.status(500).json(error)
   }
 }
@@ -156,13 +233,15 @@ async function updateOfferStatus(req,res){
 async function getCoupons(req, res) {
   try {
     const getAllCoupons = await OfferModel.find(
-      { $and: [
-        { OfferType: 'coupon' },
-        { "status.active": true },
-        { "status.deleted": false} ,
-        { startDate: { $lte: (new Date()) } }, 
-        {endDate:{$gte:(new Date())}},
-      ] });
+      {
+        $and: [
+          { OfferType: 'coupon' },
+          { "status.active": true },
+          { "status.deleted": false },
+          { startDate: { $lte: (new Date()) } },
+          { endDate: { $gte: (new Date()) } },
+        ]
+      });
     res.status(200).json(getAllCoupons);
 
   } catch (error) {
@@ -170,31 +249,33 @@ async function getCoupons(req, res) {
   }
 }
 
-async function checkCoupon(couponId,userId){
+async function checkCoupon(couponId, userId) {
   try {
-    const response=await OfferModel.findOne({ $and:[
-      { OfferType: 'coupon' },
-      {_id:couponId},
-      { userUsed:{$nin: [userId]}},
-      // {$gte:{'couponUsersLimit':1}},
-      {couponUsersLimit:{$gte:1}},
-      {UserEmails:{$nin:[userId]}}
-    ]});
-    console.log('response is ',response);
-    return new Promise((res,rej)=>{
-      if(!response) res(0);
+    const response = await OfferModel.findOne({
+      $and: [
+        { OfferType: 'coupon' },
+        { _id: couponId },
+        { userUsed: { $nin: [userId] } },
+        // {$gte:{'couponUsersLimit':1}},
+        { couponUsersLimit: { $gte: 1 } },
+        { UserEmails: { $nin: [userId] } }
+      ]
+    });
+    console.log('response is ', response);
+    return new Promise((res, rej) => {
+      if (!response) res(0);
       res(response);
     })
 
   } catch (error) {
-    console.log('error coming inside checkcoupo is -----> ',error);
+    console.log('error coming inside checkcoupo is -----> ', error);
   }
 }
 
-async function updateCoupon(couponId,userId){
+async function updateCoupon(couponId, userId) {
   try {
-    const response=await OfferModel.findOneAndUpdate({_id:couponId,userUsed:{$nin: [userId]}},{$push:{userUsed:new moongoose.Types.ObjectId(userId)}},{new:true});
-    return new Promise((res,rej)=>{
+    const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: new moongoose.Types.ObjectId(userId) } }, { new: true });
+    return new Promise((res, rej) => {
       res(response);
     })
 
@@ -204,30 +285,30 @@ async function updateCoupon(couponId,userId){
 
 
 
-async function searchOffer(req,res){
+async function searchOffer(req, res) {
   try {
-    const query={$regex:req.body.searchWord,$options:"i"}  ;
-    const findsearchedOffers=await OfferModel.find(
+    const query = { $regex: req.body.searchWord, $options: "i" };
+    const findsearchedOffers = await OfferModel.find(
 
-    
-   {  
-    'status.deleted':false,
-    'status.active':true,
-    $or:[
-   { OfferType:query},
-   { discountType:query},
-   {Title:query},
-    {couponcode:query},
-    
-  ]
-    }
+
+      {
+        'status.deleted': false,
+        'status.active': true,
+        $or: [
+          { OfferType: query },
+          { discountType: query },
+          { Title: query },
+          { couponcode: query },
+
+        ]
+      }
     )
 
-    console.log('findSearch offer is ',findsearchedOffers);
+    console.log('findSearch offer is ', findsearchedOffers);
     res.status(200).json(findsearchedOffers);
 
   } catch (error) {
-      res.status(500).json(error);
+    res.status(500).json(error);
   }
 }
 

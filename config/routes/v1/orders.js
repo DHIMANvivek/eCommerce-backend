@@ -8,7 +8,7 @@ router.post('/', orderController.getOrders);
 router.post('/verifyOrderSummary',jwtVerify,orderController.verifyOrderSummary)
 router.use(jwtVerify);
 router.post('/create',orderController.createOrder);
-router.get('/getparticularUserOrders',orderController.getParicularUserOrders);
+router.get('/getparticularUserOrders',jwtVerify,orderController.getParicularUserOrders);
 
 router.post('/sellerOrders', adminVerify, orderController.getSellerOrdersInventory);
 router.get('/sellerOrderDetail', adminVerify, orderController.getSellerOrderDetails);

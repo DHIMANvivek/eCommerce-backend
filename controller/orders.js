@@ -104,8 +104,6 @@ async function getOrders(req, res) {
             const buyerId = decoded.id;
             console.log('buyer id is ', buyerId);
             const { newPaymentStatus, transactionId, MOP } = req.body;
-            console.log(newPaymentStatus , "--------------" , MOP)
-    
             const latestOrder = await ordersModel
                 .findOne({ buyerId: buyerId })
                 .sort({ orderDate: -1 })

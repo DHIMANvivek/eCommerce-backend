@@ -8,16 +8,16 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
         let query = {};
         let user;
-
+        console.log(req.query);
         if (req.headers.authorization) {
             user = verifyToken(req.headers.authorization.split(' ')[1]);
         }
         if (admincontroller) {
-
             if (user.role == 'admin') query['sellerID'] = user.id;
         }
 
         query['sku'] = req.query.sku ? req.query.sku : sku;
+        console.log(query);
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {

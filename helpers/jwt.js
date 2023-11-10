@@ -4,7 +4,6 @@ require('dotenv').config()
 function verifyToken(token) {
     try {
         const data = token;
-
         if (!data) {
             throw ({ message: 'Please login/signup.' });
         }

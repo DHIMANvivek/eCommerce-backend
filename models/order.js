@@ -63,13 +63,7 @@ const orderSchema = mongoose.Schema(
                     type:String,
                     required:true
                 },
-                // invoice_status:{
-                //     type:Boolean,
-                //     default:false,
-                // },
-                // invoiceId:{
-                //     type:String,
-                // },
+ 
 
             }
         ],
@@ -109,23 +103,6 @@ const orderSchema = mongoose.Schema(
         MOP:{
             type:String
         },
-
-        // OTP:{
-        //     type:Number,
-        //     default:function OtpCreater(){
-        //         return Math.floor((Math.random() * 999999));
-        //     },
-        //     // default:100000,
-        //     validate: {
-        //         validator: function (value) {
-        //           // Check if the value is a number and has at least 6 digits.
-        //           let result= value >= 100000 && value<=999999;
-        //           console.log('value coming is ',value," result is ",result, " ",value >= 100000," "," ",value<=999999);
-        //           return result;
-        //         },
-        //         message: 'Your field must be a number with a minimum of 6 digits.',
-        //       },
-        // },
 
 
         coupon:{
@@ -186,7 +163,7 @@ orderSchema.post('save',async function (){
                 'assets.color': el.color,
                 'assets.stockQuantity.size': el.size
         }, {'assets.stockQuantity.quantity':1,_id:0});
-        if(el.quantity>findQuantity) el.quantity=findQuantity;
+        if(el.quantity>=findQuantity) el.quantity=findQuantity;
         else el.quantity=el.quantity;
         const updateProduct = await Products.updateOne(
             {

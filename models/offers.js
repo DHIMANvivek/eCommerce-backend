@@ -1,3 +1,4 @@
+const { off } = require("./address");
 const products = require("./products");
 const mongoose = require('mongoose');
 
@@ -7,6 +8,10 @@ let offerSchema = mongoose.Schema({
         type: String,
         required: true,
         enum: ['coupon', 'discount']
+    },
+
+    Image:{
+        type:String
     },
 
     couponcode: {
@@ -119,6 +124,10 @@ let offerSchema = mongoose.Schema({
         }
        
     ],
+
+    Link:{
+        type:String,
+    },
     couponUsersLimit: {
         type: Number,
         required: function validate() {
@@ -150,6 +159,11 @@ let offerSchema = mongoose.Schema({
     }
 
 )
+
+
+// offerSchema.post('save',async function (){
+//     console.log("this is ",this.ExtraInfo.brands," cat ",this.ExtraInfo.categories);
+// })
 
 
 module.exports = mongoose.model('Offers', offerSchema);

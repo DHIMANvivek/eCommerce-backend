@@ -72,7 +72,6 @@ async function fetchCart(req, res) {
         res.status(200).json(cart);
     }
     catch (error) {
-        // console.log(error, "rtertertert---------");
         res.status(500).json({
             message: 'Problem while fetching Cart'
         });

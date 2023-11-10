@@ -157,9 +157,9 @@ async function DefaultAddress(req, res) {
         console.log('body coming is ',req.body);
 let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
 FindAddress.info.address.push(FindAddress[0]);
-FindAddress.info.address[0]=(req.body);
+FindAddress.info.address[0]=(req.body.address);
 await FindAddress.save();
-const result=await this.getActiveAddresses();
+const result=await getActiveAddresses();
 
 // console.log('reqbodu si ',req.body);
 
