@@ -17,8 +17,10 @@ const SKU_generater = require('../helpers/sku');
 // const paginateResults = require('../helpers/pagination');
 
 const productController = require('../controller/products');
-
+const Notification = require('../models/notifications')
 const OffersModel = require('../models/offers');
+const webPush = require('../models/support-ticket/supportNotifications');
+const { updateItem } = require('./cart');
 
 async function getOverallInfo(req, res) {
   try {
@@ -1064,6 +1066,105 @@ async function deleteSupportTicket(req, res) {
   }
 }
 
+async function getFcmTokens(req , res) {
+  const supportNotification = await webPush.findOne({});
+  if (supportNotification) {
+    const distinctTokens = await webPush.aggregate([
+      { $match: { _id: supportNotification._id } },
+      { $unwind: '$tokenDetail' },
+      { $group: { _id: null, distinctTokens: { $addToSet: '$tokenDetail.token' } } },
+      { $project: { _id: 0, distinctTokens: 1 } }
+    ]);
+    console.log('Distinct Tokens:', distinctTokens[0].distinctTokens);
+    res.status(200).send(distinctTokens[0].distinctTokens);
+  } else {
+    console.log('SupportNotifications document not found');
+  }
+}
+
+async function getNotificationDetail(req, res) {
+  try {
+    const notifications = await Notification.find();
+
+    res.json(notifications);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function setNotifications(req, res) {
+  try {
+    const incomingNotifications = req.body.notification; 
+    console.log("incoming ", incomingNotifications);
+
+    if (!Array.isArray(incomingNotifications)) {
+      return res.status(400).json({ message: 'Invalid notification data. Expected an array.' });
+    }
+
+    const createdNotifications = [];
+
+    for (const incomingNotification of incomingNotifications) {
+      const { icon, title, body, url } = incomingNotification;
+
+      if (!icon || !title || !body || !url) {
+        return res.status(400).json({ message: 'Invalid notification data. Required fields are missing.' });
+      }
+
+      const createdNotification = await Notification.create({
+        notification: {
+          icon,
+          title,
+          body,
+          url,
+        },
+        state: true, 
+      });
+
+      createdNotifications.push(createdNotification);
+    }
+
+    res.status(200).json({ message: "Notifications inserted successfully", data: createdNotifications });
+  } catch (error) {
+    console.error('Failed to insert NOTIFICATIONS:', error);
+    res.status(500).json({ message: 'Failed to insert notifications' });
+  }
+}
+
+async function updateNotifications(req, res) {
+  try {
+    const { index, data } = req.body;
+
+    if (index !== undefined) {
+      const notificationItems = await Notification.find({});
+      if (index >= notificationItems.length) {
+        return res.status(404).json({ message: 'Index out of range' });
+      }
+
+      const updateData = data.notification[0];
+
+      // Update the notification field directly
+      const updatedItem = await Notification.findOneAndUpdate(
+        { _id: notificationItems[index]._id },
+        { notification: updateData },
+        { new: true }
+      );
+
+      if (!updatedItem) {
+        return res.status(404).json({ message: 'Item not found' });
+      }
+
+      res.status(200).json({ message: 'Item updated successfully', updatedItem });
+    } else {
+      const newItem = await Notification.create(data);
+      res.status(200).json({ message: 'New item added successfully', newItem });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 
 async function getPaymentKeys(req, res) {
   try {
@@ -1169,6 +1270,26 @@ async function getPaginatedData(req, res) {
   }
 }
 
+async function toggleNotifications(req, res) {
+  try {
+    const { id, state } = req.body;
+    console.log(id , state , "states ----");
+    const filter = { _id: id };
+    const update = { state: state };
+
+    const updatedNotifications = await Notification.findOneAndUpdate(filter, update, { new: true });
+
+    if (!updatedNotifications) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    res.status(200).json({ message: 'Notification updated successfully', updatedNotifications });
+  } catch (error) {
+    console.log('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 module.exports = {
   // Stats Data
   getOverallInfo,
@@ -1210,6 +1331,11 @@ module.exports = {
   getPaymentKeys,
   updatePaymentKeys,
   deletePaymentKeys,
-  getPaginatedData
+  getPaginatedData,
+  getFcmTokens,
+  getNotificationDetail,
+  setNotifications,
+  updateNotifications,
+  toggleNotifications
 }
 

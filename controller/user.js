@@ -2,6 +2,7 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/custom-website-elements/faq');
 
+const Notification = require('../models/notifications');
 const Title = require('../models/support-ticket/createTicket');
 const Ticket = require('../models/support-ticket/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -18,6 +19,7 @@ async function getDetails(req, res) {
         const basicDetails = await Users.findById(req.tokenData.id);
         res.status(200).json(basicDetails)
     } catch (error) {
+        console.log('error --------> ',error);
         res.status(500).json(error);
     }
 }
@@ -332,24 +334,62 @@ async function sendTicket(req , res) {
 
 async function webPushDetails(req, res) {
     try {
-        const { email, token } = req.body;
-        console.log('email is ', email, 'token is ', token);
-    
-        const supportNotification = await webPush.findOne({});
-    
-        if (supportNotification) {
-            supportNotification.tokenDetail.push({ token, email });
+      const { email, token } = req.body;
+      console.log('email is ', email, 'token is ', token);
+  
+      const supportNotification = await webPush.findOne({});
+  
+      if (supportNotification) {
+        if (!email && token) {
+          // Add a new entry to the tokenDetail array with only the token
+          supportNotification.tokenDetail.push({ token });
           await supportNotification.save();
           res.status(200).json(supportNotification);
         } else {
-          // If the document doesn't exist, you can create a new one or handle this case as needed
-          res.status(404).json({ error: 'SupportNotifications document not found' });
+          const existingEntryIndex = supportNotification.tokenDetail.findIndex(
+            (entry) => entry.email === email
+          );
+  
+          if (existingEntryIndex !== -1) {
+            if (token) {
+              // Update the existing entry with the new token
+              supportNotification.tokenDetail[existingEntryIndex].token = token;
+              await supportNotification.save();
+              res.status(200).json(supportNotification);
+            } else {
+              res.status(400).json({ error: 'Token is required for updating an entry' });
+            }
+          } else {
+            // Add a new entry to the tokenDetail array
+            supportNotification.tokenDetail.push({ token, email });
+            await supportNotification.save();
+            res.status(200).json(supportNotification);
+          }
         }
-      } catch (error) {
-        console.error('Error saving user details:', error);
-        return res.status(500).json({ error: 'An error occurred while saving user details' });
+      } else {
+        console.log(error);
+        res.status(404).json({ error: 'SupportNotifications document not found' });
+      }
+    } catch (error) {
+      console.error('Error saving user details:', error);
+      return res.status(500).json({ error: 'An error occurred while saving user details' });
+    }
+  }
+
+  async function comingNotifications(req, res) {
+    try {
+        const notifications = await Notification.find();
+    
+        res.json(notifications);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
       }
   }
+  
+  
+
+
 
 
 
@@ -377,5 +417,6 @@ module.exports = {
     getTicketTitle,
     sendTicket,
     // getPaymentKeys
-    webPushDetails
+    webPushDetails,
+    comingNotifications
 }

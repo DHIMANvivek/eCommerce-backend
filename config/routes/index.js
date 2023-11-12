@@ -8,7 +8,9 @@ const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
 const paginateResults = require('../../helpers/pagination');
-
+const Notification = require('../../models/notifications')
+const axios = require('axios');
+const notifications = require('../../models/notifications');
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
@@ -118,6 +120,7 @@ async function getPaginatedData(req, res) {
 
 // ticket status
 router.post('/ticketStatus', async (req, res) => {
+try {
     console.log(req.body)
     const mailData = {
         email: req.body.email,
@@ -125,17 +128,58 @@ router.post('/ticketStatus', async (req, res) => {
         status: req.body.status,
         message: req.body.message
     }
+    console.log("body us ", mailData)
     const emailTemplate = TicketStatusTemplate(mailData);
     const mailSent = await mailer(mailData, emailTemplate);
 
     res.status(200).json({
         message: "done"
     })
+} catch (error) {
+    console.log(error , "error is ")
+}
 })
+
+// router.post('/notifications', async (req, res) => {
+//     try {
+//         console.log("notification called ", req.body)
+//         // return;
+//       const { notification } = req.body.payload;
+//       const { registration_ids } = req.body;
+//       const { url } = req.body.payload.data;
+
+
+//     //   return;
+//     //   const url = req.body.payload.data['gcm.notification.url'];
+//     //   if (!url) {
+//     //     throw new Error('Notification URL is required.');
+//     //   }
+  
+//       console.log(notification, url, registration_ids, "sdfsf");
+  
+//       const newNotification = new Notification({
+//         notification: {
+//           title: notification.title,
+//           body: notification.body,
+//           icon: notification.icon,
+//           url: url,
+//         },
+//         registration_ids: registration_ids,
+//       });
+  
+//       await newNotification.save();
+  
+//       res.status(200).send('Notification saved successfully');
+//     } catch (error) {
+//       console.error(error.message);
+//       res.status(400).send(`Error: ${error.message}`);
+//     }
+//   });
+
 
 // email invoice 
 router.post('/invoiceSend', async (req, res) => {
-    console.log(req.body)
+    console.log(req.body, "invoice")
     const mailData = {
         email: req.body.receipt_email,
         subject: "Invoice",

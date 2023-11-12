@@ -15,19 +15,31 @@ admin.initializeApp({
 });
 
 app.post('/send-notification', (req, res) => {
-  const { title, body, icon, token } = req.body;
+  const { title, body, icon, url, token , registration_ids } = req.body;
+  const tokens = registration_ids || [token].filter(Boolean);
 
-  console.log('title is ', title, 'body is ', body, 'icon is ', icon, 'token is ', token)
+  console.log('Notification details:', { title, body, icon, url , token , registration_ids});
+
+  // Static registration_ids
+  // const registration_ids = [
+  //   "eIGVynF7qde1Ij5_bZe0cN:APA91bEtmmM8fTh3pVDlqJsrV98gdS1JlHcYRdye1G323pTm2hcnVYAKUHLoYIcJneqWcJ7CI-Vfr8xbRLZs5HU185g4PF57PFdZEfQUTXh19V7L6QayCjoWi8Ovq9dWT_PHrHViLImv",
+  //   "eN1rb5EdCGBl37ihVIwdqL:APA91bGBoAI9CVlNukzoxGwjd8SQxrZT1ceuWtg7eALmVBHe8d7XqeeNGXG_6c5ZrBGHwMXX4_C59wTwzgTjVL5LuZiDPb-A_qQ298fwCZiMSvSJ9Bbiy8wpt2LJqabXmDF9ooNQFSkg",
+  //   "ctnSJmkHSgmcEeL6OCDMYo%3AAPA91bEtlagyQdob5pTe7i4AcZbblpJXXnF0qmjjtuYOpbKLxgdmF0b8KNz6W7oNQd4CjxwK28ysRoQImzPnhmB-XbCjctEwkHkdrCVNYU_PLKoJFymcbCdcwEFNhakP8eeYIgkpF_w7"
+  // ];
 
   const message = {
-      "notification": {
-        "title": title,
-        "body": body,
-      },
-      "token": req.body.token,
-    };
+    notification: {
+      title,
+      body,
+      image: icon
+    },
+    data: {
+      url: String(url) || null
+    },
+    tokens: tokens,
+  };
 
-  admin.messaging().send(message)
+  admin.messaging().sendMulticast(message)
     .then((response) => {
       console.log('Successfully sent message:', response);
       res.status(200).send('Notification sent successfully');
@@ -39,28 +51,55 @@ app.post('/send-notification', (req, res) => {
 });
 
 
-const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
-const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
 
-webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
-app.post('/subscribe', (req, res) => {
-  const subscription = req.body;
+// app.post('/send-notification', (req, res) => {
+//   const { title, body, icon, token } = req.body;
 
-  const payload = JSON.stringify({ title: req.body.title,
-body: req.body.body,
-icon: req.body.icon,
-to: req.body.to });
+//   console.log('title is ', title, 'body is ', body, 'icon is ', icon, 'token is ', token)
 
-  webpush.sendNotification(subscription, payload)
-      .then(() => {
-          console.log('Push notification sent');
-          res.status(201).json({ message: 'Push notification sent successfully' });
-      })
-      .catch((err) => {
-          console.error(err);
-          res.status(500).json({ error: 'Failed to send push notification' });
-      });
-});
+//   const message = {
+//       "notification": {
+//         "title": title,
+//         "body": body,
+//         "image": icon
+//       },
+//       "token": req.body.token,
+//   };
+
+//   admin.messaging().send(message)
+//     .then((response) => {
+//       console.log('Successfully sent message:', response);
+//       res.status(200).send('Notification sent successfully');
+//     })
+//     .catch((error) => {
+//       console.error('Error sending message:', error);
+//       res.status(500).send('Error sending notification');
+//     });
+// });
+
+
+// const publicVapidKey = 'BHpZMgcqmYkdUWVXuYP0ByYwIkvvcDaYgfPqKjW1hps4fbMNs1uR37kbq-PmJUanYDdeiEgl8lfhMDUu3fXk1KM';
+// const privateVapidKey = '2tVV2JHt8jcBLCTSSJmTO4kx0-zx7W8QavXEZOGWprk';
+
+// webpush.setVapidDetails('mailto:googlydhiman.4236@gmail.com', publicVapidKey, privateVapidKey);
+// app.post('/subscribe', (req, res) => {
+//   const subscription = req.body;
+
+//   const payload = JSON.stringify({ title: req.body.title,
+// body: req.body.body,
+// image: req.body.icon,
+// to: req.body.to });
+
+//   webpush.sendNotification(subscription, payload)
+//       .then(() => {
+//           console.log('Push notification sent');
+//           res.status(201).json({ message: 'Push notification sent successfully' });
+//       })
+//       .catch((err) => {
+//           console.error(err);
+//           res.status(500).json({ error: 'Failed to send push notification' });
+//       });
+// });
 
 
 

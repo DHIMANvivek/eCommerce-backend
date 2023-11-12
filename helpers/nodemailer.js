@@ -4,6 +4,7 @@ const {ForgetTemplate,SignupTemplate, SubscribeTemplate, TicketStatusTemplate, s
 async function sendMail(data, Template) {
   
     try {
+        console.log("hdsfjdskhfsjsdhf------helo")
         const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {

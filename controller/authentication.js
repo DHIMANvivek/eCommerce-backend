@@ -106,7 +106,7 @@ async function login(req, res) {
         if (!userFound) {
             throw ({ message: 'User not found! Kindly sign in.' })
         }
-        console.log("bhai?");
+        // console.log("bhai?");
 
         // PURE GOOGLE LOGIN
         if (userFound.provider == 'GOOGLE' && input.token) {

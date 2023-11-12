@@ -46,9 +46,12 @@ router.post('/deleteTicketTitle', adminController.deleteTicketTitle);
 router.get('/getAllTicket', adminController.getAllTicket);
 router.post('/updateTicketStatus', adminController.updateTicketStatus);
 router.post('/deleteSupportTicket', adminController.deleteSupportTicket);
+router.get('/getFcmTokens', adminController.getFcmTokens)
 // router.get('/getPaymentKeys', adminController.getPaymentKeys);
-
-
+router.get('/getNotificationDetail', adminController.getNotificationDetail);
+router.post('/setNotifications', adminController.setNotifications);
+router.post('/updateNotifications', adminController.updateNotifications);
+router.post('/toggleNotifications', adminController.toggleNotifications);
 // payment keys
 // router.post('/addPaymentKeys', adminController.addPaymentKeys);
 // router.post('/updatePaymentKeys', adminController.updatePaymentKeys);

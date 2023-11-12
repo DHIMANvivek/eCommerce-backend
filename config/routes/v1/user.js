@@ -36,6 +36,7 @@ router.post('/sendTicket', userController.sendTicket);
 router.post('/webPushDetails', userController.webPushDetails);
 // router.get('/getPaymentKeys', userController.getPaymentKeys);
 
+router.get('/comingNotifications', userController.comingNotifications);
 
 // router.get('/coupons',userController.getCoupons);
 router.post('/used',userController.usedCoupon)

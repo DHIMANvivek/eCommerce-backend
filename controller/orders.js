@@ -83,7 +83,7 @@ async function getOrders(req, res) {
             .exec();
 
         if (latestProduct) {
-            console.log('Latest product details:', latestProduct);
+            // console.log('Latest product details:', latestProduct);
             res.status(200).json({ latestProduct });
         } else {
             res.status(404).json({ error: 'No products found for the user' });
@@ -102,7 +102,7 @@ async function getOrders(req, res) {
     
             const decoded = verifyToken(token);
             const buyerId = decoded.id;
-            console.log('buyer id is ', buyerId);
+            console.log("buyer id is ", buyerId)
             const { newPaymentStatus, transactionId, MOP } = req.body;
             const latestOrder = await ordersModel
                 .findOne({ buyerId: buyerId })

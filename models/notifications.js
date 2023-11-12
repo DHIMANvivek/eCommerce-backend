@@ -1,33 +1,39 @@
 const mongoose = require('mongoose');
+
 let notificationSchema = new mongoose.Schema({
-    image: {
-        type: String
+  notification: {
+    title: {
+      type: String,
+      required: true,
+      trim: true
     },
-    heading: {
-        type: String,
-        required: true,
-        trim: true
+    body: {
+      type: String,
+      required: true,
+      trim: true
     },
-    content: {
-        type: String,
-        required: true,
-        trim: true
+    icon: {
+      type: String
     },
     url: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    state:{
-        type: Boolean,
-        default: true
+      type: String,
+      required: true,
+      trim: true
     }
-
+  },
+  registration_ids: [{
+    type: String,
+    // required: true,
+    trim: true
+  }],
+  state: {
+    type: Boolean,
+    default: true
+  }
 },
 {
-    autoIndex: true,
-    timestamps: true
-}
-);
+  autoIndex: true,
+  timestamps: true
+});
 
 module.exports = mongoose.model('notifications', notificationSchema);
