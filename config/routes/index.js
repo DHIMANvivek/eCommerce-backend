@@ -27,6 +27,7 @@ router.use('/banners', require('./v1/custom-website-elements/banners'))
 router.use('/sales', require('./v1/custom-website-elements/sales'))
 
 router.use('/deals', require('./v1/custom-website-elements/deals'))
+router.use('/razorpay', require('./v1/razorpay/payment'));
 
 
 

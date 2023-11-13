@@ -98,6 +98,7 @@ async function getOrders(req, res) {
 
     async function updateLatestOrderDetail(req, res) {
         try {
+            console.log(req.body)
             const token = req.body.buyerId;
     
             const decoded = verifyToken(token);
