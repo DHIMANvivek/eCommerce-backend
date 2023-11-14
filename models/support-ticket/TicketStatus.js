@@ -19,4 +19,4 @@ const childSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('ticketType', childSchema);
+module.exports = mongoose.model('TicketStatus', childSchema);

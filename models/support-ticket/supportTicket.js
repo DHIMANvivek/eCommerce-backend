@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const childSchema = new mongoose.Schema({
   title: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ticketType',
+    ref: 'TicketStatus',
   }
 });
 
@@ -32,10 +32,10 @@ const ticketSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  ticketType: [childSchema],  
+  TicketStatus: [childSchema],  
   notificationDetails: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'supportNotifications',
+    ref: 'supportNotificationTokens',
   }],
 });
 

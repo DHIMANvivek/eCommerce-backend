@@ -31,12 +31,10 @@ router.post('/sendData', userController.sendData);
 router.get('/getPaginatedData/:model', userController.getPaginatedData);
 
 // support ticket
-router.get('/getTicketTitle', userController.getTicketTitle);
-router.post('/sendTicket', userController.sendTicket);
-router.post('/webPushDetails', userController.webPushDetails);
+// router.get('/getTicketTitle', userController.getTicketTitle);
+// router.post('/sendTicket', userController.sendTicket);
+// router.post('/webPushDetails', userController.webPushDetails);
 // router.get('/getPaymentKeys', userController.getPaymentKeys);
-
-router.get('/comingNotifications', userController.comingNotifications);
 
 // router.get('/coupons',userController.getCoupons);
 router.post('/used',userController.usedCoupon)

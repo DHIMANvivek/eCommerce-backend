@@ -8,9 +8,9 @@ const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
 const paginateResults = require('../../helpers/pagination');
-const Notification = require('../../models/notifications')
+const Notification = require('../../models/notifications/notifications')
 const axios = require('axios');
-const notifications = require('../../models/notifications');
+const notifications = require('../../models/notifications/notifications');
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
@@ -31,6 +31,12 @@ router.use('/razorpay', require('./v1/razorpay/payment'));
 
 router.use('/deals', require('./v1/custom-website-elements/deals'));
 router.use('/homeLayout', require('./v1/custom-website-elements/home-layout'));
+// tickets
+router.use('/ticket', require('./v1/support-ticket/ticket'));
+
+// notification
+router.use('/notification', require('./v1/notifications/notification'));
+
 
 
 
@@ -181,6 +187,7 @@ try {
 
 
 // email invoice 
+
 router.post('/invoiceSend', async (req, res) => {
     console.log(req.body, "invoice")
     const mailData = {

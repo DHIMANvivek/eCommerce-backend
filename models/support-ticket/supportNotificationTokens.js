@@ -15,4 +15,4 @@ const tokenDetailSchema = new mongoose.Schema([{
   tokenDetail: [tokenSchema],
 }]);
 
-module.exports = mongoose.model('supportNotifications', tokenDetailSchema);
+module.exports = mongoose.model('supportNotificationTokens', tokenDetailSchema);

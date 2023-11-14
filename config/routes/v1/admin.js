@@ -38,20 +38,15 @@ router.get('/getAdminDetails', adminController.getAdminDetails);
 // router.post('/addFaq', adminController.addFaq);
 
 // router.get('/getFaq', adminController.getFaq);
-router.post('/setTicketTitle', adminController.setTicketTitle);
-router.post('/createTicketTitle', adminController.createTicketTitle);
-router.post('/updateTicketTitle', adminController.updateTicketTitle);
-router.post('/addTitleToTicketType', adminController.addTitleToTicketType);
-router.post('/deleteTicketTitle', adminController.deleteTicketTitle);
-router.get('/getAllTicket', adminController.getAllTicket);
-router.post('/updateTicketStatus', adminController.updateTicketStatus);
-router.post('/deleteSupportTicket', adminController.deleteSupportTicket);
-router.get('/getFcmTokens', adminController.getFcmTokens)
+// router.post('/setTicketTitle', adminController.setTicketTitle);
+// router.post('/createTicketTitle', adminController.createTicketTitle);
+// router.post('/updateTicketTitle', adminController.updateTicketTitle);
+// router.post('/addTitleToTicketType', adminController.addTitleToTicketType);
+// router.post('/deleteTicketTitle', adminController.deleteTicketTitle);
+// router.get('/getAllTicket', adminController.getAllTicket);
+// router.post('/updateTicketStatus', adminController.updateTicketStatus);
+// router.post('/deleteSupportTicket', adminController.deleteSupportTicket);
 // router.get('/getPaymentKeys', adminController.getPaymentKeys);
-router.get('/getNotificationDetail', adminController.getNotificationDetail);
-router.post('/setNotifications', adminController.setNotifications);
-router.post('/updateNotifications', adminController.updateNotifications);
-router.post('/toggleNotifications', adminController.toggleNotifications);
 // payment keys
 // router.post('/addPaymentKeys', adminController.addPaymentKeys);
 // router.post('/updatePaymentKeys', adminController.updatePaymentKeys);

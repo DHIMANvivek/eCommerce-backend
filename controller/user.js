@@ -2,14 +2,15 @@ const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/custom-website-elements/faq');
 
-const Notification = require('../models/notifications');
-const Title = require('../models/support-ticket/createTicket');
+const Notification = require('../models/notifications/notifications');
+const Title = require('../models/support-ticket/TicketStatus');
 const Ticket = require('../models/support-ticket/supportTicket');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const address = require('../models/address');
 const OffersModel = require('../models/offers');
-const webPush = require('../models/support-ticket/supportNotifications');
+const webPush = require('../models/support-ticket/SupportNotificationTokens');
+
 // const OffersModel=require('../models/offers');
 const paginateResults = require('../helpers/pagination');
 const ProductController = require('../controller/products');
@@ -288,113 +289,6 @@ async function sendData(req, res) {
         res.status(500).json({ error: 'An error occurred while inserting FAQ data.' });
     }
 }
-
-async function getTicketTitle(req, res) {
-    try {
-        const response = await Title.find({})
-        if (response) {
-            return res.status(200).json(response);
-        }
-        throw "404";
-    } catch (err) {
-        console.log(err);
-        return res.status(404).send();
-    }
-  }
-
-async function sendTicket(req , res) {
-    console.log(req.body)
-    try {
-        const ticketType = await Title.findOne({ title: req.body.selectedTicket});
-        const webPushId = await webPush.find({});
-        
-        if (!ticketType) {
-          return res.status(404).json({ error: 'TicketType not found' });
-        }
-    
-        const newTicket = new Ticket({
-          userName: req.body.name,
-          userEmail: req.body.email,
-        //   status: '',
-        //   action: '',
-          ticketTypes: req.body.selectedTicket,
-          message: req.body.message,
-          ticketType: {title: ticketType},
-          notificationDetails: webPushId
-        });
-    
-        const savedTicket = await newTicket.save();
-    
-        return res.status(200).json(savedTicket);
-      } catch (error) {
-        console.error('Error creating ticket:', error);
-        return res.status(500).json({ error: 'An error occurred while creating the ticket' });
-      }
-}
-
-async function webPushDetails(req, res) {
-    try {
-      const { email, token } = req.body;
-      console.log('email is ', email, 'token is ', token);
-  
-      const supportNotification = await webPush.findOne({});
-  
-      if (supportNotification) {
-        if (!email && token) {
-          // Add a new entry to the tokenDetail array with only the token
-          supportNotification.tokenDetail.push({ token });
-          await supportNotification.save();
-          res.status(200).json(supportNotification);
-        } else {
-          const existingEntryIndex = supportNotification.tokenDetail.findIndex(
-            (entry) => entry.email === email
-          );
-  
-          if (existingEntryIndex !== -1) {
-            if (token) {
-              // Update the existing entry with the new token
-              supportNotification.tokenDetail[existingEntryIndex].token = token;
-              await supportNotification.save();
-              res.status(200).json(supportNotification);
-            } else {
-              res.status(400).json({ error: 'Token is required for updating an entry' });
-            }
-          } else {
-            // Add a new entry to the tokenDetail array
-            supportNotification.tokenDetail.push({ token, email });
-            await supportNotification.save();
-            res.status(200).json(supportNotification);
-          }
-        }
-      } else {
-        console.log(error);
-        res.status(404).json({ error: 'SupportNotifications document not found' });
-      }
-    } catch (error) {
-      console.error('Error saving user details:', error);
-      return res.status(500).json({ error: 'An error occurred while saving user details' });
-    }
-  }
-
-  async function comingNotifications(req, res) {
-    try {
-        const notifications = await Notification.find();
-    
-        res.json(notifications);
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal server error' });
-      }
-  }
-  
-  
-
-
-
-
-
-    
-  
   
 module.exports = {
     getDetails,
@@ -403,20 +297,12 @@ module.exports = {
     // getCoupons,
     DefaultAddress,
     usedCoupon,
-    // getCoupons,
     addAddress,
     deleteAddress,
     updateAddress,
     getOrders,
     getFaq,
     sendData,
-    // getCoupons,
     getPaginatedData,
-    getTicketTitle,
-    // sendTicket,
-    getTicketTitle,
-    sendTicket,
     // getPaymentKeys
-    webPushDetails,
-    comingNotifications
 }
