@@ -96,6 +96,8 @@ async function addFaq(req, res) {
 
 /* Add Faq  with Aggregation */
 async function addFaq(req, res) {
+
+  console.log(req.body)
   try {
     const { title, children } = req.body;
 

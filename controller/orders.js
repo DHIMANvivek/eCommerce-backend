@@ -107,7 +107,7 @@ async function getOrders(req, res) {
             const { newPaymentStatus, transactionId, MOP } = req.body;
             const latestOrder = await ordersModel
                 .findOne({ buyerId: buyerId })
-                .sort({ orderDate: -1 })
+                .sort({ createdAt: -1 })
                 .exec();
     
                 if (!latestOrder) {

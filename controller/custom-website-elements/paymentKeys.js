@@ -35,40 +35,52 @@ async function getPaymentKeys(req, res) {
 }
 
 async function getAllPaymentKeys(req, res) {
+  try {
+    const paymentKeys = await PaymentKeys.find({})
+      .populate('keys.adminId')
+      .populate('razorKey.adminId');
+
+    res.status(200).json(paymentKeys);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json(error);
+  }
+}
+
+  
+      async function addPaymentKeys(req, res) {
         try {
-          const paymentKeys = await PaymentKeys.find({}).populate('keys.adminId');
-          res.status(200).json(paymentKeys);
+          const { publicKey, privateKey, rzpPublicKey, rzpPrivateKey } = req.body;
+          const decodedPayload = atob(req.body.adminId);
+          const admin = JSON.parse(decodedPayload);
+          const adminId = admin.id;
+          console.log(adminId, "admin Id Is");
+      
+          let adminKeys = await PaymentKeys.findOne({});
+      
+          if (!adminKeys) {
+            adminKeys = new PaymentKeys({
+              keys: [],
+              razorKey: []
+            });
+          }
+      
+          if (publicKey && privateKey) {
+            adminKeys.keys.push({ adminId, publicKey, privateKey });
+          }
+      
+          if (rzpPublicKey && rzpPrivateKey) {
+            adminKeys.razorKey.push({ adminId, rzpIdKey: rzpPublicKey, rzpSecretKey: rzpPrivateKey });
+          }
+      
+          await adminKeys.save();
+          res.status(200).json({ message: 'Payment Keys added Successfully' });
         } catch (error) {
-          console.error('Error:', error);
+          console.log('error is ', error);
           res.status(500).json(error);
         }
       }
-  
-  async function addPaymentKeys(req, res) {
-    try {
-      const { publicKey, privateKey } = req.body;
-      const decodedPayload = atob(req.body.adminId);
-      const admin = JSON.parse(decodedPayload);
-      const adminId = admin.id;
-      console.log(adminId, "admin Id Is");
-  
-      let adminKeys = await PaymentKeys.findOne({});
       
-      if (!adminKeys) {
-        adminKeys = new PaymentKeys({
-          keys: [{ adminId, publicKey, privateKey }]
-        });
-      } else {
-        adminKeys.keys.push({ adminId, publicKey, privateKey });
-      }
-      
-      await adminKeys.save();
-      res.status(200).json({ message: 'Payment Keys added Successfully' });
-    } catch (error) {
-      console.log('error is ', error);
-      res.status(500).json(error);
-    }
-  }
   
   async function updatePaymentKeys(req , res) {
     try {
