@@ -75,7 +75,7 @@ async function getOrders(req, res) {
           const decoded = jwt.verify(token, process.env.secretKey);
           const buyerId = decoded.id;
       
-          console.log(buyerId, "latest buyer Id");
+        //   console.log(buyerId, "latest buyer Id");
       
           const latestProduct = await ordersModel
             .findOne({ buyerId: buyerId })

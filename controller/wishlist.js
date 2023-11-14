@@ -257,8 +257,6 @@ async function showWishlistedData(req, res) {
 
 async function removeFromWishlist(req, res) {
     try {
-        console.log('inside removeWishlist Service');
-        console.log(req.body, "del input");
         const input = req.body;
         const user = req.tokenData;
 

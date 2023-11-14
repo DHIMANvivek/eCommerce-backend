@@ -18,7 +18,7 @@ router.use('/reviews', require('./v1/reviews'));
 router.use('/orders', require('./v1/orders'));
 router.use('/cart', require('./v1/cart'));
 router.use('/offer', require('./v1/offer'));
-router.use('/wishlist', jwtVerify, require('./v1/wishlist'))
+router.use('/wishlist', jwtVerify, require('./v1/wishlist'));
 router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
@@ -29,6 +29,8 @@ router.use('/sales', require('./v1/custom-website-elements/sales'))
 router.use('/deals', require('./v1/custom-website-elements/deals'))
 router.use('/razorpay', require('./v1/razorpay/payment'));
 
+router.use('/deals', require('./v1/custom-website-elements/deals'));
+router.use('/homeLayout', require('./v1/custom-website-elements/home-layout'));
 
 
 

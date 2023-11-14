@@ -49,7 +49,6 @@ async function deleteBanner(req, res) {
 async function updateBanner(req, res) {
     try {
         const input = req.body;
-        console.log(input, "update input");
 
         await banners.findByIdAndUpdate({
             _id: input.id,
@@ -70,7 +69,6 @@ async function updateBanner(req, res) {
 async function toggleBanner(req, res) {
     try {
         const input = req.body;
-        console.log(input, "toggle input");
         await banners.findByIdAndUpdate({
             _id: input.id,
 

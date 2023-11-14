@@ -84,7 +84,6 @@ const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
 async function login(req, res) {
     try {
         const input = req.body;
-        console.log(input, "input");
         if (input.token) {
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
@@ -106,7 +105,6 @@ async function login(req, res) {
         if (!userFound) {
             throw ({ message: 'User not found! Kindly sign in.' })
         }
-        // console.log("bhai?");
 
         // PURE GOOGLE LOGIN
         if (userFound.provider == 'GOOGLE' && input.token) {
@@ -127,9 +125,7 @@ async function login(req, res) {
         }
 
         // PURE MANUAL LOGIN
-        console.log("yar?");
         const compare = await bcryptjs.compare(input.password, userFound.password);
-        console.log(compare, "compare");
         if (!compare) {
             throw ({ message: 'Incorrect Password!' })
         }
@@ -151,7 +147,6 @@ async function login(req, res) {
 
 async function signup(req, res) {
     try {
-        console.log(req.body, "signup input");
         if (req.body.token) {
             const googleOathClient = new OAuth2Client();
             const ticket = await googleOathClient.verifyIdToken({
@@ -257,8 +252,6 @@ async function updatePassword(req, res) {
     try {
         const input = req.body;
         const tokenData = req.tokenData;
-        console.log(tokenData, "tokenData");
-        console.log(input, "input");
 
         const requesterFound = await passwordModel.findOne({
             UserId: tokenData.id
