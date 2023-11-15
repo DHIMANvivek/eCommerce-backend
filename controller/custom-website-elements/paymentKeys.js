@@ -82,42 +82,58 @@ async function getAllPaymentKeys(req, res) {
       }
       
   
-  async function updatePaymentKeys(req , res) {
-    try {
-      const { publicKey, privateKey, id , enable} = req.body;
-      const adminId = id;
-      console.log(adminId, privateKey, publicKey , id , enable, "admin Id Is");
-  
-      const adminKeys = await PaymentKeys.findOneAndUpdate(
-        { 'keys._id': adminId }, 
-        { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': enable } }, // Update the fields
-        { new: true }
-      )
-        .then(updatedKeys => {
-          console.log(updatedKeys);
-        })
-        .catch(err => {
-          console.error(err);
-        });
-      if (adminKeys) {
-        console.log('Document Updated:', adminKeys);
-      } else {
-        console.log('No matching document found for the given query.');
+      async function updatePaymentKeys(req, res) {
+        try {
+          const { publicKey, privateKey, id, enable } = req.body;
+          const adminId = id;
+          console.log(adminId, privateKey, publicKey, id, enable, "admin Id Is");
+      
+          await PaymentKeys.updateMany({}, { $set: { 'keys.$[elem].enable': false } }, { arrayFilters: [{ 'elem.enable': true }] });
+      
+          if (enable === true) {
+            const adminKeys = await PaymentKeys.findOneAndUpdate(
+              { 'keys._id': adminId },
+              { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': true } },
+              { new: true }
+            );
+      
+            if (adminKeys) {
+              console.log('Document Updated:', adminKeys);
+              res.status(200).json({ message: 'Payment Keys updated Successfully' });
+            } else {
+              console.log('No matching document found for the given query.');
+              res.status(404).json({ message: 'No matching document found for the given query.' });
+            }
+          } else {
+            console.log('Received enable is not true.');
+            res.status(200).json({ message: 'Received enable is not true.' });
+          }
+        } catch (error) {
+          console.log('Error:', error);
+          res.status(500).json(error);
+        }
       }
-      res.status(200).json({ message: 'Payment Keys updated Successfully' });
-    } catch (error) {
-      console.log('error is ', error);
-      res.status(500).json(error);
-    }
-  }
   
-  async function deletePaymentKeys(req , res) {
-    const { id } = req.body;
-    console.log(id);
-    const data = await PaymentKeys.deleteOne({ 'keys._id': id });
-    console.log(data);
-    res.status(200).json({ message: 'Payment Keys deleted Successfully'});
-  }
+      async function deletePaymentKeys(req, res) {
+        const { id } = req.body;
+        console.log(id);
+        
+        try {
+          const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
+          console.log(data);
+      
+          if (data) {
+            res.status(200).json({ message: 'Payment Key deleted Successfully' });
+          } else {
+            console.log('No matching document found for the given query.');
+            res.status(404).json({ message: 'No matching document found for the given query.' });
+          }
+        } catch (error) {
+          console.log('Error:', error);
+          res.status(500).json(error);
+        }
+      }
+      
   
 
 module.exports = {

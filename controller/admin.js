@@ -803,6 +803,8 @@ async function updateFaq(req, res) {
     const updatedTitle = updateFaqData.title;
     const updatedContent = updateFaqData.content;
 
+    console.log(updateFaqData)
+
 
     const result = await faqData.findOneAndUpdate(
       { 'childrens._id': itemId },
@@ -821,7 +823,7 @@ async function updateFaq(req, res) {
 
     res.json(result);
   } catch (err) {
-    console.error(err);
+    console.error(err, "error");
     res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
   }
 }

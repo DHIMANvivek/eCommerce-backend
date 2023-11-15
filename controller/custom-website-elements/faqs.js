@@ -51,6 +51,7 @@ async function getFaq(req, res) {
 
 /* update Faq without Aggregation */
 async function updateFaq(req, res) {
+  console.log(req.body)
   try {
     const { _id: itemId, title: updatedTitle, content: updatedContent } = req.body;
 
