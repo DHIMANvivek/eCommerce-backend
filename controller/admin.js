@@ -19,7 +19,7 @@ const SKU_generater = require('../helpers/sku');
 const productController = require('../controller/products');
 const Notification = require('../models/notifications/notifications')
 const OffersModel = require('../models/offers');
-const webPush = require('../models/support-ticket/SupportNotificationTokens');
+// const webPush = require('../models/support-ticket/SupportNotificationTokens');
 const { updateItem } = require('./cart');
 
 async function getOverallInfo(req, res) {
