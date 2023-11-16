@@ -314,27 +314,25 @@ async function fetchUniqueFields(req, res) {
         let filterObject;
 
         if (parameter != 'all') {
-            // console.log("even here");
-            filterObject2 = { male: uniqueData, female: uniqueData };
+            filterObject2 = { male: JSON.parse(JSON.stringify(uniqueData)), female: JSON.parse(JSON.stringify(uniqueData)) };
         }
         else {
             filterObject = uniqueData;
         }
 
         products.forEach((data) => {
-
             if (parameter != 'all') {
-                ;
                 if (data.info.gender == 'male') {
-                    a = aa;
-                    filterObject = filterObject2.male;
+                    filterObject=filterObject2.male;
                 }
                 else {
-                    filterObject = filterObject2.female;
+                    filterObject=filterObject2.female;
                 }
             }
-            for (let filter in filterObject) {
 
+
+
+            for (let filter in (filterObject)) {
                 if (filter in data) {
                     target = data;
                 }
@@ -342,30 +340,36 @@ async function fetchUniqueFields(req, res) {
                     target = data.info;
                 }
 
-                const value = target[filter];
 
+                const value = target[filter];
                 if (Array.isArray(value)) {
                     for (let v of value) {
                         const arr = filterObject[filter];
-
                         if (!arr.includes(v.toLowerCase())) {
                             arr.push(v.toLowerCase());
                         }
                     }
                 }
                 else {
-
                     const arr = filterObject[filter];
                     if (!arr.includes(value.toLowerCase())) {
                         arr.push(value.toLowerCase());
                     }
                 }
             }
+
         });
+
+
+        if(parameter!='all') {  
+
+            return filterObject2;
+        }
         return uniqueData;
     }
 
-    const data = getData(products, 'all');
+    const data = getData(products, input);
+    console.log('data come up is ',data);
     res.status(200).json({ data });
 
 }
