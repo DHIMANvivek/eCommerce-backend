@@ -19,7 +19,6 @@ async function getBanners(req, res) {
             //     'active': true
             // }
         );
-        console.log(bannersData);
         res.status(200).json(bannersData);
     }
     catch (error) {
@@ -32,8 +31,6 @@ async function getBanners(req, res) {
 async function deleteBanner(req, res) {
     try {
         const input = req.body;
-        console.log(input);
-
         await banners.findByIdAndDelete(input.id)
         res.status(200).json({
             message: "Banner deleted!"

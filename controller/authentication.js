@@ -84,6 +84,7 @@ const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
 async function login(req, res) {
     try {
         const input = req.body;
+        console.log(input, "login input");
         if (input.token) {
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
@@ -126,6 +127,7 @@ async function login(req, res) {
 
         // PURE MANUAL LOGIN
         const compare = await bcryptjs.compare(input.password, userFound.password);
+        console.log(compare, "compare");
         if (!compare) {
             throw ({ message: 'Incorrect Password!' })
         }

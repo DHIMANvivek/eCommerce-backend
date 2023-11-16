@@ -304,9 +304,10 @@ async function fetchUniqueFields(req, res) {
 
     function getData(products, parameter = input) {
         const uniqueData = {
-            category: [],
+            gender:[],
             brand: [],
-            tags: [],
+            category: [],
+            // tags: [],
         }
 
         let filterObject;
@@ -346,15 +347,16 @@ async function fetchUniqueFields(req, res) {
                     for (let v of value) {
                         const arr = filterObject[filter];
 
-                        if (!arr.includes(v)) {
-                            arr.push(v);
+                        if (!arr.includes(v.toLowerCase())) {
+                            arr.push(v.toLowerCase());
                         }
                     }
                 }
                 else {
+
                     const arr = filterObject[filter];
-                    if (!arr.includes(value)) {
-                        arr.push(value);
+                    if (!arr.includes(value.toLowerCase())) {
+                        arr.push(value.toLowerCase());
                     }
                 }
             }

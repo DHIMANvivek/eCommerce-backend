@@ -78,7 +78,7 @@ async function addToWishlist(req, res) {
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
         })
-        console.log(wishlister, "wishlisterrr");
+        // console.log(wishlister, "wishlisterrr");
 
         if (!wishlister) {
             console.log("here inside");
@@ -98,7 +98,7 @@ async function addToWishlist(req, res) {
             }
         });
 
-        console.log("hogya product addd");
+        // console.log("hogya product addd");
         return res.status(200).json({
             message: "Product successfully added to wishlist!"
         })
@@ -141,7 +141,7 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
-        console.log(input, "input/?/");
+        // console.log(input, "input/?/");
         const user = req.tokenData;
 
         const wishlister = await wishlist.findOne({
@@ -151,7 +151,7 @@ async function deleteWishlist(req, res) {
             const del = await wishlister.wishlists.splice(input.index, 1);
         }
         wishlister.save()
-        console.log(wishlister.wishlists, "after deletion");
+        // console.log(wishlister.wishlists, "after deletion");
         return res.status(200).json({
             message: "Wishlist deleted!"
         })
@@ -167,10 +167,10 @@ async function deleteWishlist(req, res) {
 async function showWishlistCount(req, res) {
     try {
         const user = req.tokenData;
-        console.log("hello", user.id);
+        // console.log("hello", user.id);
         const result = await wishlist.findOne({ userId: new mongoose.Types.ObjectId('6541ea9c937b999d318165d7') })
             .populate('wishlists.products', { 'sku': 1, _id: 0 });
-        console.log(result, 'dddd');
+        // console.log(result, 'dddd');
         let ans = result.wishlists.some((el) => {
             return el.products.some(e => { e.sku == 'sku-kurti003' })
         })
@@ -260,7 +260,7 @@ async function removeFromWishlist(req, res) {
         const input = req.body;
         const user = req.tokenData;
 
-        console.log(input, "del data", user.id);
+        // console.log(input, "del data", user.id);
         const response = await wishlist.updateOne(
             {
                 userId: user.id,
@@ -272,7 +272,7 @@ async function removeFromWishlist(req, res) {
                 }
             }
         )
-        console.log('response coming is ', response);
+        // console.log('response coming is ', response);
         return res.status(200).json({
             message: "Product removed from wishlist!",
             response
