@@ -24,7 +24,7 @@ function createQuery(req) {
     query = {
       $and: [
         { 'ExtraInfo.brands': { $in: req.body.ExtraInfo.brands } },  // At least one of these brands must be present
-        // { 'ExtraInfo.categories': req.body.ExtraInfo.categories }
+        { 'ExtraInfo.categories': null }
       ]
     }
   }
@@ -32,7 +32,7 @@ function createQuery(req) {
   else if (!req.body.ExtraInfo.brands && req.body.ExtraInfo.categories) {
     query = {
       $and: [
-        // { 'ExtraInfo.brands': req.body.ExtraInfo.brands }, 
+        { 'ExtraInfo.brands': null }, 
         { 'ExtraInfo.categories': { $in: req.body.ExtraInfo.categories } }
       ]
     }
@@ -62,40 +62,43 @@ function createQuery(req) {
   let newquery={
     $or:[
       {startDate:{$gte:req.body.startDate,$lte:req.body.endDate}},
-      {endDate:{$gte:req.body.startDate,$lte:req.body.endDate}}
+      {endDate:{$gte:req.body.startDate,$lte:req.body.endDate}},
+      {startDate:{$lte:req.body.startDate},endDate:{$gte:req.body.endDate}}
     ]
+
+
   }
 
   Object.assign(query, newquery);
-
   return query;
 }
 async function createOffer(req, res) {
   try {
     let result;
     if (req.body.OfferType == 'discount') {
+      req.body.Link=generateLink(req);
       let query = createQuery(req);
-      if (query.global) {
-        let extraKey = {
-          OfferType: 'discount',
-          'ExtraInfo.categories': {$eq: null}, 'ExtraInfo.brands': {$eq: null}
+
+        if (query.global) {
+          let extraKey = {
+            OfferType: 'discount',
+            'ExtraInfo.categories': {$eq: null}, 'ExtraInfo.brands': {$eq: null}
+          }
+          delete query.global;
+          Object.assign(query, extraKey);
+          // result = await OfferModel.findOne(query);
         }
-        delete query.global;
-        Object.assign(query, extraKey);
-        result = await OfferModel.findOne(query);
-      }
-      else {
-        query.OfferType='discount';
-        console.log('quer coming is ------> ',query);
-        result = await OfferModel.findOne(query);
-      }
+    
+        // result = await OfferModel.findOne(query);
+      query.OfferType='discount';
+      console.log('query come up is ',query);
+      result = await OfferModel.findOne(query);
 
       if (result) {
         throw { message: 'This is conflict point please try to create another date points ' };
       }
 
     }
-
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
@@ -111,7 +114,6 @@ async function getOffers(req, res) {
     const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
     res.status(200).json(data);
   } catch (error) {
-    console.log('error si ', error);
     res.status(500).json(error);
   }
 }
@@ -149,7 +151,7 @@ function generateLink(req){
       link+='brand'+'='+value;
     }
     else{
-      link+='&'+value;
+      link+='&'+'brand'+'='+value;
     }
   }
 
@@ -168,7 +170,7 @@ function generateLink(req){
       link+='category'+'='+value;
     }
     else{
-      link+='&'+value;
+      link+='&'+'category'+'='+value;
     }
   }
 
@@ -179,14 +181,41 @@ function generateLink(req){
 async function updateOffer(req, res) {
   try {
     
-    if(req.body.OfferType=='discount'){
-      req.Link=generateLink(req);
-      console.log('req linke is ',req.Link);
+    if (req.body.OfferType == 'discount') {
+      req.body.Link=generateLink(req);
+      let query = createQuery(req);
+
+        if (query.global) {
+          let extraKey = {
+            OfferType: 'discount',
+            'ExtraInfo.categories':  null, 'ExtraInfo.brands': null
+          }
+          delete query.global;
+          Object.assign(query, extraKey);
+        }
+    
+      query.OfferType='discount';
+      let results= await OfferModel.find(query);
+      
+      for(let result of results){
+        if (result && result._id!=req.body.id) {
+          throw { message: 'This is conflict point please try to create another date points ' };
+        }
+      }
+    
+
     }
+    if(req.body.ExtraInfo?.brands?.length==0){
+      req.body.ExtraInfo.brands=null;
+    }
+    if(req.body.ExtraInfo?.categories?.length==0){
+      req.body.ExtraInfo.categories=null;
+    }
+
     result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
     res.status(200).json(result);
   } catch (error) {
-    console.log('error is ', error);
+    console.log('errpr cpmogn is ',error);
     res.status(500).json(error);
   }
 }
@@ -197,10 +226,8 @@ async function updateOfferStatus(req, res) {
     let status = req.body.status;
     req.body = req.body.data;
     if (req.body.OfferType == 'discount') {
-      // console.log('discount coming is ----------------> ',req.body.OfferType);
       let query = createQuery(req);
       query['status.active'] = true;
-      
       if (query.global) {
         let extraKey = {
           OfferType: 'discount',
@@ -210,14 +237,16 @@ async function updateOfferStatus(req, res) {
         Object.assign(query, extraKey);
         // result = await OfferModel.findOne(query);
       }
-
-      console.log('query cone up is >',query);
-      let result = await OfferModel.findOne(query);
-      result = JSON.parse(JSON.stringify(result));
-      console.log('result come up si ', result, " req bodycome us ", req.body);
-      if (result && result._id != req.body._id) {
-        throw { message: 'This is conflict point please try to create another date points ' };
+     
+      let results = await OfferModel.find(query);
+      console.log('result coming is ',results);
+      for(let result of results){
+        result = JSON.parse(JSON.stringify(result));
+        if (result && result._id != req.body._id) {
+          throw { message: 'This is conflict point please try to create another date points ' };
+        }
       }
+    
     }
 
     const updateOfferStatus = await OfferModel.updateOne({ _id: req.body._id }, {
@@ -258,17 +287,19 @@ async function checkCoupon(couponId, userId) {
         { userUsed: { $nin: [userId] } },
         // {$gte:{'couponUsersLimit':1}},
         { couponUsersLimit: { $gte: 1 } },
-        { UserEmails: { $nin: [userId] } }
+        { UserEmails: { $nin: [userId] } },
+        {startDate:{$lte:new Date()}},
+        {endDate:{$gte:new Date()}},
+        {'status.active':true}
       ]
     });
-    console.log('response is ', response);
+
     return new Promise((res, rej) => {
       if (!response) res(0);
       res(response);
     })
 
   } catch (error) {
-    console.log('error coming inside checkcoupo is -----> ', error);
   }
 }
 
@@ -293,7 +324,7 @@ async function searchOffer(req, res) {
 
       {
         'status.deleted': false,
-        'status.active': true,
+        // 'status.active': true,
         $or: [
           { OfferType: query },
           { discountType: query },

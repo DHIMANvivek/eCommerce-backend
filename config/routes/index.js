@@ -15,7 +15,7 @@ router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
 router.use('/reviews', require('./v1/reviews'));
-router.use('/orders', require('./v1/orders'));
+router.use('/orders', require('./v1/orders'))
 router.use('/cart', require('./v1/cart'));
 router.use('/offer', require('./v1/offer'));
 router.use('/wishlist', jwtVerify, require('./v1/wishlist'));
@@ -27,6 +27,7 @@ router.use('/banners', require('./v1/custom-website-elements/banners'))
 router.use('/sales', require('./v1/custom-website-elements/sales'))
 
 router.use('/deals', require('./v1/custom-website-elements/deals'))
+router.use('/about',require('./v1/custom-website-elements/about'))
 router.use('/razorpay', require('./v1/razorpay/payment'));
 
 router.use('/deals', require('./v1/custom-website-elements/deals'));

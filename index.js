@@ -48,7 +48,6 @@ app.post('/send-notification', (req, res) => {
 
   admin.messaging().sendMulticast(message)
     .then((response) => {
-      console.log('Successfully sent message:', response);
       res.status(200).send('Notification sent successfully');
     })
     .catch((error) => {
@@ -140,12 +139,6 @@ app.use(express.json());
 const routes = require('./config/routes');
 app.use(routes);
 
-// app.listen(process.env.port, (err) => {
-//     if (err)
-//         console.log(err);
-//     else
-//         console.log(`listening to port ${process.env.port}`);
-// })
 
 let port = 1000;
 app.listen(port, (err) => {

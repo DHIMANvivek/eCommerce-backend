@@ -11,4 +11,5 @@ router.post('/showWishlistProducts', wishlistController.showWishlistedData)
 router.post('/deleteFromWishlist', wishlistController.removeFromWishlist)
 // router.get('/insert', wishlistController.insertWishlists)
 
+
 module.exports = router;

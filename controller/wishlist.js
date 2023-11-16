@@ -259,8 +259,18 @@ async function removeFromWishlist(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
-
-        // console.log(input, "del data", user.id);
+        if(!input.wishlistName){
+            const find=await wishlist.findOne({userId:user.id,
+                'wishlists':
+                {$elemMatch:
+                    {'products':{$in:[input.productId]}}
+                }
+            },{'wishlists.$':1}   
+            );
+            console.log('find come uo is ',find);
+                input.wishlistName=find.wishlists[0].wishlistName;
+        }
+      
         const response = await wishlist.updateOne(
             {
                 userId: user.id,
@@ -272,7 +282,6 @@ async function removeFromWishlist(req, res) {
                 }
             }
         )
-        // console.log('response coming is ', response);
         return res.status(200).json({
             message: "Product removed from wishlist!",
             response
@@ -284,6 +293,9 @@ async function removeFromWishlist(req, res) {
         console.log('erroris ', error);
     }
 }
+
+
+
 
 // async function insertWishlists(req, res) {
 //     try {

@@ -158,18 +158,13 @@ async function updateAddress(req, res) {
 async function DefaultAddress(req, res) {
     try {
 let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
-FindAddress.info.address.push(FindAddress[0]);
+FindAddress.info.address[req.body.index]=(FindAddress.info.address[0]);
 FindAddress.info.address[0]=(req.body.address);
 await FindAddress.save();
-const result=await getActiveAddresses();
-
-// console.log('reqbodu si ',req.body);
-
-// const getAllAddress=await this.getActiveAddresses();
-res.status(200).json(result);
+const result=await getActiveAddresses(req);
+res.status(200).json(result[0].addresses);
 
     } catch (error) {
-        console.log('error coming is ', error);
         res.status(500).json(error)
     }
 }

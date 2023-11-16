@@ -2,6 +2,7 @@ const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
+const { off } = require('../models/address');
 
 async function fetchProductDetails(req, res, sku = null, admincontroller = null) {
     try {
@@ -369,6 +370,20 @@ async function fetchUniqueFields(req, res) {
 
 }
 
+
+function uppecaseConverter(option){
+    option=option.split(' ');
+    let parameter='';
+    for(let i=0;i<option.length;i++){
+      parameter+=option[i].charAt(0).toUpperCase() + option[i].slice(1);
+        if(i!=option.length-1){
+            parameter+=' ';
+        }
+    }
+
+    return parameter;
+}
+
 async function getProductPrice(products) {
     try {
         if (!Array.isArray(products)) {
@@ -392,34 +407,36 @@ async function getProductPrice(products) {
     }
 
     async function discountQuery(parameter) {
-
         let product = JSON.parse(JSON.stringify(parameter));
-
-        product.info.brand = product.info.brand.charAt(0).toUpperCase() + product.info.brand.slice(1);
-        product.info.category = product.info.category.charAt(0).toUpperCase() + product.info.category.slice(1);
+        product.info.brand=uppecaseConverter(product.info.brand);
+        product.info.category=uppecaseConverter(product.info.category);
         return new Promise(async (res, rej) => {
 
-            const allOffers = await OffersModel.find({ OfferType: 'discount', 'status.active': true });
             let discount;
-            for (let offer of allOffers) {
-                if (offer.ExtraInfo?.brand?.includes([product.info.brand]) && offer.ExtraInfo?.categories?.includes([product.info.category])) {
-                    discount = offer;
-                    break;
+            let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':product.info.brand,'ExtraInfo.categories':product.info.category ,'status.active': true ,startDate:{$lte:new Date()}});
+            if(!offer){
+                 offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':product.info.brand ,'ExtraInfo.categories':null  ,'status.active': true ,startDate:{$lte:new Date()}});
+                if(!offer){
+                    let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':null,'ExtraInfo.categories':product.info.category ,'status.active': true ,startDate:{$lte:new Date()}});
+                    
+                    if(!offer){
+                        let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':null,'ExtraInfo.categories':null ,'status.active': true ,startDate:{$lte:new Date()}});
+                        discount=offer;
+                    }
+                    else{
+                        discount=offer;
+                    }
                 }
-
-                else if (offer.ExtraInfo?.brand?.includes([product.info.brand]) && !offer.ExtraInfo?.categories?.includes([product.info.category])) {
-                    discount = offer;
+                else{
+                    discount=offer;
+                    
                 }
-                else if (!offer.ExtraInfo?.brand?.includes([product.info.brand]) && offer.ExtraInfo?.categories?.includes([product.info.category])) {
-                    discount = offer;
-                }
-
+                
             }
-            //  discount = await OffersModel.findOne({
-            //     $or: [{ 'ExtraInfo': { $exists: false } }, { "ExtraInfo.categories": { $in: [product.info.category] } },
-            //     { "ExtraInfo.brands": { $in: [product.info.brand] } },
-            //     ], OfferType: 'discount','status.active':true
-            // }, { 'discountType': 1, 'discountAmount': 1, 'DiscountPercentageType': 1, 'maximumDiscount': 1, 'OfferType': 1 })
+
+            else{
+                discount=offer;
+            }
 
             if (discount == null) {
                 res(product);
@@ -444,7 +461,7 @@ async function getProductPrice(products) {
 
             }
 
-            // console.log('product discount is ',product.discount," product category is ",product.info.category);
+           
             res(product);
         });
     }
@@ -459,9 +476,46 @@ const hexToRgb = (hex) => {
     return { r, g, b };
 }
 
+async function ReduceProductQuantity(products){
+
+    try {
+        products.forEach(async (el)=>{
+            const findQuantity=await Products.findOne({
+                    sku: el.sku,
+                    'assets.color': el.color,
+                    'assets.stockQuantity.size': el.size
+            }, {'assets.stockQuantity.quantity':1,_id:0});
+            console.log("---------->",findQuantity.assets.stockQuantity);
+            if(el.quantity>findQuantity) {throw {message:'Sorry given Product Quantity is not available'} }
+            // if(el.quantity>=findQuantity) el.quantity=findQuantity;
+            else el.quantity=el.quantity;
+            const updateProduct = await Products.updateOne(
+                {
+                  sku: el.sku,
+                  'assets.color': el.color,
+                  'assets.stockQuantity.size': el.size
+                },
+                
+                {
+                  $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                },
+                {
+                  arrayFilters: [
+                    { "outer.color": el.color }, 
+                    { "inner.size": el.size } 
+                  ]
+                }
+              );
+        })
+    } catch (error) {
+        
+    }
+ 
+}
 module.exports = {
     fetchProducts,
     fetchProductDetails,
     fetchUniqueFields,
-    getProductPrice
+    getProductPrice,
+    ReduceProductQuantity
 }
