@@ -33,11 +33,33 @@ async function getOverallInfo(req, res) {
     result['categorySales'] = await fetchCategorySalesData(req, res);
     result['popularStats'] = await fetchPopularProducts(req, res);
 
-    const customerCount = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
-    result['customerCount'] = customerCount;
+    
+    const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
+    
+    const customerCountPrev = await users.find({
+      'role': { $not: { $eq: 'admin' } },
+      'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
+    }).count();
+    
+    let customerChange = ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100;
+    
+    result['customer'] = {
+      'count': customerCountCurr,
+      'change': Math.floor(customerChange)
+    };
 
-    const orderCount = await orders.find({}).count();
-    result['orderCount'] = orderCount;
+    const orderCountTotal = await orders.find({}).count();
+
+    const orderCountPrev = await orders.find({
+      'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
+    }).count();
+
+    let orderChange = orderCountPrev ?  ((orderCountTotal - orderCountPrev) / orderCountTotal) * 100 : 0;
+
+    result['orders'] = {
+      'count': orderCountTotal,
+      'change': Math.floor(orderChange)
+    };
 
     const alertStats = await products.aggregate([
       {
@@ -67,7 +89,7 @@ async function getOverallInfo(req, res) {
                       $arrayElemAt: [
                         "$$ROOT.info.orderQuantity",
                         0]
-                    },
+                      },
                   ]
                 }, 1, 0],
             },
@@ -75,36 +97,92 @@ async function getOverallInfo(req, res) {
         },
       },
     ]);
-
     result['alertCount'] = alertStats[0].alertCount;
 
+    const revenue = await orders.aggregate([
+      {
+        $unwind: "$products",
+      },
+      {
+        $facet: {
+          prev: [
+            {
+              $match: {
+                payment_status: "success",
+                orderDate: {
+                  $lte: new Date(
+                    new Date().getFullYear(),
+                    new Date().getMonth() - 1,
+                    31
+                  ),
+                },
+                "products.shipmentStatus": {
+                  $nin: ["cancelled", "declined"],
+                },
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                overallDiscount: {
+                  $sum: "$discount",
+                },
+                totalsales: {
+                  $sum: "$products.amount",
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                totalSales: {
+                  $subtract: [
+                    "$totalsales",
+                    "$overallDiscount",
+                  ],
+                },
+              },
+            },
+          ],
+          total: [
+            {
+              $match: {
+                payment_status: "success",
+                "products.shipmentStatus": { $nin: ['cancelled', 'declined'] }
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                overallDiscount: {
+                  $sum: "$discount",
+                },
+                totalsales: {
+                  $sum: "$products.amount",
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                totalSales: {
+                  $subtract: [
+                    "$totalsales",
+                    "$overallDiscount",
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ]);
 
-    // const customerCountChange = await users.aggregate(
-    //   [
-    //     {
-    //       $match: {
-    //         'role': { $not: { $eq: 'admin' } },
-    //         'createdAt': {
-    //           $lte: new Date(),
-    //           $gte: new Date(new Date().getFullYear(), new Date().getMonth() - 1)
-    //         }
-    //       }
-    //     },
-    //     {
-    //       $group: {
-    //         _id: {
-    //           year: { $year: '$createdAt' },
-    //           month: { $month: '$createdAt' }
-    //         },
-    //         count: { $sum: 1 }
-    //       }
-    //     },
-    //     {
-    //       $sort: { '_id:': -1}
-    //     }
-    //   ]
-    // );
-    // const change = ((customerCountChange[0].count - customerCountChange[1].count)/ customerCountChange[1].count)*100;
+    result['revenue'] = {
+      total: revenue[0].total[0].totalSales,
+      change: revenue[0].prev? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
+    }
+
     res.status(200).json(result);
 
   } catch (err) {
@@ -120,11 +198,6 @@ async function fetchProductSalesData(req, res) {
     if (data.role == 'admin') {
 
       const salesStats = await orders.aggregate([
-        {
-          $match: {
-            payment_status: "success",
-          },
-        },
         {
           $unwind: "$products",
         },
@@ -143,6 +216,12 @@ async function fetchProductSalesData(req, res) {
           },
         },
         {
+          $match: {
+            payment_status: "success",
+            'products.shipmentStatus': { $nin: ['cancelled', 'declined'] }
+          },
+        },
+        {
           $group: {
             _id: {
               year: { $year: "$orderDate" },
@@ -150,28 +229,7 @@ async function fetchProductSalesData(req, res) {
             },
             overallDiscount: { $sum: "$discount" },
             totalsales: {
-              $sum: {
-                $cond: [
-                  {
-                    $or: [
-                      {
-                        $ne: [
-                          "$products.shipmentStatus",
-                          "cancelled",
-                        ],
-                      },
-                      {
-                        $ne: [
-                          "$products.shipmentStatus",
-                          "declined",
-                        ],
-                      },
-                    ],
-                  },
-                  "$products.amount",
-                  0,
-                ],
-              },
+              $sum: "$products.amount"
             },
             totalExpenses: {
               $sum: {
@@ -218,31 +276,18 @@ async function fetchPopularProducts(req, res) {
 
     const popularProductStats = await orders.aggregate([
       {
+        $unwind: "$products",
+      },
+      {
         $match: {
+          payment_status: "success",
+          'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
           $expr: {
             $eq: [
               { $month: "$orderDate" },
               { $month: new Date() },
             ]
           }
-        }
-      },
-      {
-        $unwind: "$products",
-      },
-      {
-        $match: {
-          payment_status: "success",
-          $expr: {
-            $ne: [
-              "$products.shipmentStatus",
-              "cancelled",
-            ],
-            $ne: [
-              "$products.shipmentStatus",
-              "declined",
-            ],
-          },
         },
       },
       {
@@ -286,7 +331,7 @@ async function fetchPopularProducts(req, res) {
           photo: { $first: "$products.image" },
         },
       },
-      { $sort: { profit: -1 } },
+      { $sort: { revenue: -1 } },
       { $limit: 3 },
     ]);
 
@@ -343,6 +388,9 @@ async function fetchCategorySalesData(req, res) {
           sales: -1,
         },
       },
+      {
+        $limit: 3
+      }
     ]);
     if (!categoryStats) throw '401'; // throw error if aggregationPipe Fails
     if (controller) return categoryStats; // return calculated data if it arrives from controller
@@ -391,11 +439,8 @@ async function fetchReviewStats(req, res) {
     }
     const ratingOverView = await reviews.aggregate(aggregationPipe);
 
-    console.log(controller);
     if (!ratingOverView) throw '401'; // throw error if aggregationPipe Fails
     if (controller) return ratingOverView[0]; // return calculated data if it arrives from controller
-
-    console.log("ddddd", ratingOverView);
     res.status(200).json(ratingOverView[0]);
 
   } catch (err) {

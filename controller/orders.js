@@ -421,7 +421,7 @@ async function getSellerOrdersInventory(req, res) {
 async function getSellerOrderDetails(req, res) {
     const sellerID = req.tokenData.id;
     const OrderID = req.query.orderID;
-
+    console.log("jhajskdh")
     try {
         const response = await ordersModel.findOne(
             { _id: OrderID },

@@ -3,8 +3,6 @@ const { verifyToken } = require('../helpers/jwt');
 async function AdminVerify(req, res, next) {
     try {
         let data;
-        console.log('ppp');
-        console.log(req.headers.authorization, 'okk');
         if (req.headers.authorization){
             data = verifyToken(req.headers.authorization.split(' ')[1])
         }
