@@ -1,5 +1,5 @@
 const notificationModel = require('../../models/notifications/notifications');
-const supportNotificationTokens = require('../../models/support-ticket/SupportNotificationTokens');
+const supportNotificationTokens = require('../../models/support-ticket/supportNotificationTokens');
 
 const getfcmToken = async (req, res) => {
     const supportNotification = await supportNotificationTokens.findOne({});
