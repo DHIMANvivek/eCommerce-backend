@@ -1,6 +1,6 @@
 const TicketStatus = require('../../models/support-ticket/TicketStatus');
 const supportTicket = require('../../models/support-ticket/supportTicket');
-const supportNotificationTokens = require('../../models/support-ticket/supportNotificationTokens');
+const supportNotificationTokens = require('../../models/support-ticket/SupportNotificationTokens');
 
 const getTicketStatus = async (req, res) => {
     try {
