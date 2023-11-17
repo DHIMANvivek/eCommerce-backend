@@ -427,7 +427,7 @@ async function getOverallOrderData(req, res) {
         if (!statistics) {
             return res.status(401).send();
         }
-        console.log("Statistics", statistics);
+        
         statistics.forEach((stats) => {
             if (stats.paymentStatus == 'success' || stats.paymentStatus == 'pending') {
                 if (stats.shipmentStatus == 'pending') {

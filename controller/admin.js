@@ -41,7 +41,7 @@ async function getOverallInfo(req, res) {
       'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
     
-    let customerChange = ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100;
+    let customerChange = customerCountPrev ? ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100 : 0;
     
     result['customer'] = {
       'count': customerCountCurr,
