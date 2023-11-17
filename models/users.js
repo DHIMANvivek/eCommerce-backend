@@ -93,12 +93,10 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.post('save', async function (){
-    console.log('id is ',this._id);
     const defaultWishlist = {
         wishlistName : 'My Wishlist',
         products : []
     }
-    console.log(this._id, "id assigned");
     await wishlist.create({
         userId : this._id,
         wishlists : [defaultWishlist]

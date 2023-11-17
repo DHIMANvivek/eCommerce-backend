@@ -87,7 +87,6 @@ router.post('/create-payment-intent', async (req, res) => {
 
     const stripe = require('stripe')(privateKey);
 
-    console.log(req.body, "payment intent")
     try {
         const { items } = req.body;
         const paymentIntent = await stripe.paymentIntents.create({
@@ -131,14 +130,12 @@ async function getPaginatedData(req, res) {
 // ticket status
 router.post('/ticketStatus', async (req, res) => {
 try {
-    console.log(req.body)
     const mailData = {
         email: req.body.email,
         subject: "Ticket Status",
         status: req.body.status,
         message: req.body.message
     }
-    console.log("body us ", mailData)
     const emailTemplate = TicketStatusTemplate(mailData);
     const mailSent = await mailer(mailData, emailTemplate);
 
@@ -150,54 +147,16 @@ try {
 }
 })
 
-// router.post('/notifications', async (req, res) => {
-//     try {
-//         console.log("notification called ", req.body)
-//         // return;
-//       const { notification } = req.body.payload;
-//       const { registration_ids } = req.body;
-//       const { url } = req.body.payload.data;
-
-
-//     //   return;
-//     //   const url = req.body.payload.data['gcm.notification.url'];
-//     //   if (!url) {
-//     //     throw new Error('Notification URL is required.');
-//     //   }
-  
-//       console.log(notification, url, registration_ids, "sdfsf");
-  
-//       const newNotification = new Notification({
-//         notification: {
-//           title: notification.title,
-//           body: notification.body,
-//           icon: notification.icon,
-//           url: url,
-//         },
-//         registration_ids: registration_ids,
-//       });
-  
-//       await newNotification.save();
-  
-//       res.status(200).send('Notification saved successfully');
-//     } catch (error) {
-//       console.error(error.message);
-//       res.status(400).send(`Error: ${error.message}`);
-//     }
-//   });
-
-
 // email invoice 
 
 router.post('/invoiceSend', async (req, res) => {
-    console.log(req.body, "invoice")
     const mailData = {
         email: req.body.receipt_email,
         subject: "Invoice",
         invoice: req.body
     }
     const emailTemplate = sendInvoiceTemplate(mailData.invoice);
-    const mailSent = await mailer(mailData, emailTemplate);
+    await mailer(mailData, emailTemplate);
 
     res.status(200).json({
         message: "done"

@@ -10,7 +10,6 @@ const getfcmToken = async (req, res) => {
         { $group: { _id: null, distinctTokens: { $addToSet: '$tokenDetail.token' } } },
         { $project: { _id: 0, distinctTokens: 1 } }
       ]);
-      console.log('Distinct Tokens:', distinctTokens[0].distinctTokens);
       res.status(200).send(distinctTokens[0].distinctTokens);
     } else {
       console.log('SupportNotifications document not found');
@@ -31,7 +30,6 @@ const getNotification = async (req, res) => {
 const setNotification = async (req, res) => {
     try {
         const incomingNotifications = req.body.notification; 
-        console.log("incoming ", incomingNotifications);
     
         if (!Array.isArray(incomingNotifications)) {
           return res.status(400).json({ message: 'Invalid notification data. Expected an array.' });
@@ -103,7 +101,6 @@ const updateNotifications = async (req, res) => {
 const toggleNotification = async (req, res) => {
     try {
         const { id, state } = req.body;
-        console.log(id , state , "states ----");
         const filter = { _id: id };
         const update = { state: state };
     
@@ -115,7 +112,6 @@ const toggleNotification = async (req, res) => {
     
         res.status(200).json({ message: 'Notification updated successfully', updatedNotifications });
       } catch (error) {
-        console.log('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
       }
 }

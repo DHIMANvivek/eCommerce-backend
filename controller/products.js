@@ -9,7 +9,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
         let query = {};
         let user;
-        console.log(req.query);
+
         if (req.headers.authorization) {
             user = verifyToken(req.headers.authorization.split(' ')[1]);
         }
@@ -18,7 +18,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         }
 
         query['sku'] = req.query.sku ? req.query.sku : sku;
-        console.log(query);
+
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {
@@ -57,7 +57,6 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         return product;
 
     } catch (error) {
-        console.log('error is ', error);
         if (req.query.sku) {
             res.status(500).json({
                 message: 'This Product is not available'
@@ -292,7 +291,6 @@ async function fetchProducts(req, res) {
         }
 
     } catch (error) {
-        console.log('error coming is ', error);
         res.status(500).json({
             message: 'Unable to fetch Products'
         });
@@ -489,7 +487,7 @@ async function ReduceProductQuantity(products){
                     'assets.color': el.color,
                     'assets.stockQuantity.size': el.size
             }, {'assets.stockQuantity.quantity':1,_id:0});
-            console.log("---------->",findQuantity.assets.stockQuantity);
+
             if(el.quantity>findQuantity) {throw {message:'Sorry given Product Quantity is not available'} }
             // if(el.quantity>=findQuantity) el.quantity=findQuantity;
             else el.quantity=el.quantity;

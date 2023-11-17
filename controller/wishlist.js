@@ -47,22 +47,18 @@ async function showWishlists(req, res) {
 //         const wishlister = await wishlist.findOne({
 //             userId: user.id
 //         })
-//         console.log(wishlister, "wishlister");
 
 //         const newWishlist = {
 //             wishlistName: input.wishlistName,
 //             products: []
 //         }
-//         console.log(wishlister.wishlists, "before adding new wishlist");
 //         const add = await wishlister.wishlists.push(newWishlist)
 //         wishlister.save()
-//         console.log(wishlister.wishlists, "after adding new wishlist");
 //         return res.status(200).json({
 //             message: "New Wishlist created successfully!"
 //         })
 //     }
 //     catch (error) {
-//         console.log(error, "addWishlist")
 //         return res.status(500).json({
 //             message: "Error in creating new wishlist!"
 //         })
@@ -78,10 +74,8 @@ async function addToWishlist(req, res) {
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
         })
-        // console.log(wishlister, "wishlisterrr");
 
         if (!wishlister) {
-            console.log("here inside");
             const newWishlist = {
                 wishlistName: input.wishlistName,
                 products: []
@@ -98,13 +92,11 @@ async function addToWishlist(req, res) {
             }
         });
 
-        // console.log("hogya product addd");
         return res.status(200).json({
             message: "Product successfully added to wishlist!"
         })
     }
     catch (error) {
-        console.log(error, "couldnt add product to wishlist!");
         return res.status(500).json({
             message: "Error while adding product to wishlist!"
         })
@@ -141,23 +133,20 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
-        // console.log(input, "input/?/");
         const user = req.tokenData;
 
         const wishlister = await wishlist.findOne({
             userId: user.id
         })
         if (wishlister) {
-            const del = await wishlister.wishlists.splice(input.index, 1);
+            await wishlister.wishlists.splice(input.index, 1);
         }
         wishlister.save()
-        // console.log(wishlister.wishlists, "after deletion");
         return res.status(200).json({
             message: "Wishlist deleted!"
         })
     }
     catch (error) {
-        console.log(error, "error while deleting wishlist!")
         return res.status(500).json({
             message: "Couldn't delete wishlist"
         })
@@ -167,10 +156,8 @@ async function deleteWishlist(req, res) {
 async function showWishlistCount(req, res) {
     try {
         const user = req.tokenData;
-        // console.log("hello", user.id);
         const result = await wishlist.findOne({ userId: new mongoose.Types.ObjectId('6541ea9c937b999d318165d7') })
             .populate('wishlists.products', { 'sku': 1, _id: 0 });
-        // console.log(result, 'dddd');
         let ans = result.wishlists.some((el) => {
             return el.products.some(e => { e.sku == 'sku-kurti003' })
         })
@@ -183,7 +170,6 @@ async function showWishlistCount(req, res) {
         // //     userId : user.id
         // // })
         // // const wishlistsArray = wishlister.wishlists
-        // // // console.log(wishlister.wishlists, "wishlistsss");
         // // let count = 0;
 
         // // wishlistsArray.forEach(wishlist => {
@@ -203,7 +189,6 @@ async function showWishlistCount(req, res) {
         //     }
         // ])).length;
 
-        // // console.log(count, "my count")
         // return res.status(200).json(
         //     count
         // )
@@ -217,7 +202,6 @@ async function showWishlistedData(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
-        // console.log(input.wishlistName, "kosni wishlist");
 
         let products = await wishlist.aggregate([
             { $match: { userId: new mongoose.Types.ObjectId(user.id) } },
@@ -267,7 +251,6 @@ async function removeFromWishlist(req, res) {
                 }
             },{'wishlists.$':1}   
             );
-            console.log('find come uo is ',find);
                 input.wishlistName=find.wishlists[0].wishlistName;
         }
       
@@ -320,18 +303,13 @@ async function removeFromWishlist(req, res) {
 //                 }
 //             )
 //         }))
-//         console.log(findAllusersId, "-----");
 
 //         // return;
 
-      
-
-//         console.log('inserWishlist is ', insertWishlists);
 //     }
 
 
 //     catch (error) {
-//         console.log(error, "error in inserting wihlists");
 //     }
 // }
 

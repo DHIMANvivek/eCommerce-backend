@@ -10,7 +10,6 @@ const getTicketStatus = async (req, res) => {
         }
         throw "404";
     } catch (err) {
-        console.log(err);
         return res.status(404).send();
     }
 };
@@ -18,8 +17,6 @@ const getTicketStatus = async (req, res) => {
 const webPushTokenDetails = async (req, res) => {
     try {
         const { email, token } = req.body;
-        console.log('email is ', email, 'token is ', token);
-
         const supportNotification = await supportNotificationTokens.findOne({});
 
         if (supportNotification) {
@@ -47,7 +44,6 @@ const webPushTokenDetails = async (req, res) => {
                 }
             }
         } else {
-            console.log(error);
             res.status(404).json({ error: 'SupportNotifications document not found' });
         }
     } catch (error) {
@@ -150,8 +146,6 @@ const deleteTicketTitle = async (req, res) => {
     try {
         const { _id, title } = req.body;
     
-        console.log(_id, title)
-    
         if (!title) {
           return res.status(400).json({ error: 'Title is required' });
         }
@@ -188,7 +182,6 @@ const getAllTickets = async (req, res) => {
         }
         throw "404";
       } catch (err) {
-        console.log(err);
         return res.status(404).send();
       }
 }
@@ -196,7 +189,6 @@ const getAllTickets = async (req, res) => {
 const updateTicket = async (req , res) => {
     try {
         const { _id, status } = req.body;
-        console.log(_id, status)
         const result = await supportTicket.findByIdAndUpdate(
           _id,
           { $set: { status: status } },
@@ -217,7 +209,6 @@ const updateTicket = async (req , res) => {
 const deleteTicket = async (req, res) => {
     try {
         const { _id } = req.body;
-        console.log(_id)
         const result = await supportTicket.findByIdAndDelete(_id);
     
         if (!result) {

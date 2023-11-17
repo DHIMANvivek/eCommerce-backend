@@ -54,7 +54,6 @@ async function getAllPaymentKeys(req, res) {
           const decodedPayload = atob(req.body.adminId);
           const admin = JSON.parse(decodedPayload);
           const adminId = admin.id;
-          console.log(adminId, "admin Id Is");
       
           let adminKeys = await PaymentKeys.findOne({});
       
@@ -76,7 +75,6 @@ async function getAllPaymentKeys(req, res) {
           await adminKeys.save();
           res.status(200).json({ message: 'Payment Keys added Successfully' });
         } catch (error) {
-          console.log('error is ', error);
           res.status(500).json(error);
         }
       }

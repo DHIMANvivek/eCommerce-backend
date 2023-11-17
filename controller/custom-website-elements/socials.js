@@ -15,6 +15,10 @@ async function setSocials(req, res) {
                 accountID: input.accountID,
                 accessToken: input.accessToken,
             },
+            logos: {
+                desktop: input.desktopLogo,
+                mobile: input.mobileLogo
+            }
         };
 
         const existingSocials = await Socials.findOne();
@@ -30,7 +34,6 @@ async function setSocials(req, res) {
             message: 'Successfully updated Social Details'
         })
     } catch (error) {
-        console.log(error);
         res.status(409).json({
             message: 'Cannot Set Social links right now.'
         });
@@ -43,7 +46,6 @@ async function getSocials(req, res){
         res.status(200).json(socialsData);
 
     } catch (error) {
-        console.log(error);
         res.status(500).json({
             message: 'Unable to get Socials data.'
         });

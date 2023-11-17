@@ -2,7 +2,6 @@ const Razorpay = require('razorpay');
 const PaymentKeys = require('./../../models/custom-website-elements/paymentKeys');
 
 const createUpiPayment = async (req, res) => {
-    console.log(req.body.items.name[0]);
     try {
 
         const keys = await PaymentKeys.findOne({});
@@ -24,15 +23,10 @@ const createUpiPayment = async (req, res) => {
             razorpayInstance.orders.create(options, (err, order) => {
                 if (!err) {
                     const token = req.body.token;
-
                     const [header, payload, signature] = token.split('.');
-
                     const decodedPayload = atob(payload);
-
                     const payloadData = JSON.parse(decodedPayload);
 
-                    console.log('Razorpay Order:', order);
-                    console.log(payloadData, "payload");
                     res.status(200).send({
                         success: true,
                         msg: 'Order Created',
@@ -44,13 +38,11 @@ const createUpiPayment = async (req, res) => {
                         email: payloadData.email,
                     });
                 } else {
-                    console.error('Razorpay Order Creation Error:', err);
                     res.status(400).send({ success: false, msg: 'Something went wrong!' });
                 }
             });
         }
      } catch (error) {
-            console.log(error.message);
             res.status(500).send({ success: false, msg: 'Internal Server Error' });
         }
     }

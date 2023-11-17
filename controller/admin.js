@@ -264,7 +264,6 @@ async function fetchProductSalesData(req, res) {
       return res.status(200).json(salesStats);
     }
   } catch (err) {
-    console.log(err);
     return res.status(401).send();
 
   }
@@ -397,7 +396,6 @@ async function fetchCategorySalesData(req, res) {
 
     return res.status(200).json({ 'categoryStats': categoryStats });
   } catch (err) {
-    console.log(err);
   }
 }
 
@@ -477,7 +475,6 @@ async function addProduct(req, res) {
     return res.status(200).json("uploaded");
 
   } catch (err) {
-    console.log(err);
     return res.status(401).json(err);
 
   }
@@ -486,7 +483,6 @@ async function addProduct(req, res) {
 async function updateHighlightProduct(req, res) {
   const sellerID = req.tokenData.id;
   const highlight = req.body;
-  console.log(highlight, sellerID);
   try {
     const response = await products.updateOne(
       {
@@ -499,13 +495,10 @@ async function updateHighlightProduct(req, res) {
 
     const highlightCount = await products.find({ 'highlight': true }).count();
 
-    console.log("RES", response);
-
     if (!response) throw "Unable to Update";
     return res.status(200).json({ 'highlightCount': highlightCount });
 
   } catch (err) {
-    console.log(err);
     return res.status(401).send();
   }
 }
@@ -530,10 +523,8 @@ async function updateProduct(req, res) {
 
     // SKU_generater.generateSKU(productObject.data);
 
-    console.log("response:: ", response);
     return res.status(200).json("uploaded");
   } catch (err) {
-    console.log(err);
   }
 }
 
@@ -551,7 +542,6 @@ async function deleteProductInventory(req, res) {
 
     response = await products.updateOne({ 'sellerID': sellerID, _id: reqData.data }, { $set: { 'active': false } });
 
-    console.log(response);
     if (!response) throw "Unable to Delete";
 
     return res.status(200).json({ message: 'Products Deleted' })
@@ -680,7 +670,6 @@ async function fetchProductInventory(req, res) {
     res.status(200).json(response[0]);
 
   } catch (err) {
-    console.log(err);
   }
 }
 
@@ -691,11 +680,9 @@ async function fetchProductDetail(req, res) {
 
   try {
     let response = await productController.fetchProductDetails(req, res, sku, true);
-    console.log(response);
     return res.status(200).json(response);
 
   } catch (err) {
-    console.log(err);
     return res.status(404).json({ message: err });
   }
 }
@@ -720,7 +707,6 @@ async function fetchFeatures(req, res) {
     }
     throw "404";
   } catch (err) {
-    console.log(err);
     return res.status(404).send();
   }
 }
@@ -737,7 +723,6 @@ async function updateFeatures(req, res) {
     }
     throw "404";
   } catch (err) {
-    console.log(err);
     return res.status(404).send();
   }
 }
@@ -745,15 +730,11 @@ async function updateFeatures(req, res) {
 async function updateDetails(req, res) {
 
   const userToken = req.body.data.info.token;
-  console.log(userToken, "userToken")
   const payload = JSON.parse(atob(userToken.split('.')[1]));
-  console.log(payload);
 
   const email = payload.email;
   const role = payload.role;
   const data = req.body.data;
-
-  console.log(data)
 
   if (data && role == 'admin' && email && data.name && data.name.firstname !== undefined) {
     const firstname = data.name.firstname;
@@ -792,7 +773,6 @@ async function updateDetails(req, res) {
 async function getAdminDetails(req, res) {
   const userToken = req.query.token;
   const payload = JSON.parse(atob(userToken.split('.')[1]));
-  console.log(userToken);
 
   try {
     const response = await users.find({ role: 'admin', email: payload.email });
@@ -801,7 +781,6 @@ async function getAdminDetails(req, res) {
     }
     throw "404";
   } catch (err) {
-    console.log(err);
     return res.status(404).send();
   }
 }
@@ -812,7 +791,6 @@ async function getAdminDetails(req, res) {
 //         await offer.save();
 //         res.status(200).json(offer);
 //     } catch (error) {
-//       console.log('error is ',error);
 //         res.status(500).json(error);
 //     }
 // }
@@ -841,15 +819,11 @@ async function getAdminDetails(req, res) {
 
 
 async function updateFaq(req, res) {
-  console.log(req.body)
   try {
     const updateFaqData = req.body;
     const itemId = updateFaqData._id;
     const updatedTitle = updateFaqData.title;
     const updatedContent = updateFaqData.content;
-
-    console.log(updateFaqData)
-
 
     const result = await faqData.findOneAndUpdate(
       { 'childrens._id': itemId },
@@ -897,7 +871,6 @@ async function addFaq(req, res) {
 async function deleteFaq(req, res) {
   try {
     const itemId = req.body._id;
-    console.log(itemId)
     const result = await faqData.findOneAndUpdate(
       { 'childrens._id': itemId },
       {
@@ -907,7 +880,6 @@ async function deleteFaq(req, res) {
       },
       { new: true }
     );
-    console.log(result)
   }
   catch (err) {
     console.error(err);
@@ -929,12 +901,9 @@ async function getPaymentKeys(req, res) {
 
 // async function updateOffer(req, res) {
 //   try {
-//     console.log('req   body is ', req.body);
 //     const result = await OffersModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
-//     console.log('update offer is ', result);
 //     res.status(200).json({ message: 'updated Successfully' });
 //   } catch (error) {
-//     console.log('error is ', error);
 //     res.status(500).json(error);
 //   }
 // }
@@ -946,7 +915,6 @@ async function addPaymentKeys(req, res) {
     const decodedPayload = atob(req.body.adminId);
     const admin = JSON.parse(decodedPayload);
     const adminId = admin.id;
-    console.log(adminId, "admin Id Is");
 
     let adminKeys = await PaymentKeys.findOne({});
 
@@ -961,7 +929,6 @@ async function addPaymentKeys(req, res) {
     await adminKeys.save();
     res.status(200).json({ message: 'Payment Keys added Successfully' });
   } catch (error) {
-    console.log('error is ', error);
     res.status(500).json(error);
   }
 }
@@ -970,36 +937,22 @@ async function updatePaymentKeys(req, res) {
   try {
     const { publicKey, privateKey, id, enable } = req.body;
     const adminId = id;
-    console.log(adminId, privateKey, publicKey, id, enable, "admin Id Is");
 
     const adminKeys = await PaymentKeys.findOneAndUpdate(
       { 'keys._id': adminId },
       { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': enable } }, // Update the fields
       { new: true }
-    )
-      .then(updatedKeys => {
-        console.log(updatedKeys);
-      })
-      .catch(err => {
-        console.error(err);
-      });
-    if (adminKeys) {
-      console.log('Document Updated:', adminKeys);
-    } else {
-      console.log('No matching document found for the given query.');
-    }
+    );
+
     res.status(200).json({ message: 'Payment Keys updated Successfully' });
   } catch (error) {
-    console.log('error is ', error);
     res.status(500).json(error);
   }
 }
 
 async function deletePaymentKeys(req, res) {
   const { id } = req.body;
-  console.log(id);
   const data = await PaymentKeys.deleteOne({ 'keys._id': id });
-  console.log(data);
   res.status(200).json({ message: 'Payment Keys deleted Successfully' });
 }
 

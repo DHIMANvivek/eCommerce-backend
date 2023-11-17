@@ -15,7 +15,6 @@ async function getFaq(req, res) {
     }
     throw "404";
   } catch (err) {
-    console.log(err);
     return res.status(404).send();
   }
 }*/
@@ -44,14 +43,12 @@ async function getFaq(req, res) {
     }
     throw "404";
   } catch (err) {
-    console.log(err);
     return res.status(404).send();
   }
 }
 
 /* update Faq without Aggregation */
 async function updateFaq(req, res) {
-  console.log(req.body)
   try {
     const { _id: itemId, title: updatedTitle, content: updatedContent } = req.body;
 
@@ -98,7 +95,6 @@ async function addFaq(req, res) {
 /* Add Faq  with Aggregation */
 async function addFaq(req, res) {
 
-  console.log(req.body)
   try {
     const { title, children } = req.body;
 
@@ -134,7 +130,6 @@ async function addFaq(req, res) {
 async function deleteFaq(req, res) {
   try {
     const itemId = req.body._id;
-    console.log(itemId)
     const result = await faqData.findOneAndUpdate(
       { 'childrens._id': itemId },
       {
@@ -144,7 +139,6 @@ async function deleteFaq(req, res) {
       },
       { new: true }
     );
-    console.log(result)
   }
   catch (err) {
     console.error(err);

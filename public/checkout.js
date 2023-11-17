@@ -7,8 +7,6 @@ window.onload = async function() {
 
     const data = await response.json();
 
-    console.log( "response is  public key ",data[0].keys[0].publicKey)
-
   if (Array.isArray(data) && data.length > 0 && data[0].keys && data[0].keys.length > 0) {
     const publicKey = data[0].keys[0].publicKey;
     const privateKey = data[0].keys[0].privateKey;
@@ -39,10 +37,8 @@ window.onload = async function() {
     // const inrObject = JSON.parse(inr);
     // const price = inrObject.items[0].price;
 
-    // console.log(price, "price"); 
 
     const { clientSecret } = await response.json();
-    console.log("Client Secret:", clientSecret);
 
     const appearance = {
       theme: 'stripe',
@@ -75,15 +71,12 @@ window.onload = async function() {
     // });
 
     // (async () => {
-    //   console.log("Before calling paymentRequest.canMakePayment()");
     //   const result = await paymentRequest.canMakePayment();
-    //   console.log("After calling paymentRequest.canMakePayment()");
 
     //   if (result) {
     //     prButton.mount('#payment-request-button');
     //   } else {
     //     document.getElementById('payment-request-button').style.display = 'none';
-    //     console.error("Error: Payment request cannot be made.");
     //   }
     // })();
 
@@ -132,8 +125,6 @@ window.onload = async function() {
 
   const data = await response.json();
 
-  console.log("response is  public key ", data[0].keys[0].publicKey)
-
   if (Array.isArray(data) && data.length > 0 && data[0].keys && data[0].keys.length > 0) {
     const publicKey = data[0].keys[0].publicKey;
     const privateKey = data[0].keys[0].privateKey;
@@ -163,10 +154,7 @@ window.onload = async function() {
       // const inrObject = JSON.parse(inr);
       // const price = inrObject.items[0].price;
 
-      // console.log(price, "price"); 
-
       const { clientSecret } = await response.json();
-      console.log("Client Secret:", clientSecret);
 
       const appearance = {
         theme: 'stripe',
@@ -199,9 +187,7 @@ window.onload = async function() {
       // });
 
       // (async () => {
-      //   console.log("Before calling paymentRequest.canMakePayment()");
       //   const result = await paymentRequest.canMakePayment();
-      //   console.log("After calling paymentRequest.canMakePayment()");
 
       //   if (result) {
       //     prButton.mount('#payment-request-button');
@@ -284,19 +270,15 @@ window.onload = async function() {
       case "succeeded":
         showMessage("Payment succeeded!");
         
-        console.log("Payment succeeded. Payment Intent Status:", paymentIntent);
         break;
       case "processing":
         showMessage("Your payment is processing.");
-        console.log("Payment is processing. Payment Intent Status:", paymentIntent.status);
         break;
       case "requires_payment_method":
         showMessage("Your payment was not successful, please try again.");
-        console.log("Payment requires a valid payment method. Payment Intent Status:", paymentIntent.status);
         break;
       default:
         showMessage("Something went wrong.");
-        console.log("An unexpected error occurred. Payment Intent Status:", paymentIntent.status);
         break;
     }
 

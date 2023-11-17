@@ -33,21 +33,17 @@ async function getOrders(req, res) {
           const decoded = jwt.verify(token, process.env.secretKey);
           const buyerId = decoded.id;
       
-        //   console.log(buyerId, "latest buyer Id");
-      
           const latestProduct = await ordersModel
             .findOne({ buyerId: buyerId })
             .sort({ createdAt: -1 })
             .exec();
 
         if (latestProduct) {
-            // console.log('Latest product details:', latestProduct);
             res.status(200).json({ latestProduct });
         } else {
             res.status(404).json({ error: 'No products found for the user' });
           }
         } catch (error) {
-            console.log('errorcoming is ',error);
           res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
         }
     }
@@ -56,12 +52,10 @@ async function getOrders(req, res) {
 
     async function updateLatestOrderDetail(req, res) {
         try {
-            console.log(req.body)
             const token = req.body.buyerId;
     
             const decoded = verifyToken(token);
             const buyerId = decoded.id;
-            console.log("buyer id is ", buyerId)
             const { newPaymentStatus, transactionId, MOP } = req.body;
             const latestOrder = await ordersModel
                 .findOne({ buyerId: buyerId })
@@ -76,11 +70,8 @@ async function getOrders(req, res) {
                     .findOne({ buyerId: buyerId, payment_status: 'success' })
                     .sort({ orderDate: -1 })
                     .exec();
-
                     buyId =  buyerId.slice(buyerId.length-4 , buyerId.length);
 
-                    // console.log("edited buyid is ", buyId)
-    
                 let orderId = 0;
     
                     if (previousOrder) {
@@ -100,11 +91,8 @@ async function getOrders(req, res) {
                     }
                 );
     
-                console.log('new user status is ', newPaymentStatus);
-    
                 latestOrder.products.forEach(async (el) => {
 
-                    console.log('el quantity is ------------> ',el.quantity);
                     const findQuantity = await Products.findOne({
                         sku: el.sku,
                         'assets.color': el.color,
@@ -135,7 +123,6 @@ async function getOrders(req, res) {
                 res.status(200).json({ message: 'Latest order payment status updated successfully' });
             
         } catch (error) {
-            console.log('error coming is ------------------->', error);
             res.status(500).json({ error: 'Failed to update the latest order payment status' });
         }
     }
@@ -250,14 +237,11 @@ async function createOrder(req, res) {
                 }
               );
         })
-
-        }
-
+    }
 
         res.status(200).json('order created success');
 
     } catch (error) {
-        console.log('error thrown started----> ',error);
         res.status(500).json(error);
     }
 }
@@ -359,7 +343,6 @@ async function getSellerOrdersInventory(req, res) {
             throw "Order not Found";
         }
     } catch (err) {
-        console.log(err);
         return res.status(404).json({ message: err });
     }
 }
@@ -367,7 +350,6 @@ async function getSellerOrdersInventory(req, res) {
 async function getSellerOrderDetails(req, res) {
     const sellerID = req.tokenData.id;
     const OrderID = req.query.orderID;
-    console.log("jhajskdh")
     try {
         const response = await ordersModel.findOne(
             { _id: OrderID },
@@ -461,7 +443,6 @@ async function cancelOrderedProduct(req, res) {
         await order.save();
         return res.status(200).json({ message: 'Product cancelled successfully' });
     } catch (error) {
-        console.log(error, "error in deleting ---------");
         return res.status(500).json({ message: 'Error cancelling the product' });
     }
 }

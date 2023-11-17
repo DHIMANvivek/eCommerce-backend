@@ -160,10 +160,4 @@ let offerSchema = mongoose.Schema({
 
 )
 
-
-// offerSchema.post('save',async function (){
-//     console.log("this is ",this.ExtraInfo.brands," cat ",this.ExtraInfo.categories);
-// })
-
-
 module.exports = mongoose.model('Offers', offerSchema);

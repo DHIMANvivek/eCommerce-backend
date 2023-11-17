@@ -20,7 +20,6 @@ async function getDetails(req, res) {
         const basicDetails = await Users.findById(req.tokenData.id);
         res.status(200).json(basicDetails)
     } catch (error) {
-        console.log('error --------> ',error);
         res.status(500).json(error);
     }
 }
@@ -56,7 +55,6 @@ try {
   
 
 } catch (error) {
-    console.log('error inside main function is ',error);
     return  new Promise((res,rej)=>{
         rej(0);
     })
@@ -196,11 +194,6 @@ async function addReview(req, res) {
     }
 }
 
-async function putReviews(req, res){
-    console.log(req.body);
-    Reviews.insertMany(req.body);
-}
-
 
 // async function getCoupons(req, res) {
 //     try {
@@ -218,12 +211,10 @@ async function usedCoupon(req, res) {
         req.body.couponId = new mongoose.Types.ObjectId('65312dcde94dc6738db7bb21');
         const findCoupon = await OffersModel.findById(req.body.couponId);
 
-
         findCoupon.userUsed.push(req.body.id);
         await findCoupon.save();
         res.status(200).json(findCoupon);
     } catch (error) {
-        console.log('error is ', error);
         res.status(500).json(error);
     }
 }
@@ -264,7 +255,6 @@ async function getFaq(req , res) {
         }
         throw "404";
     } catch (err) {
-        console.log(err);
         return res.status(404).send();
     }
 }
@@ -288,7 +278,6 @@ module.exports = {
     getDetails,
     updateDetails,
     getAddress,
-    // getCoupons,
     DefaultAddress,
     usedCoupon,
     addAddress,
@@ -298,5 +287,4 @@ module.exports = {
     getFaq,
     sendData,
     getPaginatedData,
-    // getPaymentKeys
 }

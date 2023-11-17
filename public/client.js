@@ -4,7 +4,6 @@
       navigator.serviceWorker
         .register("/worker.js")
         .then(function (registration) {
-          console.log("Service Worker registered with scope:", registration.scope);
         })
         .catch(function (error) {
           console.error("Service Worker registration failed:", error);
@@ -32,7 +31,6 @@
             });
           })
           .then(function (newSubscription) {
-            console.log("User is subscribed:", newSubscription);
             sendSubscriptionToServer(newSubscription);
           })
           .catch(function (error) {

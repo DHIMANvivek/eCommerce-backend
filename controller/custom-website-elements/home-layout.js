@@ -57,7 +57,6 @@ async function updateOrCreate(req, res) {
         });
     }
     catch (error) {
-        console.log('error', error);
         res.status(500).json({
             message: 'Unable to update/create Layout right now'
         });
@@ -77,8 +76,31 @@ async function fetchAll(req, res) {
     }
 }
 
+async function deleteLayout(req, res){
+    try {
+        const layoutId = req.body.id;
+        const layout = await HomeLayout.findById(layoutId);
+        if(layout.active){
+            res.status(403).json({
+                message: 'Cannot delete currently active Layout'
+            });
+            return;
+        }
+
+        await HomeLayout.deleteOne({_id: layoutId});
+        res.status(202).json({});
+    } 
+    catch (error) {
+        console.log(error, 'ok');
+        res.status(500).json({
+            message: 'Unable to delete this Layout right now'
+        });
+    }
+}
+
 module.exports = {
     updateOrCreate,
     fetchAll,
-    fetch
+    fetch,
+    deleteLayout
 }

@@ -25,8 +25,6 @@ app.post('/send-notification', (req, res) => {
   const { title, body, icon, url, token , registration_ids } = req.body;
   const tokens = registration_ids || [token].filter(Boolean);
 
-  console.log('Notification details:', { title, body, icon, url , token , registration_ids});
-
   // Static registration_ids
   // const registration_ids = [
   //   "eIGVynF7qde1Ij5_bZe0cN:APA91bEtmmM8fTh3pVDlqJsrV98gdS1JlHcYRdye1G323pTm2hcnVYAKUHLoYIcJneqWcJ7CI-Vfr8xbRLZs5HU185g4PF57PFdZEfQUTXh19V7L6QayCjoWi8Ovq9dWT_PHrHViLImv",
@@ -61,7 +59,6 @@ app.post('/send-notification', (req, res) => {
 // app.post('/send-notification', (req, res) => {
 //   const { title, body, icon, token } = req.body;
 
-//   console.log('title is ', title, 'body is ', body, 'icon is ', icon, 'token is ', token)
 
 //   const message = {
 //       "notification": {
@@ -74,7 +71,6 @@ app.post('/send-notification', (req, res) => {
 
 //   admin.messaging().send(message)
 //     .then((response) => {
-//       console.log('Successfully sent message:', response);
 //       res.status(200).send('Notification sent successfully');
 //     })
 //     .catch((error) => {
@@ -98,7 +94,6 @@ app.post('/send-notification', (req, res) => {
 
 //   webpush.sendNotification(subscription, payload)
 //       .then(() => {
-//           console.log('Push notification sent');
 //           res.status(201).json({ message: 'Push notification sent successfully' });
 //       })
 //       .catch((err) => {
@@ -142,9 +137,6 @@ app.use(routes);
 
 let port = 1000;
 app.listen(port, (err) => {
-  if (err)
-    console.log(err);
-  else
     console.log(`listening to port ${port}`);
 });
 
@@ -156,15 +148,12 @@ const server = app.listen(3000, () => {
 const io = require('socket.io')(server);
 
 // io.on('connection', (socket) => {
-//   console.log('A user connected');
 
 //   socket.on('chatMessage', (data) => {
-//       console.log(data);
 //       io.emit('message', data);
 //   });
 
 //   socket.on('disconnect', () => {
-//       console.log('A user disconnected');
 //   });
 // });
 
@@ -178,8 +167,6 @@ io.on('connection', (socket) => {
             user: user, 
             content: data, 
         });
-
-        console.log(newMessage)
 
         newMessage.save()
             .then(() => {

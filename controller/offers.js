@@ -91,7 +91,6 @@ async function createOffer(req, res) {
     
         // result = await OfferModel.findOne(query);
       query.OfferType='discount';
-      console.log('query come up is ',query);
       result = await OfferModel.findOne(query);
 
       if (result) {
@@ -103,7 +102,6 @@ async function createOffer(req, res) {
     await newOffer.save();
     res.status(200).json(newOffer);
   } catch (error) {
-    console.log('error coming is ', error);
     res.status(500).json(error);
   }
 }
@@ -215,7 +213,6 @@ async function updateOffer(req, res) {
     result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
     res.status(200).json(result);
   } catch (error) {
-    console.log('errpr cpmogn is ',error);
     res.status(500).json(error);
   }
 }
@@ -239,7 +236,6 @@ async function updateOfferStatus(req, res) {
       }
      
       let results = await OfferModel.find(query);
-      console.log('result coming is ',results);
       for(let result of results){
         result = JSON.parse(JSON.stringify(result));
         if (result && result._id != req.body._id) {
@@ -254,7 +250,6 @@ async function updateOfferStatus(req, res) {
     })
     res.status(200).json({ message: 'offer status updated sucess' })
   } catch (error) {
-    console.log('error coming si ', error);
     res.status(500).json(error)
   }
 }
@@ -335,7 +330,6 @@ async function searchOffer(req, res) {
       }
     )
 
-    console.log('findSearch offer is ', findsearchedOffers);
     res.status(200).json(findsearchedOffers);
 
   } catch (error) {

@@ -193,7 +193,6 @@ function SubscribeTemplate(email) {
 
 
 async function TicketStatusTemplate(mailData) {
-  console.log(mailData , "status")
   let statusText = mailData.status === 'open' ? 'Open' : 'Closed'; 
 
   let html = `
@@ -264,7 +263,6 @@ async function TicketStatusTemplate(mailData) {
 
 async function sendInvoiceTemplate(paymentData) {
   let productList = JSON.parse(paymentData.description);
-  console.log(productList, "product data is");
 
   let productRows = productList.map(product => {
     let productDetails = product.id.map((productId, index) => {

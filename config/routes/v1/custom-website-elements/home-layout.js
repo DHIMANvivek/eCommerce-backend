@@ -4,8 +4,9 @@ const homeLayoutController = require('../../../../controller/custom-website-elem
 const AdminVerify = require('../../../../middlewares/adminVerify');
 
 //admins
-router.post('/updateOrCreate', homeLayoutController.updateOrCreate);
-router.get('/getAll', homeLayoutController.fetchAll);
+router.post('/updateOrCreate', AdminVerify, homeLayoutController.updateOrCreate);
+router.get('/getAll', AdminVerify, homeLayoutController.fetchAll);
+router.post('/delete', AdminVerify, homeLayoutController.deleteLayout);
 
 //normal
 router.get('/get', homeLayoutController.fetch);

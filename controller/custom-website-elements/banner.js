@@ -9,7 +9,6 @@ async function setBanners(req, res) {
         })
     }
     catch (error) {
-        console.log(error, "banner");
     }
 }
 async function getBanners(req, res) {
@@ -22,7 +21,6 @@ async function getBanners(req, res) {
         res.status(200).json(bannersData);
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: 'Unable to get banners.'
         });
@@ -37,7 +35,6 @@ async function deleteBanner(req, res) {
         })
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: 'Unable to delete banner.'
         });
@@ -57,7 +54,6 @@ async function updateBanner(req, res) {
         })
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: "Error in updating banner!"
         })
@@ -80,7 +76,6 @@ async function toggleBanner(req, res) {
         })
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: "Error in updating banner!"
         })
