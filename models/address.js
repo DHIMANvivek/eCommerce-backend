@@ -35,7 +35,11 @@ module.exports = new mongoose.Schema({
         trim: true,
         required: ['true', "Please enter a valid pincode"]
     },
-
+    city: {
+        type: String,
+        required: true,
+        lowercase: true
+    },
     town_city:{ 
         type: String,
         trim: true,
@@ -56,10 +60,7 @@ module.exports = new mongoose.Schema({
     },
     mobile: {
         type: Number,
-        required:true,
-        trim: true,
-        minLength: [10],
-        maxLength: [10]
+        required:true
     },
     status:{
         type:Boolean,

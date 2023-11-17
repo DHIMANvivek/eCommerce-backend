@@ -728,11 +728,15 @@ async function updateFeatures(req, res) {
 }
 
 async function updateDetails(req, res) {
+  console.log(req.body);
 
   const userToken = req.body.data.info.token;
   const payload = JSON.parse(atob(userToken.split('.')[1]));
+  const id = req.tokenData.id;
 
-  const email = payload.email;
+  const emails=await users.findOne({_id:req.tokenData.id},{email:1,_id:0});
+  const email = emails.email
+  console.log(email)
   const role = payload.role;
   const data = req.body.data;
 
@@ -741,10 +745,10 @@ async function updateDetails(req, res) {
 
     try {
       const response = await users.updateOne(
-        { 'email': email, 'role': role },
+        { '_id': id, 'role': role },
         {
           $set: {
-            email: data.email,
+            email: email,
             'name.firstname': firstname,
             'name.lastname': data.name.lastname,
             'mobile': data.mobile,
@@ -773,9 +777,10 @@ async function updateDetails(req, res) {
 async function getAdminDetails(req, res) {
   const userToken = req.query.token;
   const payload = JSON.parse(atob(userToken.split('.')[1]));
+  const id = req.tokenData.id;
 
   try {
-    const response = await users.find({ role: 'admin', email: payload.email });
+    const response = await users.find({ role: 'admin', _id: id });
     if (response) {
       return res.status(200).json(response);
     }
