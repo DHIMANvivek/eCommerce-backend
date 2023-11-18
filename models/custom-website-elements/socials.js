@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
 const socialsSchema = new mongoose.Schema({
-    logos: {
-        desktop: {
-            type: String,
-            trim: true
-        },
-        mobile: {
-            type: String,
-            trim: true
-        }
-    },
+    // logos: {
+    //     desktop: {
+    //         type: String,
+    //         trim: true
+    //     },
+    //     mobile: {
+    //         type: String,
+    //         trim: true
+    //     }
+    // },
     email: {
         type: String,
         trim: true,

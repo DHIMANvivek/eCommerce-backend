@@ -69,8 +69,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 // exploring, searching and filtering
 async function fetchProducts(req, res) {
     try {
-        console.log("query", req.query);
-        const reqType = req.query.type || '';
+
         delete req.query.type;
 
         req.query = req.query ? req.query : req.body;
@@ -148,10 +147,11 @@ async function fetchProducts(req, res) {
             let key = (req.query.sort).split(':')[0];
             let value = Number((req.query.sort).split(':')[1]);
 
-            // //defaults to if some other value is input
-            // if (!(keyCanContain.includes(key))) {
-            //     key = 'createdAt';
-            // }
+            //defaults to if some other value is input
+            if (!(keyCanContain.includes(key))) {
+                key = 'name';
+                value = 1;
+            }
 
             if (key == 'price') {
                 priceSortValue = value
@@ -163,6 +163,11 @@ async function fetchProducts(req, res) {
             }
 
             delete req.query.sort;
+        }
+        else{
+            aggregationPipe.push({
+                $sort: {'name': 1}
+            })
         }
 
 
@@ -505,7 +510,6 @@ async function ReduceProductQuantity(products) {
     } catch (error) {
 
     }
-
 }
 module.exports = {
     fetchProducts,

@@ -229,12 +229,9 @@ async function generateOrderId(req,res){
 async function createOrder(req, res) {
     try {
 
-        console.log('req body coming is ',req.body);
         // return;
         // VERIFY ORDER
         const verifyOrder=await verifyOrderSummary(req,res);
-
-        console.log('req body products is ',req.body.products);
 
         req.body.buyerId=req.tokenData.id;
         if(req.body.coupon){
@@ -414,7 +411,7 @@ async function getSellerOrdersInventory(req, res) {
 async function getSellerOrderDetails(req, res) {
     const sellerID = req.tokenData.id;
     const OrderID = req.query.orderID;
-    console.log("jhajskdh")
+    
     try {
         const response = await ordersModel.findOne(
             { _id: OrderID },
