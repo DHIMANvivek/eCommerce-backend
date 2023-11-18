@@ -33,9 +33,9 @@ window.onload = async function() {
       body: JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) }),
     });
 
-    //   const inr = JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) });
-    // const inrObject = JSON.parse(inr);
-    // const price = inrObject.items[0].price;
+      const inr = JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) });
+    const inrObject = JSON.parse(inr);
+    const price = inrObject.items[0].price;
 
 
     const { clientSecret } = await response.json();
@@ -53,57 +53,58 @@ window.onload = async function() {
       },
       //  labels: 'floating',
     };
-    // const elements = stripe.elements();
+    const elements = stripe.elements();
     elements = stripe.elements({ clientSecret, appearance });
-    // const paymentRequest = stripe.paymentRequest({
-    //   country: 'IN',
-    //   currency: 'inr',
-    //   total: {
-    //     label: 'Demo total',
-    //     amount: 123,
-    //   },
-    //   requestPayerName: true,
-    //   requestPayerEmail: true,
-    // });
+    const paymentRequest = stripe.paymentRequest({
+      country: 'IN',
+      currency: 'inr',
+      total: {
+        label: 'Demo total',
+        amount: 123,
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
+    });
 
-    // const prButton = elements.create('paymentRequestButton', {
-    //   paymentRequest,
-    // });
+    const prButton = elements.create('paymentRequestButton', {
+      paymentRequest,
+    });
 
-    // (async () => {
-    //   const result = await paymentRequest.canMakePayment();
+    (async () => {
+      const result = await paymentRequest.canMakePayment();
 
-    //   if (result) {
-    //     prButton.mount('#payment-request-button');
-    //   } else {
-    //     document.getElementById('payment-request-button').style.display = 'none';
-    //   }
-    // })();
+      if (result) {
+        prButton.mount('#payment-request-button');
+      } else {
+        console.log('cant make payment')
+        document.getElementById('payment-request-button').style.display = 'none';
+      }
+    })();
 
-    // paymentRequest.on('paymentmethod', async (ev) => {
-    //   const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
-    //     clientSecret,
-    //     {payment_method: ev.paymentMethod.id},
-    //     {handleActions: false}
-    //   );
+    paymentRequest.on('paymentmethod', async (ev) => {
+      const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
+        clientSecret,
+        {payment_method: ev.paymentMethod.id},
+        {handleActions: false}
+      );
 
-    //   if (confirmError) {
-    //     ev.complete('fail');
-    //   } else {
-    //     ev.complete('success');
-    //     if (paymentIntent.status === "requires_action") {
-    //       const {error} = await stripe.confirmCardPayment(clientSecret);
-    //       if (error) {
+      if (confirmError) {
+        ev.complete('fail');
+      } else {
+        ev.complete('success');
+        if (paymentIntent.status === "requires_action") {
+          const {error} = await stripe.confirmCardPayment(clientSecret);
+          if (error) {
 
-    //       } else {
+          } else {
 
-    //       }
-    //     } else {
+          }
+        } else {
 
-    //     }
-    //   }
-    // });
-    // elements = stripe.elements({ clientSecret , appearance });
+        }
+      }
+    });
+    elements = stripe.elements({ clientSecret , appearance });
 
     const linkAuthenticationElement = elements.create("linkAuthentication");
     linkAuthenticationElement.mount("#link-authentication-element");

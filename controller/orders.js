@@ -44,7 +44,8 @@ async function getOrders(req, res) {
             // console.log('Latest product details:', latestProduct);
             res.status(200).json({ latestProduct });
         } else {
-            res.status(404).json({ error: 'No products found for the user' });
+            // res.status(404).json({ error: 'No products found for the user' });
+            return;
           }
         } catch (error) {
             console.log('errorcoming is ',error);
