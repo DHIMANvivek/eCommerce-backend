@@ -69,6 +69,10 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 // exploring, searching and filtering
 async function fetchProducts(req, res) {
     try {
+        console.log("query", req.query);
+        const reqType = req.query.type || '';
+        delete req.query.type;
+
         req.query = req.query ? req.query : req.body;
         // Search
         let search = req.query.search || '';
@@ -127,6 +131,7 @@ async function fetchProducts(req, res) {
                     info: { $first: '$$ROOT.info' },
                     price: { $first: '$$ROOT.price' },
                     createdAt: { $first: '$$ROOT.createdAt' },
+                    highlight: { $first: '$$ROOT.highlight' },
                     avgRating: {
                         $avg: {
                             $ifNull: [{ $avg: "$rating.reviews.rating" }, 0]
@@ -136,22 +141,17 @@ async function fetchProducts(req, res) {
             },
         ];
 
-        popularQuery = {
-            $match: {
-                'higlight': true
-            }
-        }
-
         let priceSortValue;
+
         if (req.query.sort) {
             let keyCanContain = ['avgRating', 'price', 'createdAt'];
             let key = (req.query.sort).split(':')[0];
             let value = Number((req.query.sort).split(':')[1]);
 
-            //defaults to if some other value is input
-            if (!(keyCanContain.includes(key))) {
-                key = 'createdAt';
-            }
+            // //defaults to if some other value is input
+            // if (!(keyCanContain.includes(key))) {
+            //     key = 'createdAt';
+            // }
 
             if (key == 'price') {
                 priceSortValue = value
@@ -174,6 +174,7 @@ async function fetchProducts(req, res) {
         if (req.query.page) delete req.query.page;
 
         if ((Object.keys(req.query)).length > 0) {
+
             aggregationPipe.unshift(
                 {
                     $match: getFilterQuery(req.query)
@@ -185,17 +186,11 @@ async function fetchProducts(req, res) {
             total: 0
         };
 
-        aggregationPipe.push(
-            {
-                $sort: { 'name': 1 }
-            }
-        );
-
         // fetching the data
         let products = await Products.aggregate(aggregationPipe);
+
         matchedProducts.total = products.length;
         matchedProducts.items = await getProductPrice((products));
-
 
         if (priceSortValue) {
             matchedProducts.items = matchedProducts.items.sort((a, b) => {
@@ -303,7 +298,7 @@ async function fetchUniqueFields(req, res) {
 
     function getData(products, parameter = input) {
         const uniqueData = {
-            gender:[],
+            gender: [],
             brand: [],
             category: [],
             // tags: [],
@@ -321,10 +316,10 @@ async function fetchUniqueFields(req, res) {
         products.forEach((data) => {
             if (parameter != 'all') {
                 if (data.info.gender == 'male') {
-                    filterObject=filterObject2.male;
+                    filterObject = filterObject2.male;
                 }
                 else {
-                    filterObject=filterObject2.female;
+                    filterObject = filterObject2.female;
                 }
             }
 
@@ -359,7 +354,7 @@ async function fetchUniqueFields(req, res) {
         });
 
 
-        if(parameter!='all') {  
+        if (parameter != 'all') {
 
             return filterObject2;
         }
@@ -367,19 +362,17 @@ async function fetchUniqueFields(req, res) {
     }
 
     const data = getData(products, input);
-    console.log('data come up is ',data);
     res.status(200).json({ data });
-
 }
 
 
-function uppecaseConverter(option){
-    option=option.split(' ');
-    let parameter='';
-    for(let i=0;i<option.length;i++){
-      parameter+=option[i].charAt(0).toUpperCase() + option[i].slice(1);
-        if(i!=option.length-1){
-            parameter+=' ';
+function uppecaseConverter(option) {
+    option = option.split(' ');
+    let parameter = '';
+    for (let i = 0; i < option.length; i++) {
+        parameter += option[i].charAt(0).toUpperCase() + option[i].slice(1);
+        if (i != option.length - 1) {
+            parameter += ' ';
         }
     }
 
@@ -410,34 +403,34 @@ async function getProductPrice(products) {
 
     async function discountQuery(parameter) {
         let product = JSON.parse(JSON.stringify(parameter));
-        product.info.brand=uppecaseConverter(product.info.brand);
-        product.info.category=uppecaseConverter(product.info.category);
+        product.info.brand = uppecaseConverter(product.info.brand);
+        product.info.category = uppecaseConverter(product.info.category);
         return new Promise(async (res, rej) => {
 
             let discount;
-            let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':product.info.brand,'ExtraInfo.categories':product.info.category ,'status.active': true ,startDate:{$lte:new Date()}});
-            if(!offer){
-                 offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':product.info.brand ,'ExtraInfo.categories':null  ,'status.active': true ,startDate:{$lte:new Date()}});
-                if(!offer){
-                    let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':null,'ExtraInfo.categories':product.info.category ,'status.active': true ,startDate:{$lte:new Date()}});
-                    
-                    if(!offer){
-                        let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':null,'ExtraInfo.categories':null ,'status.active': true ,startDate:{$lte:new Date()}});
-                        discount=offer;
+            let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, startDate: { $lte: new Date() } });
+            if (!offer) {
+                offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true, startDate: { $lte: new Date() } });
+                if (!offer) {
+                    let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': product.info.category, 'status.active': true, startDate: { $lte: new Date() } });
+
+                    if (!offer) {
+                        let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': null, 'status.active': true, startDate: { $lte: new Date() } });
+                        discount = offer;
                     }
-                    else{
-                        discount=offer;
+                    else {
+                        discount = offer;
                     }
                 }
-                else{
-                    discount=offer;
-                    
+                else {
+                    discount = offer;
+
                 }
-                
+
             }
 
-            else{
-                discount=offer;
+            else {
+                discount = offer;
             }
 
             if (discount == null) {
@@ -463,7 +456,7 @@ async function getProductPrice(products) {
 
             }
 
-           
+
             res(product);
         });
     }
@@ -478,41 +471,41 @@ const hexToRgb = (hex) => {
     return { r, g, b };
 }
 
-async function ReduceProductQuantity(products){
+async function ReduceProductQuantity(products) {
 
     try {
-        products.forEach(async (el)=>{
-            const findQuantity=await Products.findOne({
+        products.forEach(async (el) => {
+            const findQuantity = await Products.findOne({
+                sku: el.sku,
+                'assets.color': el.color,
+                'assets.stockQuantity.size': el.size
+            }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
+
+            if (el.quantity > findQuantity) { throw { message: 'Sorry given Product Quantity is not available' } }
+            // if(el.quantity>=findQuantity) el.quantity=findQuantity;
+            else el.quantity = el.quantity;
+            const updateProduct = await Products.updateOne(
+                {
                     sku: el.sku,
                     'assets.color': el.color,
                     'assets.stockQuantity.size': el.size
-            }, {'assets.stockQuantity.quantity':1,_id:0});
+                },
 
-            if(el.quantity>findQuantity) {throw {message:'Sorry given Product Quantity is not available'} }
-            // if(el.quantity>=findQuantity) el.quantity=findQuantity;
-            else el.quantity=el.quantity;
-            const updateProduct = await Products.updateOne(
                 {
-                  sku: el.sku,
-                  'assets.color': el.color,
-                  'assets.stockQuantity.size': el.size
-                },
-                
-                {
-                  $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
                 },
                 {
-                  arrayFilters: [
-                    { "outer.color": el.color }, 
-                    { "inner.size": el.size } 
-                  ]
+                    arrayFilters: [
+                        { "outer.color": el.color },
+                        { "inner.size": el.size }
+                    ]
                 }
-              );
+            );
         })
     } catch (error) {
-        
+
     }
- 
+
 }
 module.exports = {
     fetchProducts,

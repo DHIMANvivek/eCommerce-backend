@@ -1,14 +1,14 @@
 const ordersModel = require('./../models/order');
 const userModel = require('./../models/users');
-const {verifyToken}=require('../helpers/jwt');
+const { verifyToken } = require('../helpers/jwt');
 const { getProductPrice } = require('../controller/products');
 const { checkCoupon, updateCoupon, } = require('../controller/offers');
-const  Products = require('../models/products')
+const Products = require('../models/products')
 const ProductController = require('../controller/products');
 const mongoose = require('mongoose');
-const productsModel=require('./../models/products');
-const jwt=require('jsonwebtoken');
-var buyId  = '';
+const productsModel = require('./../models/products');
+const jwt = require('jsonwebtoken');
+var buyId = '';
 
 require('dotenv').config();
 
@@ -26,16 +26,16 @@ async function getOrders(req, res) {
 }
 
 
-        
-    async function getLatestProductForBuyer(req, res) {
-        try {
-          const token = req.body.buyerId;
-          const decoded = jwt.verify(token, process.env.secretKey);
-          const buyerId = decoded.id;
-      
+
+async function getLatestProductForBuyer(req, res) {
+    try {
+        const token = req.body.buyerId;
+        const decoded = jwt.verify(token, process.env.secretKey);
+        const buyerId = decoded.id;
+
         //   console.log(buyerId, "latest buyer Id");
-      
-          const latestProduct = await ordersModel
+
+        const latestProduct = await ordersModel
             .findOne({ buyerId: buyerId })
             .sort({ createdAt: -1 })
             .exec();
@@ -46,103 +46,100 @@ async function getOrders(req, res) {
         } else {
             // res.status(404).json({ error: 'No products found for the user' });
             return;
-          }
-        } catch (error) {
-            console.log('errorcoming is ',error);
-          res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
         }
+    } catch (error) {
+        console.log('errorcoming is ', error);
+        res.status(500).json({ error: 'Failed to retrieve latest product for the user' });
     }
+}
 
 
 
-    async function updateLatestOrderDetail(req, res) {
-        try {
-            console.log(req.body)
-            const token = req.body.buyerId;
-    
-            const decoded = verifyToken(token);
-            const buyerId = decoded.id;
-            console.log("buyer id is ", buyerId)
-            const { newPaymentStatus, transactionId, MOP } = req.body;
-            const latestOrder = await ordersModel
-                .findOne({ buyerId: buyerId })
-                .sort({ createdAt: -1 })
-                .exec();
-    
-                if (!latestOrder) {
-                    return res.status(404).json({ error: 'No orders found for the user' });
+async function updateLatestOrderDetail(req, res) {
+    try {
+        console.log(req.body)
+        const token = req.body.buyerId;
+
+        const decoded = verifyToken(token);
+        const buyerId = decoded.id;
+        console.log("buyer id is ", buyerId)
+        const { newPaymentStatus, transactionId, MOP } = req.body;
+        const latestOrder = await ordersModel
+            .findOne({ buyerId: buyerId })
+            .sort({ createdAt: -1 })
+            .exec();
+
+        if (!latestOrder) {
+            return res.status(404).json({ error: 'No orders found for the user' });
+        }
+
+        const previousOrder = await ordersModel
+            .findOne({ buyerId: buyerId, payment_status: 'success' })
+            .sort({ orderDate: -1 })
+            .exec();
+
+        buyId = buyerId.slice(buyerId.length - 4, buyerId.length);
+
+        // console.log("edited buyid is ", buyId)
+
+        let orderId = 0;
+
+        if (previousOrder) {
+            const prevOrderId = previousOrder.orderID.split('-');
+            orderId = parseInt(prevOrderId[1]) + 1;
+        }
+
+        const result = await ordersModel.updateOne(
+            { _id: latestOrder._id },
+            {
+                $set: {
+                    payment_status: newPaymentStatus,
+                    transactionId: transactionId,
+                    MOP: MOP,
+                    orderID: `${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
                 }
+            }
+        );
 
-                const previousOrder = await ordersModel
-                    .findOne({ buyerId: buyerId, payment_status: 'success' })
-                    .sort({ orderDate: -1 })
-                    .exec();
+        console.log('new user status is ', newPaymentStatus);
 
-                    buyId =  buyerId.slice(buyerId.length-4 , buyerId.length);
+        latestOrder.products.forEach(async (el) => {
 
-                    // console.log("edited buyid is ", buyId)
-    
-                let orderId = 0;
-    
-                    if (previousOrder) {
-                        const prevOrderId = previousOrder.orderID.split('-');
-                        orderId = parseInt(prevOrderId[1]) + 1;
-                    }
-                
-                const result = await ordersModel.updateOne(
-                    { _id: latestOrder._id },
-                    {
-                        $set: {
-                            payment_status: newPaymentStatus,
-                            transactionId: transactionId,
-                            MOP: MOP,
-                            orderID: `${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
-                        }
-                    }
-                );
-    
-                console.log('new user status is ', newPaymentStatus);
-    
-                latestOrder.products.forEach(async (el) => {
+            console.log('el quantity is ------------> ', el.quantity);
+            const findQuantity = await Products.findOne({
+                sku: el.sku,
+                'assets.color': el.color,
+                'assets.stockQuantity.size': el.size
+            }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
+            if (el.quantity > findQuantity) el.quantity = findQuantity;
+            else el.quantity = el.quantity;
 
-                    console.log('el quantity is ------------> ',el.quantity);
-                    const findQuantity = await Products.findOne({
-                        sku: el.sku,
-                        'assets.color': el.color,
-                        'assets.stockQuantity.size': el.size
-                    }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
-                    if (el.quantity > findQuantity) el.quantity = findQuantity;
-                    else el.quantity = el.quantity;
-                   
-                    const updateProduct = await Products.updateOne(
-                        {
-                            sku: el.sku,
-                            'assets.color': el.color,
-                            'assets.stockQuantity.size': el.size
-                        },
-    
-                        {
-                            $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                        },
-                        {
-                            arrayFilters: [
-                                { "outer.color": el.color },
-                                { "inner.size": el.size }
-                            ]
-                        }
-                    );
-                })
-    
-                res.status(200).json({ message: 'Latest order payment status updated successfully' });
-            
-        } catch (error) {
-            console.log('error coming is ------------------->', error);
-            res.status(500).json({ error: 'Failed to update the latest order payment status' });
-        }
+            const updateProduct = await Products.updateOne(
+                {
+                    sku: el.sku,
+                    'assets.color': el.color,
+                    'assets.stockQuantity.size': el.size
+                },
+
+                {
+                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                },
+                {
+                    arrayFilters: [
+                        { "outer.color": el.color },
+                        { "inner.size": el.size }
+                    ]
+                }
+            );
+        })
+
+        res.status(200).json({ message: 'Latest order payment status updated successfully' });
+
+    } catch (error) {
+        console.log('error coming is ------------------->', error);
+        res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
-    
-    
-    
+}
 
 async function verifyOrderSummary(req, res) {
     try {
@@ -167,18 +164,18 @@ async function verifyOrderSummary(req, res) {
         response.subTotal = totalAmount;
 
         if (req.body.CouponApplied) {
-            let coupon= await checkCoupon(req.body.CouponApplied._id,req.tokenData.id);
+            let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
-            if (coupon.discountType=='percentage' && coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
+            if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
             let discount = 0;
             if (coupon.discountType == 'percentage') {
                 let discountCalculated = (totalAmount / 100) * coupon.discountAmount;
                 discount = discountCalculated <= coupon.maximumDiscount ? discountCalculated : coupon.maximumDiscount;
-                discount=discount>=req.body.amounts.total?0:discount
+                discount = discount >= req.body.amounts.total ? 0 : discount
             }
             else {
                 discount = coupon.discountAmount
-                discount=discount>=req.body.amounts.total?0:discount
+                discount = discount >= req.body.amounts.total ? 0 : discount
             }
 
             totalAmount -= discount;
@@ -189,7 +186,7 @@ async function verifyOrderSummary(req, res) {
         response.shipping = 0;
         if (!response.savings) response.savings = 0;
         if (!response.total) response.total = response.subTotal;
-    createOrderId();
+        createOrderId();
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error);
@@ -201,56 +198,56 @@ async function verifyOrderSummary(req, res) {
 
 async function createOrder(req, res) {
     try {
-        req.body.buyerId=req.tokenData.id;
-        if(req.body.coupon){
-           let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
-           if(!response){ throw({message:'You already use this coupon'})}
+        req.body.buyerId = req.tokenData.id;
+        if (req.body.coupon) {
+            let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
+            if (!response) { throw ({ message: 'You already use this coupon' }) }
         }
 
 
         await Promise.all(req.body.products.map(async (element) => {
             const matchedProduct = await productsModel.findOne({ sku: element.sku }, { sellerID: 1 });
             element.sellerID = matchedProduct.sellerID;
-            const findQuantity =await  Products.find({sku:element.sku,'assets.color':element.color,'assets.stockQuantity.size':element.size},{'assets.$':1})
-            for(let el of findQuantity[0].assets[0].stockQuantity){
-                if(el.size==element.size){
-                   if( el.quantity<element.quantity){
-                    throw({message:'Product quantity selected is greater than  expected'})
-                   }
-                   break;
+            const findQuantity = await Products.find({ sku: element.sku, 'assets.color': element.color, 'assets.stockQuantity.size': element.size }, { 'assets.$': 1 })
+            for (let el of findQuantity[0].assets[0].stockQuantity) {
+                if (el.size == element.size) {
+                    if (el.quantity < element.quantity) {
+                        throw ({ message: 'Product quantity selected is greater than  expected' })
+                    }
+                    break;
                 }
             }
 
             return element;
         }));
 
-        const orderCreated=ordersModel(req.body);
+        const orderCreated = ordersModel(req.body);
 
 
-      await  orderCreated.save();
+        await orderCreated.save();
 
-    
-      if(req.body.payment_status=='confirmed'){
-        await updateCoupon(req.body.coupon._id, req.tokenData.id);
-        req.body.products.forEach(async (el)=>{
-            const updateProduct = await Products.updateOne(
-                {
-                  sku: el.sku,
-                  'assets.color': el.color,
-                  'assets.stockQuantity.size': el.size
-                },
-                
-                {
-                  $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                },
-                {
-                  arrayFilters: [
-                    { "outer.color": el.color }, 
-                    { "inner.size": el.size } 
-                  ]
-                }
-              );
-        })
+
+        if (req.body.payment_status == 'confirmed') {
+            await updateCoupon(req.body.coupon._id, req.tokenData.id);
+            req.body.products.forEach(async (el) => {
+                const updateProduct = await Products.updateOne(
+                    {
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    },
+
+                    {
+                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    },
+                    {
+                        arrayFilters: [
+                            { "outer.color": el.color },
+                            { "inner.size": el.size }
+                        ]
+                    }
+                );
+            })
 
         }
 
@@ -258,21 +255,21 @@ async function createOrder(req, res) {
         res.status(200).json('order created success');
 
     } catch (error) {
-        console.log('error thrown started----> ',error);
+        console.log('error thrown started----> ', error);
         res.status(500).json(error);
     }
 }
 
 
-async function createOrderId(){
-try {
-    const findLatestOrder=await ordersModel.findOne().sort({$natural:-1});
-    if(!findLatestOrder.orderID){
-        
+async function createOrderId() {
+    try {
+        const findLatestOrder = await ordersModel.findOne().sort({ $natural: -1 });
+        if (!findLatestOrder.orderID) {
+
+        }
+    } catch (error) {
+
     }
-} catch (error) {
-    
-}
 }
 
 async function getParicularUserOrders(req, res) {
@@ -292,32 +289,51 @@ async function getSellerOrdersInventory(req, res) {
     try {
 
         let aggregationPipe = [
-            { $unwind: { path: '$products' } },
             {
-                $lookup: {
-                    from: 'users',
-                    localField: 'buyerId',
-                    foreignField: '_id',
-                    as: 'buyerInfo'
-                }
-            },
-            { $unwind: { path: '$buyerInfo' } },
-            {
-                $group: {
-                    _id: '$_id',
-                    orderQuantity: {
-                        $sum: '$products.quantity'
-                    },
-                    customer: { $first: { $concat: ['$buyerInfo.name.firstname', ' ', '$buyerInfo.name.lastname'] } },
-                    data: { $first: '$$ROOT' }
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    orderQuantity: 1,
-                    data: 1,
-                    customer: 1,
+                $facet: {
+                    orders: [
+                        { $unwind: { path: '$products' } },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'buyerId',
+                                foreignField: '_id',
+                                as: 'buyerInfo'
+                            }
+                        },
+                        { $unwind: { path: '$buyerInfo' } },
+                        {
+                            $group: {
+                                _id: '$_id',
+                                orderQuantity: {
+                                    $sum: '$products.quantity'
+                                },
+                                customer: { $first: { $concat: ['$buyerInfo.name.firstname', ' ', '$buyerInfo.name.lastname'] } },
+                                data: { $first: '$$ROOT' }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                orderQuantity: 1,
+                                data: 1,
+                                customer: 1,
+                            }
+                        },
+                        {
+                            $sort: { _id: 1 }
+                        }
+
+                    ],
+                    total: [
+                        {
+                            $group:
+                            {
+                                _id: null,
+                                count: { $sum: 1 },
+                            }
+                        }
+                    ]
                 }
             }
         ];
@@ -355,7 +371,7 @@ async function getSellerOrdersInventory(req, res) {
         const response = await ordersModel.aggregate(aggregationPipe);
 
         if (response) {
-            return res.status(200).json(response);
+            return res.status(200).json(response[0]);
         } else {
             throw "Order not Found";
         }
@@ -428,7 +444,6 @@ async function getOverallOrderData(req, res) {
         if (!statistics) {
             return res.status(401).send();
         }
-        console.log("Statistics", statistics);
         statistics.forEach((stats) => {
             if (stats.paymentStatus == 'success' || stats.paymentStatus == 'pending') {
                 if (stats.shipmentStatus == 'pending') {

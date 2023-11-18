@@ -25,24 +25,15 @@ const { updateItem } = require('./cart');
 async function getOverallInfo(req, res) {
   try {
     let result = {};
-
-    // Review Data
-    req['controller'] = true;
-    result['customerReview'] = await fetchReviewStats(req, res);
-    result['salesStats'] = await fetchProductSalesData(req, res);
-    result['categorySales'] = await fetchCategorySalesData(req, res);
-    result['popularStats'] = await fetchPopularProducts(req, res);
-
-    
     const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
-    
+
     const customerCountPrev = await users.find({
       'role': { $not: { $eq: 'admin' } },
       'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
-    
+
     let customerChange = customerCountPrev ? ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100 : 0;
-    
+
     result['customer'] = {
       'count': customerCountCurr,
       'change': Math.floor(customerChange)
@@ -54,7 +45,7 @@ async function getOverallInfo(req, res) {
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
-    let orderChange = orderCountPrev ?  ((orderCountTotal - orderCountPrev) / orderCountTotal) * 100 : 0;
+    let orderChange = orderCountPrev ? ((orderCountTotal - orderCountPrev) / orderCountTotal) * 100 : 0;
 
     result['orders'] = {
       'count': orderCountTotal,
@@ -89,7 +80,7 @@ async function getOverallInfo(req, res) {
                       $arrayElemAt: [
                         "$$ROOT.info.orderQuantity",
                         0]
-                      },
+                    },
                   ]
                 }, 1, 0],
             },
@@ -180,7 +171,7 @@ async function getOverallInfo(req, res) {
 
     result['revenue'] = {
       total: revenue[0].total[0].totalSales,
-      change: revenue[0].prev? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
+      change: revenue[0].prev ? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
     }
 
     res.status(200).json(result);
@@ -193,11 +184,12 @@ async function getOverallInfo(req, res) {
 async function fetchProductSalesData(req, res) {
   let controller = req.controller ? true : false;
   const data = req.tokenData;
+  const type = req.query.type;
 
   try {
     if (data.role == 'admin') {
 
-      const salesStats = await orders.aggregate([
+      let aggregationPipe = [
         {
           $unwind: "$products",
         },
@@ -220,27 +212,41 @@ async function fetchProductSalesData(req, res) {
             payment_status: "success",
             'products.shipmentStatus': { $nin: ['cancelled', 'declined'] }
           },
-        },
-        {
-          $group: {
-            _id: {
-              year: { $year: "$orderDate" },
-              month: { $month: "$orderDate" },
-            },
-            overallDiscount: { $sum: "$discount" },
-            totalsales: {
-              $sum: "$products.amount"
-            },
-            totalExpenses: {
-              $sum: {
-                $multiply: [
-                  "$products.info.costPrice",
-                  "$products.quantity",
-                ],
-              }
-            }
+        }
+      ];
+
+      let groupbyQuery = {
+
+        $group: {
+          _id: {
+            year: { $year: "$orderDate" },
+            month: { $month: "$orderDate" },
           },
+          overallDiscount: { $sum: "$discount" },
+          totalsales: {
+            $sum: "$products.amount"
+          },
+          totalExpenses: {
+            $sum: {
+              $multiply: [
+                "$products.info.costPrice",
+                "$products.quantity",
+              ],
+            }
+          }
         },
+      };
+
+      if (type == 'yearly') {
+        delete groupbyQuery.$group._id.date;
+        aggregationPipe.push(
+        )
+      } else {
+        groupbyQuery.$group._id.date = { $dayOfMonth: "$orderDate" };
+      }
+
+      aggregationPipe.push(
+        groupbyQuery,
         {
           $project: {
             _id: 1,
@@ -256,8 +262,12 @@ async function fetchProductSalesData(req, res) {
             }
           }
         },
-        { $sort: { _id: 1 } }
-      ]);
+        {
+          $sort: { _id: 1 }
+        }
+      );
+
+      const salesStats = await orders.aggregate(aggregationPipe);
       if (!salesStats) throw 401;
       if (controller) return salesStats;
 
