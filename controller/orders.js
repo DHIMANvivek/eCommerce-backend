@@ -1,6 +1,6 @@
 const ordersModel = require('./../models/order');
 const userModel = require('./../models/users');
-const { verifyToken } = require('../helpers/jwt');
+const {createToken,verifyToken}=require('../helpers/jwt');
 const { getProductPrice } = require('../controller/products');
 const { checkCoupon, updateCoupon, } = require('../controller/offers');
 const Products = require('../models/products')
@@ -55,104 +55,129 @@ async function getLatestProductForBuyer(req, res) {
 
 
 
-async function updateLatestOrderDetail(req, res) {
-    try {
-        console.log(req.body)
-        const token = req.body.buyerId;
+// async function updateLatestOrderDetail(req, res) {
+//     try {
+//         console.log(req.body)
+//         const token = req.body.buyerId;
 
-        const decoded = verifyToken(token);
-        const buyerId = decoded.id;
-        console.log("buyer id is ", buyerId)
-        const { newPaymentStatus, transactionId, MOP } = req.body;
-        const latestOrder = await ordersModel
-            .findOne({ buyerId: buyerId })
-            .sort({ createdAt: -1 })
-            .exec();
+//         const decoded = verifyToken(token);
+//         const buyerId = decoded.id;
+//         console.log("buyer id is ", buyerId)
+//         const { newPaymentStatus, transactionId, MOP } = req.body;
+//         const latestOrder = await ordersModel
+//             .findOne({ buyerId: buyerId })
+//             .sort({ createdAt: -1 })
+//             .exec();
 
-        if (!latestOrder) {
-            return res.status(404).json({ error: 'No orders found for the user' });
-        }
+//         if (!latestOrder) {
+//             return res.status(404).json({ error: 'No orders found for the user' });
+//         }
 
-        const previousOrder = await ordersModel
-            .findOne({ buyerId: buyerId, payment_status: 'success' })
-            .sort({ orderDate: -1 })
-            .exec();
+//         const previousOrder = await ordersModel
+//             .findOne({ buyerId: buyerId, payment_status: 'success' })
+//             .sort({ orderDate: -1 })
+//             .exec();
 
-        buyId = buyerId.slice(buyerId.length - 4, buyerId.length);
+//         buyId = buyerId.slice(buyerId.length - 4, buyerId.length);
 
-        // console.log("edited buyid is ", buyId)
+//         // console.log("edited buyid is ", buyId)
 
-        let orderId = 0;
+//         let orderId = 0;
 
-        if (previousOrder) {
-            const prevOrderId = previousOrder.orderID.split('-');
-            orderId = parseInt(prevOrderId[1]) + 1;
-        }
+//         if (previousOrder) {
+//             const prevOrderId = previousOrder.orderID.split('-');
+//             orderId = parseInt(prevOrderId[1]) + 1;
+//         }
 
-        const result = await ordersModel.updateOne(
-            { _id: latestOrder._id },
-            {
-                $set: {
-                    payment_status: newPaymentStatus,
-                    transactionId: transactionId,
-                    MOP: MOP,
-                    orderID: `${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
-                }
+//         const result = await ordersModel.updateOne(
+//             { _id: latestOrder._id },
+//             {
+//                 $set: {
+//                     payment_status: newPaymentStatus,
+//                     transactionId: transactionId,
+//                     MOP: MOP,
+//                     orderID: `${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
+//                 }
+//             }
+//         );
+
+//         console.log('new user status is ', newPaymentStatus);
+
+//         latestOrder.products.forEach(async (el) => {
+
+//             console.log('el quantity is ------------> ', el.quantity);
+//             const findQuantity = await Products.findOne({
+//                 sku: el.sku,
+//                 'assets.color': el.color,
+//                 'assets.stockQuantity.size': el.size
+//             }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
+//             if (el.quantity > findQuantity) el.quantity = findQuantity;
+//             else el.quantity = el.quantity;
+
+//                     const findQuantity = await Products.findOne({
+//                         sku: el.sku,
+//                         'assets.color': el.color,
+//                         'assets.stockQuantity.size': el.size
+//                     }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
+//                     if (el.quantity > findQuantity) el.quantity = findQuantity;
+//                     else el.quantity = el.quantity;
+                   
+//                     const updateProduct = await Products.updateOne(
+//                         {
+//                             sku: el.sku,
+//                             'assets.color': el.color,
+//                             'assets.stockQuantity.size': el.size
+//                         },
+    
+//                         {
+//                             $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+//                         },
+//                         {
+//                             arrayFilters: [
+//                                 { "outer.color": el.color },
+//                                 { "inner.size": el.size }
+//                             ]
+//                         }
+//                     );
+//                 })
+    
+//                 res.status(200).json({ message: 'Latest order payment status updated successfully' });
+            
+//         } catch (error) {
+//             console.log('error coming is ------------------->', error);
+//             res.status(500).json({ error: 'Failed to update the latest order payment status' });
+//         }
+//     }
+    
+    
+
+    async function VerifyOrder(req,res){
+            try {
+                const verify=await verifyOrderSummary(req,res);
+                res.status(200).json(verify);
+            } catch (error) {
+                res.status(500).json(error);
             }
-        );
-
-        console.log('new user status is ', newPaymentStatus);
-
-        latestOrder.products.forEach(async (el) => {
-
-            console.log('el quantity is ------------> ', el.quantity);
-            const findQuantity = await Products.findOne({
-                sku: el.sku,
-                'assets.color': el.color,
-                'assets.stockQuantity.size': el.size
-            }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
-            if (el.quantity > findQuantity) el.quantity = findQuantity;
-            else el.quantity = el.quantity;
-
-            const updateProduct = await Products.updateOne(
-                {
-                    sku: el.sku,
-                    'assets.color': el.color,
-                    'assets.stockQuantity.size': el.size
-                },
-
-                {
-                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                },
-                {
-                    arrayFilters: [
-                        { "outer.color": el.color },
-                        { "inner.size": el.size }
-                    ]
-                }
-            );
-        })
-
-        res.status(200).json({ message: 'Latest order payment status updated successfully' });
-
-    } catch (error) {
-        console.log('error coming is ------------------->', error);
-        res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
-}
 
 async function verifyOrderSummary(req, res) {
     try {
 
         let response = {};
+        if(!req.body?.details){
+            req.body.details=req.body.products;
+        }
+
         let result = await Promise.all(req.body.details.map(async (element) => {
+            
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
+            element.sellerID = response.sellerID;
             return new Promise((res, rej) => {
                 if (response.info.orderQuantity.includes(element.quantity)) {
                     return res(response.price * element.quantity);
                 }
                 else {
-                    rej(0);
+                    rej({message:'Sorry Order Quantity Selected is not available'});
                 }
             });
         }));
@@ -186,76 +211,81 @@ async function verifyOrderSummary(req, res) {
         response.shipping = 0;
         if (!response.savings) response.savings = 0;
         if (!response.total) response.total = response.subTotal;
-        createOrderId();
-        res.status(200).json(response);
+        return new Promise((res,rej)=>{
+            res(response);
+        });
+
     } catch (error) {
         res.status(500).json(error);
     }
 }
 
 
-
+async function generateOrderId(req,res){
+    
+}
+    
 
 async function createOrder(req, res) {
     try {
-        req.body.buyerId = req.tokenData.id;
-        if (req.body.coupon) {
-            let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
-            if (!response) { throw ({ message: 'You already use this coupon' }) }
+
+        console.log('req body coming is ',req.body);
+        // return;
+        // VERIFY ORDER
+        const verifyOrder=await verifyOrderSummary(req,res);
+
+        console.log('req body products is ',req.body.products);
+
+        req.body.buyerId=req.tokenData.id;
+        if(req.body.coupon){
+           let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
+           if(!response){ throw({message:'You already use this coupon'})}
         }
 
 
-        await Promise.all(req.body.products.map(async (element) => {
-            const matchedProduct = await productsModel.findOne({ sku: element.sku }, { sellerID: 1 });
-            element.sellerID = matchedProduct.sellerID;
-            const findQuantity = await Products.find({ sku: element.sku, 'assets.color': element.color, 'assets.stockQuantity.size': element.size }, { 'assets.$': 1 })
-            for (let el of findQuantity[0].assets[0].stockQuantity) {
-                if (el.size == element.size) {
-                    if (el.quantity < element.quantity) {
-                        throw ({ message: 'Product quantity selected is greater than  expected' })
-                    }
-                    break;
+        const UserLastOrder=await ordersModel.findOne({buyerId:req.tokenData.id}).sort({createdAt:-1});
+
+        // order ID creation
+        if(!UserLastOrder){
+            let tokenCreated=createToken(req.tokenData.id);
+            req.body.orderID='Order'+tokenCreated.substring(tokenCreated.length - 4)+1;
+        }   
+        else{
+            req.body.orderID=UserLastOrder?.orderID?.slice(0,-1)+(Number(UserLastOrder.orderID.slice(-1))+1);
+        }
+    
+    
+        if(req.body.payment_status=='confirmed'){
+        await updateCoupon(req.body.coupon._id, req.tokenData.id);
+        req.body.products.forEach(async (el)=>{
+            const updateProduct = await Products.updateOne(
+                {
+                  sku: el.sku,
+                  'assets.color': el.color,
+                  'assets.stockQuantity.size': el.size
+                },
+                
+                {
+                  $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                },
+                {
+                  arrayFilters: [
+                    { "outer.color": el.color }, 
+                    { "inner.size": el.size } 
+                  ]
                 }
-            }
-
-            return element;
-        }));
-
-        const orderCreated = ordersModel(req.body);
-
-
-        await orderCreated.save();
-
-
-        if (req.body.payment_status == 'confirmed') {
-            await updateCoupon(req.body.coupon._id, req.tokenData.id);
-            req.body.products.forEach(async (el) => {
-                const updateProduct = await Products.updateOne(
-                    {
-                        sku: el.sku,
-                        'assets.color': el.color,
-                        'assets.stockQuantity.size': el.size
-                    },
-
-                    {
-                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                    },
-                    {
-                        arrayFilters: [
-                            { "outer.color": el.color },
-                            { "inner.size": el.size }
-                        ]
-                    }
-                );
-            })
+              );
+        })
 
         }
+ 
 
-
-        res.status(200).json('order created success');
+    const orderCreated=ordersModel(req.body);
+    await  orderCreated.save();
+        res.status(200).json({message:'order created success'});
 
     } catch (error) {
-        console.log('error thrown started----> ', error);
+        console.log('error coming is ',error);
         res.status(500).json(error);
     }
 }
@@ -486,13 +516,14 @@ async function cancelOrderedProduct(req, res) {
 module.exports = {
     getOrders,
     createOrder,
-    verifyOrderSummary,
+    // verifyOrderSummary,
+    VerifyOrder,
     getParicularUserOrders,
 
 
     getSellerOrdersInventory,
     getSellerOrderDetails,
-    updateLatestOrderDetail,
+    // updateLatestOrderDetail,
     getLatestProductForBuyer,
     getOverallOrderData,
     cancelOrderedProduct

@@ -8,71 +8,6 @@ const { OAuth2Client } = require('google-auth-library');
 const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
 
 
-// async function login(req, res) {
-//     try {
-//         const input = req.body;
-//         const userFound = await usersModel.findOne({
-//             email: input.email
-//         })
-//         if (input.token) {
-//             const googleOathClient = new OAuth2Client();
-//             const googleToken = await googleOathClient.verifyIdToken({
-//                 idToken: req.body.token.credential
-//             });
-//             input.email = googleToken.getPayload().email;
-//             input.provider = 'GOOGLE';
-//             req.body.name = {
-//                 firstname: googleToken.getPayload().given_name,
-//                 lastname: googleToken.getPayload().family_name
-//             }
-
-//             // const firstName = req.body.name.firstname; 
-//         }
-//         const firstName = userFound?.name.firstname
-
-//         if (!userFound) {
-//             throw ({ message: 'User not found! Kindly sign in.' })
-//         }
-
-
-//         // PURE GOOGLE LOGIN
-//         if (userFound.provider == 'GOOGLE' && input.token) {
-//             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
-//             const token = createToken(tokenData);
-//             res.status(200).json({ message: 'login sucece', token, firstName });
-//             return;
-//         }
-
-//         // GOOGLE USER TRYING TO LOGIN MANUALLY.
-//         if (userFound.provider == 'GOOGLE') {
-//             throw ({ message: 'Try login with Google, you already have account registered with it.' });
-//         }
-
-//         // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
-//         if (userFound.provider == 'direct' && input.token) {
-//             throw ({ message: 'Try to login manually.' });
-//         }
-
-//         // PURE MANUAL LOGIN
-//         const compare = await bcryptjs.compare(input.password, userFound.password);
-//         if (!compare) {
-//             throw ({ message: 'Incorrect Password!' })
-//         }
-
-//         const tokenData = { id: userFound._id, role: userFound.role }
-//         const token = createToken(tokenData);
-
-//         res.status(200).json({
-//             message: "Login Successful",
-//             token, firstName
-//         })
-//     } catch (error) {
-//         if (error.message) {
-//             res.status(500).json(error);
-//             return;
-//         }
-//     }
-// }
 async function login(req, res) {
     try {
         const input = req.body;
@@ -102,7 +37,7 @@ async function login(req, res) {
         if (userFound.provider == 'GOOGLE' && input.token) {
             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
-            res.status(200).json({ message: 'login sucece', token, firstName });
+            res.status(200).json({token, firstName });
             return;
         }
 
@@ -126,16 +61,18 @@ async function login(req, res) {
 
         const token = createToken(tokenData);
         res.status(200).json({
-            message: "Login Successful",
             token, firstName
         })
     } catch (error) {
+        if(error.error.message)
+       return res.status(500).json(error);
+        }
         res.status(500).json({
-            message: 'No User found'
+            message: 'Internal Server Error'
         });
         return;
     }
-}
+
 
 async function signup(req, res) {
     try {
@@ -176,7 +113,7 @@ async function signup(req, res) {
             role: userCreated.role
         }
         const token = createToken(tokenData);
-        res.status(200).json({ token, message: 'Signup Successful!', firstName });
+        res.status(200).json({ token, firstName });
 
     } catch (error) {
         if (error.message) {
@@ -204,7 +141,7 @@ async function forgotPassword(req, res) {
             throw { message: "This email doesn't exist." }
         }
         if (user.provider == 'GOOGLE') {
-            return res.status(500).json({ message: 'You cannot change your password as you are a Google user.' });
+            throw ({ message: 'You cannot change your password as you are a Google user.' });
         }
         const hasRequested = await passwordModel.findOne({
             UserId: user._id
@@ -247,7 +184,6 @@ async function updatePassword(req, res) {
         })
 
         let currentTime = new Date().getTime();
-
         let requesterTime = requesterFound.createdAt.getTime();
 
         const checkTime = (currentTime - requesterTime) / 60000;
@@ -259,10 +195,10 @@ async function updatePassword(req, res) {
         if (checkTime < 5) {
 
             const user = await usersModel.findById(tokenData.id)
-            const compare = await bcryptjs.compare(input.password, user.password)
 
+            const compare = await bcryptjs.compare(input.password, user.password)
             if (compare) {
-                return res.status(400).json({
+                throw({
                     message: 'Cannot set same password as before'
                 })
             }
@@ -314,13 +250,10 @@ async function changePassword(req, res) {
         })
     }
     catch (error) {
-        // if (error.message) {
-        //     res.status(500).json(error);
-        //     return;
-        // }
-        // res.status(500).json({
-        //     message : "Your old password is incorrect!"
-        // });
+        if (error.message) {
+            res.status(500).json(error);
+            return;
+        }
         res.status(500).json({
             message: "Your old password is incorrect."
         })
@@ -335,18 +268,3 @@ module.exports = {
     changePassword
 }
 
-// if (tokenData.password === user.password) {
-//     await usersModel.updateOne({
-//         email: user.email
-//     }, {
-//         $set: { 'password': await bcryptjs.hash(input.password, 10) }
-//     })
-
-//     await passwordModel.deleteOne({
-//         UserId: tokenData.id
-//     })
-
-//     return res.status(200).json({
-//         message: "Password Changed Successfully!"
-//     })
-// }
