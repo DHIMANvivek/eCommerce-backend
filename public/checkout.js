@@ -151,10 +151,6 @@ window.onload = async function() {
         body: JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) }),
       });
 
-      //   const inr = JSON.stringify({ items: JSON.parse(localStorage.getItem('paymentIntent')) });
-      // const inrObject = JSON.parse(inr);
-      // const price = inrObject.items[0].price;
-
       const { clientSecret } = await response.json();
 
       const appearance = {
@@ -168,7 +164,7 @@ window.onload = async function() {
           spacingUnit: '3px',
           borderRadius: '4px',
         },
-        //  labels: 'floating',
+         labels: 'floating',
       };
       // const elements = stripe.elements();
       elements = stripe.elements({ clientSecret, appearance });

@@ -156,6 +156,39 @@ async function removeItem(req, res) {
     }
 }
 
+async function removeItems(req, res) {
+    try {
+        const userId = req.tokenData.id;
+        const receivedData = JSON.parse(req.body.description);
+
+        if (!Array.isArray(receivedData) || !receivedData.length || !receivedData[0].id || !Array.isArray(receivedData[0].id)) {
+            return res.status(400).json({ message: 'Invalid data format' });
+        }
+
+        const skusToRemove = receivedData.flatMap(item => item.id);
+        
+        const promises = skusToRemove.map(async (sku) => {
+            await Cart.updateOne({ userId: userId }, { $pull: { items: { sku: sku } } });
+        });
+
+        await Promise.all(promises);
+
+        return res.status(200).json({ message: 'Items removed from cart' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Problem while removing items from cart' });
+    }
+}
+
+
+
+
+
+
+
+
+    
+
+
 async function updateItem(req, res) {
     try {
         const userId = req.tokenData.id;
@@ -205,6 +238,6 @@ module.exports = {
     updateItem,
     removeItem,
     clearCart,
-    removeItem
+    removeItems
    
 }

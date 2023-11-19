@@ -96,7 +96,7 @@ async function updateLatestOrderDetail(req, res) {
                     payment_status: newPaymentStatus,
                     transactionId: transactionId,
                     MOP: MOP,
-                    orderID: `Order-${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
+                    // orderID: `Order-${buyId}-${newPaymentStatus === 'success' ? orderId : 0}`
                 }
             }
         );
