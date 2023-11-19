@@ -2,11 +2,23 @@ const Reviews = require('../models/reviews');
 
 async function fetchReviews(productId, userId = '') {
     try {
-        let reviews = (await Reviews.findOne({ productID: productId })
+        let reviews = JSON.parse(JSON.stringify((await Reviews.findOne({ productID: productId })
             .populate({
                 path: 'reviews.userId',
                 select: 'name'
-            })).reviews;
+            })).reviews));
+
+        reviews = reviews.map(review => {
+            if (review.userId === null) {
+                review.userId = {
+                    name: {
+                        firstname: 'Deleted',
+                        lastname: 'User'
+                    }
+                };
+            }
+            return review;
+        })
 
         // getting avg rating 
         let avgRating = reviews.reduce((accumulator, current) => {
@@ -45,7 +57,7 @@ async function fetchReviews(productId, userId = '') {
 async function addOrUpdateReview(req, res) {
     try {
 
-        if(req.tokenData.role == 'admin'){
+        if (req.tokenData.role == 'admin') {
             res.status(403).json({
                 message: 'Admin not allowed to review a product'
             });

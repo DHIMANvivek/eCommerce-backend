@@ -741,7 +741,7 @@ async function updateDetails(req, res) {
   console.log(req.body);
 
   const userToken = req.body.data.info.token;
-  const payload = JSON.parse(atob(userToken.split('.')[1]));
+  // const payload = JSON.parse(atob(userToken.split('.')[1]));
   const id = req.tokenData.id;
 
   const emails=await users.findOne({_id:req.tokenData.id},{email:1,_id:0});
@@ -925,7 +925,7 @@ async function getPaymentKeys(req, res) {
 async function addPaymentKeys(req, res) {
   try {
     const { publicKey, privateKey } = req.body;
-    const decodedPayload = atob(req.body.adminId);
+    // const decodedPayload = atob(req.body.adminId);
     const admin = JSON.parse(decodedPayload);
     const adminId = admin.id;
 

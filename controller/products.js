@@ -69,10 +69,6 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 // exploring, searching and filtering
 async function fetchProducts(req, res) {
     try {
-
-        delete req.query.type;
-
-        req.query = req.query ? req.query : req.body;
         // Search
         let search = req.query.search || '';
         delete req.query.search;

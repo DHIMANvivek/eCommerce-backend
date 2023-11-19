@@ -17,6 +17,4 @@ async function JwtVerify(req, res, next) {
     }
 }
 
-
 module.exports = JwtVerify;
-

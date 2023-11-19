@@ -51,7 +51,7 @@ async function getAllPaymentKeys(req, res) {
       async function addPaymentKeys(req, res) {
         try {
           const { publicKey, privateKey, rzpPublicKey, rzpPrivateKey } = req.body;
-          const decodedPayload = atob(req.body.adminId);
+          // const decodedPayload = atob(req.body.adminId);
           const admin = JSON.parse(decodedPayload);
           const adminId = admin.id;
       

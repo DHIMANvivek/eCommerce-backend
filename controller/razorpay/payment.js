@@ -24,7 +24,7 @@ const createUpiPayment = async (req, res) => {
                 if (!err) {
                     const token = req.body.token;
                     const [header, payload, signature] = token.split('.');
-                    const decodedPayload = atob(payload);
+                    // const decodedPayload = atob(payload);
                     const payloadData = JSON.parse(decodedPayload);
 
                     res.status(200).send({

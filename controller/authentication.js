@@ -37,7 +37,7 @@ async function login(req, res) {
         if (userFound.provider == 'GOOGLE' && input.token) {
             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
-            res.status(200).json({token, firstName });
+            res.status(200).json({ token, firstName });
             return;
         }
 
@@ -64,14 +64,14 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        if(error.error.message)
-       return res.status(500).json(error);
-        }
+        if (error.error.message) return res.status(500).json(error);
+
         res.status(500).json({
             message: 'Internal Server Error'
         });
         return;
     }
+}
 
 
 async function signup(req, res) {
@@ -198,7 +198,7 @@ async function updatePassword(req, res) {
 
             const compare = await bcryptjs.compare(input.password, user.password)
             if (compare) {
-                throw({
+                throw ({
                     message: 'Cannot set same password as before'
                 })
             }
