@@ -785,8 +785,6 @@ async function updateDetails(req, res) {
 }
 
 async function getAdminDetails(req, res) {
-  const userToken = req.query.token;
-  const payload = JSON.parse(atob(userToken.split('.')[1]));
   const id = req.tokenData.id;
 
   try {
