@@ -122,7 +122,7 @@ async function updateLatestOrderDetail(req, res) {
                         },
     
                         {
-                            $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                            $inc: { 'assets.$[outer]..$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
                         },
                         {
                             arrayFilters: [
