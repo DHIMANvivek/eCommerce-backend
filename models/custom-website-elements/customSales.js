@@ -30,6 +30,9 @@ const salesSchema = new mongoose.Schema(
             },
             buttonColor: {
                 type: String,
+            },
+            cardColor: {
+                type: String,
             }
         },
         enable: {

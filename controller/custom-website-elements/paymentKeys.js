@@ -51,9 +51,7 @@ async function getAllPaymentKeys(req, res) {
       async function addPaymentKeys(req, res) {
         try {
           const { publicKey, privateKey, rzpPublicKey, rzpPrivateKey } = req.body;
-          // const decodedPayload = atob(req.body.adminId);
-          const admin = JSON.parse(decodedPayload);
-          const adminId = admin.id;
+          const adminId =  req.tokenData.id
       
           let adminKeys = await PaymentKeys.findOne({});
       
@@ -114,11 +112,8 @@ async function getAllPaymentKeys(req, res) {
   
       async function deletePaymentKeys(req, res) {
         const { id } = req.body;
-        console.log(id);
-        
         try {
           const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
-          console.log(data);
       
           if (data) {
             res.status(200).json({ message: 'Payment Key deleted Successfully' });

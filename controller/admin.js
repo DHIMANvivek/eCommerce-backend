@@ -747,7 +747,7 @@ async function updateDetails(req, res) {
   const emails=await users.findOne({_id:req.tokenData.id},{email:1,_id:0});
   const email = emails.email
   console.log(email)
-  const role = payload.role;
+  const role = req.tokenData.role;
   const data = req.body.data;
 
   if (data && role == 'admin' && email && data.name && data.name.firstname !== undefined) {
