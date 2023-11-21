@@ -6,8 +6,14 @@ const crypto = require("crypto");
 const admin = require('firebase-admin');
 const fs = require('fs');
 require('dotenv').config();
-
 const app = express();
+const redisClient = require('./config/redisClient');
+redisClient.connect();
+
+redisClient.on('connect', function() {
+  console.log('redis Connected!');
+});
+
 app.use(bodyParser.json({ limit: '50mb' }));
 
 const serviceAccount = require('./tradevogue-firebase-adminsdk-mohjp-c7361ba1b1.json');
@@ -19,7 +25,6 @@ serviceAccount.client_email = process.env.GOOGLE_CLIENT_EMAIL;
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-
 
 app.post('/send-notification', (req, res) => {
   const { title, body, icon, url, token , registration_ids } = req.body;

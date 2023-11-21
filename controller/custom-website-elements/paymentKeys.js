@@ -1,4 +1,5 @@
 const PaymentKeys = require('./../../models/custom-website-elements/paymentKeys');
+const redisClient = require('./../../config/redisClient');
 
 async function getPaymentKeys(req, res) {
     try {
@@ -112,8 +113,11 @@ async function getAllPaymentKeys(req, res) {
   
       async function deletePaymentKeys(req, res) {
         const { id } = req.body;
+        console.log(id);
+        
         try {
           const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
+          console.log(data);
       
           if (data) {
             res.status(200).json({ message: 'Payment Key deleted Successfully' });
@@ -127,6 +131,19 @@ async function getAllPaymentKeys(req, res) {
         }
       }
       
+      async function getRedisData(req, res) {
+        try {
+          await redisClient.get('payment_intent_client_secret').then((data) => {
+            console.log(data);
+            res.status(200).json(data);
+          })
+        } catch (error) {
+          console.log('Error:', error);
+          res.status(500).json(error);
+        }
+      }
+      
+      
   
 
 module.exports = {
@@ -134,5 +151,6 @@ module.exports = {
     updatePaymentKeys,
     addPaymentKeys,
     getPaymentKeys,
-    getAllPaymentKeys
+    getAllPaymentKeys,
+    getRedisData
 }

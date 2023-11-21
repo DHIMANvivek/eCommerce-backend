@@ -7,6 +7,7 @@ const { SubscribeTemplate } = require('../../helpers/INDEX');
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
+const redisClient = require('./../../config/redisClient');
 const paginateResults = require('../../helpers/pagination');
 const Notification = require('../../models/notifications/notifications')
 const axios = require('axios');
@@ -37,7 +38,6 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
-
 
 
 
@@ -100,6 +100,14 @@ router.post('/create-payment-intent', async (req, res) => {
                 enabled: true,
             },
         });
+
+          redisClient.set('payment_intent_client_secret', paymentIntent.client_secret, 'EX', 3600, (err, reply) => {
+            if (err) {
+              console.error('Error storing client secret:', err);
+            } else {
+              console.log('Client secret stored in Redis');
+            }
+          });
 
         res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
     } catch (error) {
