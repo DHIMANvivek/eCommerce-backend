@@ -40,6 +40,7 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 router.use('/notification', require('./v1/notifications/notification'));
 
 
+router.use('/tc', require('./v1/tc'))
 
 // check type of user (Used for purpose of Authguard)
 router.get('/checkUser', (req, res) => {

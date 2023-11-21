@@ -10,6 +10,7 @@ const productSchema = mongoose.Schema({
   sku: {
     type: String,
     required: true,
+    lowercase: true,
     unique: true
   },
   name: {
@@ -34,7 +35,6 @@ const productSchema = mongoose.Schema({
       stockQuantity: [{
         size: {
           type: String,
-          unique: true,
           enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
           required: true
         },
@@ -111,8 +111,7 @@ const productSchema = mongoose.Schema({
   },
   highlight: {
     type: Boolean,
-    lowercase: true,
-    default: ''
+    default: false
   }
 },
   {

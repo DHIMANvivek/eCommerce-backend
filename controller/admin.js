@@ -39,9 +39,10 @@ async function getOverallInfo(req, res) {
       'change': Math.floor(customerChange)
     };
 
-    const orderCountTotal = await orders.find({}).count();
+    const orderCountTotal = await orders.find({ payment_status: 'success' }).count();
 
     const orderCountPrev = await orders.find({
+      payment_status: 'success',
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
@@ -466,12 +467,35 @@ async function addProduct(req, res) {
     if (productObject.type == 'bulk') {
       let data = productObject.data;
 
-      data = await Promise.all(data.map(async (product) => {
+      let seller_info = await sellerInfo.findOne({ sellerID: sellerID });
+
+      data.forEach((product) => {
+        if (!seller_info['categories'].includes(product.info.category.toLowerCase())) {
+          seller_info['categories'].push(product.info.category);
+        }
+
+        if (!seller_info['brands'].includes(product.info.brand)) {
+          seller_info['brands'].push(product.info.brand);
+        }
+        product.info.tags.forEach((tag) => {
+          if (!seller_info['tags'].includes(tag.toLowerCase())) {
+            seller_info['tags'].push(tag);
+          }
+        });
+      })
+
+      await sellerInfo.updateOne({ sellerID: sellerID }, { $set: seller_info });
+
+      for (const product of data) {
+        // Add the sellerID for each product
         product['sellerID'] = sellerID;
+
+        // Generate SKU for the product
         product['sku'] = await SKU_generater.generateSKU(product);
-        return product;
-      }));
-      response = await products.insertMany(productObject.data);
+
+        response = await products.create(product);
+      }
+
     } else {
       Object.keys(productObject.data.basicinfo).forEach((key) => {
         productObject.data[key] = productObject.data.basicinfo[key];
@@ -485,8 +509,8 @@ async function addProduct(req, res) {
     return res.status(200).json("uploaded");
 
   } catch (err) {
+    console.log(err);
     return res.status(401).json(err);
-
   }
 }
 
@@ -639,7 +663,7 @@ async function fetchProductInventory(req, res) {
       }
     ];
 
-
+    let sortFilter = false;
     Object.keys(parameters.filter).forEach((key) => {
       if (parameters.filter[key]) {
         if (key == 'categories') {
@@ -647,15 +671,17 @@ async function fetchProductInventory(req, res) {
         }
         if (key == 'rating') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'avgRating': parameters.filter[key] } });
+          sortFilter = true;
         }
         else if (key == 'stockQuantity') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'inventory': parameters.filter[key] } });
+          sortFilter = true;
         }
       }
     });
 
-
     aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } });
+
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       {
         $lookup: {
@@ -667,14 +693,23 @@ async function fetchProductInventory(req, res) {
       },
       {
         $unwind: '$productInfo'
-      },
-      {
-        $sort: { 'productInfo.name': 1 }
-      },
-      { $skip: (parameters.page - 1) * parameters.limit },
-      { $limit: parameters.limit },
+      }
     );
 
+    if (!sortFilter) {
+      aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
+        {
+          $sort: { 'productInfo.name': 1 }
+        }
+      );
+    }
+
+
+
+    aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
+      { $skip: (parameters.page - 1) * parameters.limit },
+      { $limit: parameters.limit }
+    );
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
     res.status(200).json(response[0]);
@@ -744,7 +779,7 @@ async function updateDetails(req, res) {
   // const payload = JSON.parse(atob(userToken.split('.')[1]));
   const id = req.tokenData.id;
 
-  const emails=await users.findOne({_id:req.tokenData.id},{email:1,_id:0});
+  const emails = await users.findOne({ _id: req.tokenData.id }, { email: 1, _id: 0 });
   const email = emails.email
   console.log(email)
   const role = req.tokenData.role;
