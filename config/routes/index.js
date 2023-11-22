@@ -41,24 +41,32 @@ router.use('/notification', require('./v1/notifications/notification'));
 
 
 
-router.use('/tc', require('./v1/tc')) ;
 
-// check type of user (Used for purpose of Authguard
-router.get('/checkUser', (req, res) => {
+// check type of user (Used for purpose of Authguard)
+// router.get('/checkUser', (req, res) => {
 
+//     const token = req.headers.authorization;
+//     try {
+//         if (token) {
+//             const data = verifyToken(token.split(' ')[1]);
+//             if (data.role != 'admin') {
+//                 throw ({ message: 'You are not an admin.' })
+//             }
+//             return res.json("sucess");
+//         }
+//         throw { message: 'Please login/signup first.' };
+//     } catch (error) {
+//         return res.status(404).json(error);
+//     }
+// })
+
+router.get('/checkUser',(req,res)=>{
     const token = req.headers.authorization;
-    try {
-        if (token) {
-            const data = verifyToken(token.split(' ')[1]);
-            if (data.role != 'admin') {
-                throw ({ message: 'You are not an admin.' })
-            }
-            return res.json("sucess");
-        }
-        throw { message: 'Please login/signup first.' };
-    } catch (error) {
-        return res.status(404).json(error);
+    if(token){
+    return res.status(200).json(verifyToken(token.split(' ')[1]).role);
     }
+    return res.status(500).json(null);
+
 })
 
 //send subscribe mail 

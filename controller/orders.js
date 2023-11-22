@@ -57,38 +57,18 @@ async function getLatestProductForBuyer(req, res) {
 
 async function updateLatestOrderDetail(req, res) {
     try {
-        console.log(req.body)
-        const token = req.body.buyerId;
 
-        const decoded = verifyToken(token);
-        const buyerId = decoded.id;
-        console.log("buyer id is ", buyerId)
+        const buyerId = req.tokenData.id;
         const { newPaymentStatus, transactionId, MOP } = req.body;
+        console.log('new Payment status is ',req.body);
         const latestOrder = await ordersModel
             .findOne({ buyerId: buyerId })
             .sort({ createdAt: -1 })
-            .exec();
+            // .exec();
 
         if (!latestOrder) {
             return res.status(404).json({ error: 'No orders found for the user' });
         }
-
-        const previousOrder = await ordersModel
-            .findOne({ buyerId: buyerId, payment_status: 'success' })
-            .sort({ orderDate: -1 })
-            .exec();
-
-        buyId = buyerId.slice(buyerId.length - 4, buyerId.length);
-
-        // console.log("edited buyid is ", buyId)
-
-        let orderId = 0;
-
-        if (previousOrder) {
-            const prevOrderId = previousOrder.orderID.split('-');
-            orderId = parseInt(prevOrderId[1]) + 1;
-        }
-
         const result = await ordersModel.updateOne(
             { _id: latestOrder._id },
             {
@@ -101,19 +81,14 @@ async function updateLatestOrderDetail(req, res) {
             }
         );
 
-        console.log('new user status is ', newPaymentStatus);
-
         latestOrder.products.forEach(async (el) => {
-
-            console.log('el quantity is ------------> ', el.quantity);
             const findQuantity = await Products.findOne({
                 sku: el.sku,
                 'assets.color': el.color,
                 'assets.stockQuantity.size': el.size
             }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
             if (el.quantity > findQuantity) el.quantity = findQuantity;
-            else el.quantity = el.quantity;
-                   
+
                     const updateProduct = await Products.updateOne(
                         {
                             sku: el.sku,
@@ -122,7 +97,7 @@ async function updateLatestOrderDetail(req, res) {
                         },
     
                         {
-                            $inc: { 'assets.$[outer]..$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                            $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
                         },
                         {
                             arrayFilters: [
@@ -133,14 +108,18 @@ async function updateLatestOrderDetail(req, res) {
                     );
                 })
     
-                res.status(200).json({ message: 'Latest order payment status updated successfully' });
+
+        if(req.body.coupon){
+                  await  updateCoupon(coupon._id);
+        }
+
+
+    res.status(200).json({ message: 'Latest order payment status updated successfully' });
             
         } catch (error) {
-            console.log('error coming is ------------------->', error);
             res.status(500).json({ error: 'Failed to update the latest order payment status' });
         }
     }
-    
     
 
     async function VerifyOrder(req,res){
@@ -161,6 +140,8 @@ async function verifyOrderSummary(req, res) {
         }
 
         let result = await Promise.all(req.body.details.map(async (element) => {
+            console.log("element is ",element.assets[0].stockQuantity);
+            console.log(element)
             
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
             element.sellerID = response.sellerID;
@@ -239,29 +220,29 @@ async function createOrder(req, res) {
         }
     
     
-        if(req.body.payment_status=='confirmed'){
-        await updateCoupon(req.body.coupon._id, req.tokenData.id);
-        req.body.products.forEach(async (el)=>{
-            const updateProduct = await Products.updateOne(
-                {
-                  sku: el.sku,
-                  'assets.color': el.color,
-                  'assets.stockQuantity.size': el.size
-                },
+        // if(req.body.payment_status=='confirmed'){
+        // await updateCoupon(req.body.coupon._id, req.tokenData.id);
+        // req.body.products.forEach(async (el)=>{
+        //     const updateProduct = await Products.updateOne(
+        //         {
+        //           sku: el.sku,
+        //           'assets.color': el.color,
+        //           'assets.stockQuantity.size': el.size
+        //         },
                 
-                {
-                  $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                },
-                {
-                  arrayFilters: [
-                    { "outer.color": el.color }, 
-                    { "inner.size": el.size } 
-                  ]
-                }
-              );
-        })
+        //         {
+        //           $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+        //         },
+        //         {
+        //           arrayFilters: [
+        //             { "outer.color": el.color }, 
+        //             { "inner.size": el.size } 
+        //           ]
+        //         }
+        //       );
+        // })
 
-        }
+        // }
  
 
     const orderCreated=ordersModel(req.body);
@@ -478,8 +459,13 @@ async function getOverallOrderData(req, res) {
 
 
 async function cancelOrderedProduct(req, res) {
-    const { orderId, productId } = req.body;
+    const { orderId, sku } = req.body;
     try {
+        console.log('order is ',orderId,"product id is ",sku);
+        // return;
+        const orderUpdate=await ordersModel.updateOne({_id:orderId,'products.sku':sku},{$set:{'products.$.shipmentStatus':'cancelled'}}) 
+        console.log(orderUpdate)
+        return;
         const order = await ordersModel.findById(orderId);
         const product = order?.products.id(productId);
 
@@ -491,7 +477,6 @@ async function cancelOrderedProduct(req, res) {
         await order.save();
         return res.status(200).json({ message: 'Product cancelled successfully' });
     } catch (error) {
-        console.log(error, "error in deleting ---------");
         return res.status(500).json({ message: 'Error cancelling the product' });
     }
 }

@@ -1,6 +1,6 @@
 const { verifyToken } = require('../helpers/jwt');
 
-async function JwtVerify(req, res, next) {
+function JwtVerify(req, res, next) {
     try {
         let data;
         if (req.headers.authorization){
@@ -16,5 +16,23 @@ async function JwtVerify(req, res, next) {
 
     }
 }
+
+ function CheckUser(req,res){
+    try {
+        let data;
+        if (req.headers.authorization){
+            data = verifyToken(req.headers.authorization.split(' ')[1])
+        }
+        console.log('data come up is ',data);
+        req.tokenData = data;
+        // next();
+    } catch (error) {
+        res.status(500).json(error);
+
+    }
+}
+
+
+
 
 module.exports = JwtVerify;

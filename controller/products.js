@@ -438,13 +438,19 @@ async function getProductPrice(products) {
                 res(product);
                 return;
             }
+
             product.discount = discount.discountAmount;
+            if(product.price-discount.discountAmount<=0){
+                product.discount=0;
+                 res(product);
+            }
             if (discount.discountType == 'percentage') {
                 product.discountPercentage = discount.discountAmount;
-                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
 
+                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
                 if (product.discount > discount.maximumDiscount) {
                     product.discount = Math.floor(discount.maximumDiscount);
+                    product.discountPercentage=Math.floor((product.discount*100)/product.price);
                 }
 
 
@@ -453,7 +459,7 @@ async function getProductPrice(products) {
 
             if (product.discount) {
                 product.oldPrice = product.price;
-                product.price = (product.price - product.discount) <= 0 ? 0 : (product.price - product.discount)
+                product.price =(product.price - product.discount)
 
             }
 
