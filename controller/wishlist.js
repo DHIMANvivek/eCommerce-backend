@@ -93,10 +93,11 @@ async function addToWishlist(req, res) {
         });
 
         return res.status(200).json({
-            message: "Product successfully added to wishlist!"
+            message: "Added to " + input.wishlistName + '!'
         })
     }
     catch (error) {
+        console.log("error in wishlist:", error);
         return res.status(500).json({
             message: "Error while adding product to wishlist!"
         })

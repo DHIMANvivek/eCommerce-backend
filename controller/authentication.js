@@ -8,6 +8,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
 
 
+
 async function login(req, res) {
     try {
         const input = req.body;
@@ -259,12 +260,44 @@ async function changePassword(req, res) {
         })
     }
 }
+async function subscribeMail(req, res) {
+    try {
+        const user = await usersModel.findOne({ email: req.body.email });
+        if (user) {
+            console.log("user exists");
+            throw({message:'You are already a user'});
 
+            // throw ({ message: 'User already exists! Try to login.' });
+        }
+        else {
+            const leadCreated = leadModel(req.body);
+            await leadCreated.save();
+            const mailData = {
+            email: req.body.email,
+            subject: "Thank You for Subscribing - Enjoy 25% Off!"
+
+        }
+        const mailSent = await mailer(mailData, SubscribeTemplate);
+        res.status(200).json({
+            message: "You will be notified about latest deal and offers."
+        })
+            console.log("doesnt exist");
+        }
+
+
+
+  
+    }
+    catch(error){
+        console.log(error, "fjndvjk");
+    }
+}
 module.exports = {
     signup,
     login,
     forgotPassword,
     updatePassword,
-    changePassword
+    changePassword,
+    subscribeMail,
 }
 

@@ -11,6 +11,7 @@ router.post('/signup', authController.signup);
 router.post('/forget', authController.forgotPassword);
 router.post('/update', JwtVerify, authController.updatePassword);
 router.post('/changePassword', JwtVerify, authController.changePassword)
+router.post('/subscribe', authController.subscribeMail)
 
 // User Account
 // router.use(JwtVerify)

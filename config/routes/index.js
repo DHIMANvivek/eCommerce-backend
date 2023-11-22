@@ -40,9 +40,10 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 router.use('/notification', require('./v1/notifications/notification'));
 
 
-router.use('/tc', require('./v1/tc'))
 
-// check type of user (Used for purpose of Authguard)
+router.use('/tc', require('./v1/tc')) ;
+
+// check type of user (Used for purpose of Authguard
 router.get('/checkUser', (req, res) => {
 
     const token = req.headers.authorization;
@@ -61,18 +62,17 @@ router.get('/checkUser', (req, res) => {
 })
 
 //send subscribe mail 
-router.post('/sendMail', async (req, res) => {
-    const mailData = {
-        email: req.body.email,
-        subject: "Thank You for Subscribing - Enjoy 25% Off!"
-    }
-    const mailSent = await mailer(mailData, SubscribeTemplate);
+// router.post('/sendMail', async (req, res) => {
+//     const mailData = {
+//         email: req.body.email,
+//         subject: "Thank You for Subscribing - Enjoy 25% Off!"
+//     }
+//     const mailSent = await mailer(mailData, SubscribeTemplate);
 
-    res.status(200).json({
-        message: "done"
-    })
-
-})
+//     res.status(200).json({
+//         message: "done"
+//     })
+// })
 
 // payment intent
 router.post('/create-payment-intent', async (req, res) => {
