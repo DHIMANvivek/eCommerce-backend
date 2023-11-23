@@ -48,7 +48,7 @@ async function setDocument (req, res){
         })
     }
     catch (error){
-        console.log(error, "jnk");
+        res.status(500).json(error);
     }
 }
 async function getDocument(req, res){

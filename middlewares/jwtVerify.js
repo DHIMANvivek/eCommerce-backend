@@ -23,7 +23,6 @@ function JwtVerify(req, res, next) {
         if (req.headers.authorization){
             data = verifyToken(req.headers.authorization.split(' ')[1])
         }
-        console.log('data come up is ',data);
         req.tokenData = data;
         // next();
     } catch (error) {

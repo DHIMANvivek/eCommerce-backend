@@ -18,7 +18,6 @@ async function getSales(req, res) {
         let salesData = await Sales.find();
         res.status(200).json(salesData);
     } catch (error) {
-        console.log(error);
         res.status(500).json({
             message: 'Unable to get sales data.'
         });
@@ -39,7 +38,6 @@ async function toggle(req, res) {
 
     res.status(200).json({ message: 'Sale updated successfully', updatedSale });
   } catch (error) {
-    console.log('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
@@ -48,7 +46,6 @@ async function updateItem(req, res) {
     try {
       const { index, data } = req.body;
   
-      console.log(req.body.data);
       if (index !== undefined) {
         const salesItems = await Sales.find({}); 
         if (index >= salesItems.length) {
@@ -58,7 +55,6 @@ async function updateItem(req, res) {
         const updateData = data.sale[0]; 
         const updatedItem = await Sales.findOneAndUpdate({ _id: salesItems[index]._id }, updateData, { new: true });
   
-        // console.log(updatedItem, "item editable is ")
 
         if (!updatedItem) {
           return res.status(404).json({ message: 'Item not found' });
@@ -79,7 +75,6 @@ async function updateItem(req, res) {
     const { _id } = req.body;
     try {
         const deletedSale = await Sales.findByIdAndDelete(_id);
-        console.log("Deleted:", deletedSale);
         res.status(200).json({ message: 'Sale deleted successfully' });
     } catch (error) {
         console.error(error);

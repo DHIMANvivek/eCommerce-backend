@@ -37,10 +37,7 @@ admin.initializeApp({
 
 app.post('/send-notification', (req, res) => {
   const { title, body, icon, url, token , registration_ids } = req.body;
-
-  console.log('req.body', req.body);
   const tokens = registration_ids || [token].filter(Boolean);
-
   const message = {
     notification: {
       title,

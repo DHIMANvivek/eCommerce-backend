@@ -91,7 +91,6 @@ async function deleteLayout(req, res){
         res.status(202).json({});
     } 
     catch (error) {
-        console.log(error, 'ok');
         res.status(500).json({
             message: 'Unable to delete this Layout right now'
         });

@@ -58,11 +58,9 @@
         }
       })
       .catch(function (error) {
-        console.error('Error getting subscription:', error);
       });
   })
   .catch(function (error) {
-    console.error('Service Worker not ready:', error);
   });
 
   const publicVapidKey =
@@ -83,10 +81,8 @@
         return response.json();
       })
       .then(function (responseData) {
-        console.log("Server response:", responseData);
       })
       .catch(function (error) {
-        console.error("Failed to send subscription to the server:", error);
       });
   }
   

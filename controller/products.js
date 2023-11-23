@@ -367,26 +367,17 @@ async function fetchUniqueFields(req, res) {
 }
 
 
-function uppecaseConverter(option) {
-    option = option.split(' ');
-    let parameter = '';
-    for (let i = 0; i < option.length; i++) {
-        parameter += option[i].charAt(0).toUpperCase() + option[i].slice(1);
-        if (i != option.length - 1) {
-            parameter += ' ';
-        }
-    }
 
-    return parameter;
-}
 
 async function getProductPrice(products) {
     try {
+
         if (!Array.isArray(products)) {
             discount = await discountQuery(products);
             products = await discountQuery(products);
         }
-        else {
+        else { 
+
             products = await Promise.all(products.map(async (product) => {
                 if (!(product.info)) {
                     product = await Products.findOne({ sku: product.sku });
@@ -394,6 +385,7 @@ async function getProductPrice(products) {
                 product = await discountQuery(product);
                 return product;
             }))
+
         }
         return new Promise((res, rej) => {
             res(products);
@@ -404,12 +396,13 @@ async function getProductPrice(products) {
 
     async function discountQuery(parameter) {
         let product = JSON.parse(JSON.stringify(parameter));
-        product.info.brand = uppecaseConverter(product.info.brand);
-        product.info.category = uppecaseConverter(product.info.category);
+        product.info.brand = (product.info.brand).toLowerCase();
+        product.info.category = (product.info.category).toLowerCase();
         return new Promise(async (res, rej) => {
 
             let discount;
             let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, startDate: { $lte: new Date() } });
+
             if (!offer) {
                 offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true, startDate: { $lte: new Date() } });
                 if (!offer) {
@@ -439,6 +432,7 @@ async function getProductPrice(products) {
                 return;
             }
 
+           
             product.discount = discount.discountAmount;
             if(product.price-discount.discountAmount<=0){
                 product.discount=0;

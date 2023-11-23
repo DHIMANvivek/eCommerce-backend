@@ -12,7 +12,6 @@ const getfcmToken = async (req, res) => {
       ]);
       res.status(200).send(distinctTokens[0].distinctTokens);
     } else {
-      console.log('SupportNotifications document not found');
     }
 }
 
@@ -22,7 +21,6 @@ const getNotification = async (req, res) => {
     
         res.json(notifications);
       } catch (err) {
-        console.error(err);
         res.status(500).json({ error: 'Internal server error' });
       }
 }

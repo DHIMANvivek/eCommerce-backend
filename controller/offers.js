@@ -194,23 +194,21 @@ async function updateOfferStatus(req, res) {
     })
     res.status(200).json({ message: 'offer status updated sucess' })
   } catch (error) {
-    console.log('error coming is ',error);
     res.status(500).json(error)
   }
 }
 
 async function getCoupons(req, res) {
   try {
+
     const getAllCoupons = await OfferModel.find(
-      {
-        $and: [
-          { OfferType: 'coupon' },
-          { "status.active": true },
-          { "status.deleted": false },
-          { startDate: { $lte: (new Date()) } },
-          { endDate: { $gte: (new Date()) } },
-        ]
-      });
+          { OfferType: 'coupon' ,
+           "status.active": true ,
+           "status.deleted": false ,
+           startDate: { $lte: (new Date()) } ,
+          endDate: { $gte: (new Date()) } },
+
+      );
     res.status(200).json(getAllCoupons);
 
   } catch (error) {

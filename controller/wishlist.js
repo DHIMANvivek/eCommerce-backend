@@ -29,7 +29,6 @@ async function showWishlists(req, res) {
             )
         }
         else {
-            console.log("Wishlister not found. Please signup.")
         }
     }
     catch (error) {
@@ -97,7 +96,6 @@ async function addToWishlist(req, res) {
         })
     }
     catch (error) {
-        console.log("error in wishlist:", error);
         return res.status(500).json({
             message: "Error while adding product to wishlist!"
         })
@@ -195,8 +193,8 @@ async function showWishlistCount(req, res) {
         // )
     }
     catch (error) {
-        console.log('error is ', error);
     }
+
 }
 
 async function showWishlistedData(req, res) {
@@ -274,7 +272,7 @@ async function removeFromWishlist(req, res) {
 
 
     catch (error) {
-        console.log('erroris ', error);
+        res.status(500).json(error);
     }
 }
 

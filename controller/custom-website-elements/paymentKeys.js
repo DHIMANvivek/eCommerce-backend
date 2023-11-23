@@ -82,9 +82,7 @@ async function getAllPaymentKeys(req, res) {
       async function updatePaymentKeys(req, res) {
         try {
           const { publicKey, privateKey, id, enable } = req.body;
-          const adminId = id;
-          console.log(adminId, privateKey, publicKey, id, enable, "admin Id Is");
-      
+          const adminId = id;      
           await PaymentKeys.updateMany({}, { $set: { 'keys.$[elem].enable': false } }, { arrayFilters: [{ 'elem.enable': true }] });
       
           if (enable === true) {
@@ -95,38 +93,30 @@ async function getAllPaymentKeys(req, res) {
             );
       
             if (adminKeys) {
-              console.log('Document Updated:', adminKeys);
               res.status(200).json({ message: 'Payment Keys updated Successfully' });
             } else {
-              console.log('No matching document found for the given query.');
               res.status(404).json({ message: 'No matching document found for the given query.' });
             }
           } else {
-            console.log('Received enable is not true.');
             res.status(200).json({ message: 'Received enable is not true.' });
           }
         } catch (error) {
-          console.log('Error:', error);
           res.status(500).json(error);
         }
       }
   
       async function deletePaymentKeys(req, res) {
         const { id } = req.body;
-        console.log(id);
         
         try {
           const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
-          console.log(data);
-      
+
           if (data) {
             res.status(200).json({ message: 'Payment Key deleted Successfully' });
           } else {
-            console.log('No matching document found for the given query.');
             res.status(404).json({ message: 'No matching document found for the given query.' });
           }
         } catch (error) {
-          console.log('Error:', error);
           res.status(500).json(error);
         }
       }
@@ -134,11 +124,11 @@ async function getAllPaymentKeys(req, res) {
       async function getRedisData(req, res) {
         try {
           await redisClient.get('payment_intent_client_secret').then((data) => {
-            console.log(data);
+
             res.status(200).json(data);
           })
         } catch (error) {
-          console.log('Error:', error);
+
           res.status(500).json(error);
         }
       }

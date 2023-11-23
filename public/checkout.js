@@ -76,7 +76,6 @@ window.onload = async function() {
       if (result) {
         prButton.mount('#payment-request-button');
       } else {
-        console.log('cant make payment')
         document.getElementById('payment-request-button').style.display = 'none';
       }
     })();

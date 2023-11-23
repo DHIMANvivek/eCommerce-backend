@@ -155,8 +155,6 @@ async function updateAddress(req, res) {
 
 async function DefaultAddress(req, res) {
     try {
-        console.log('index comnig is ',req.body.index);
-
 let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
 FindAddress.info.address[req.body.index]=(FindAddress.info.address[0]);
 FindAddress.info.address[0]=(req.body.address);

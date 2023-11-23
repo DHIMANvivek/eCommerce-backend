@@ -19,17 +19,12 @@ async function sendMail(data, Template) {
         }
         await transport.sendMail(details, (error) => {
             if (error) {
-                console.log("Some error in using nodemailer", error);
             }
-            else {
-                `console.log("Mail sent successfully.");`
-            }
-
         })
 
     }
     catch (error) {
-        console.log("Some error in nodemailer: ", error);
+      res.status(500).json(error);
     }
 }
 

@@ -509,7 +509,6 @@ async function addProduct(req, res) {
     return res.status(200).json("uploaded");
 
   } catch (err) {
-    console.log(err);
     return res.status(401).json(err);
   }
 }
@@ -773,7 +772,6 @@ async function updateFeatures(req, res) {
 }
 
 async function updateDetails(req, res) {
-  console.log(req.body);
 
   const userToken = req.body.data.info.token;
   // const payload = JSON.parse(atob(userToken.split('.')[1]));
@@ -781,7 +779,6 @@ async function updateDetails(req, res) {
 
   const emails = await users.findOne({ _id: req.tokenData.id }, { email: 1, _id: 0 });
   const email = emails.email
-  console.log(email)
   const role = req.tokenData.role;
   const data = req.body.data;
 

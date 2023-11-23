@@ -10,7 +10,6 @@ const tcSchema = new mongoose.Schema(
           type:String,
           enum: ['list', 'paragraph'],
           validate:function validator(){
-            console.log('value is ',this);
           }
         },
         content_description: {
@@ -18,8 +17,6 @@ const tcSchema = new mongoose.Schema(
           validate: {
                         validator: function (value) {
                           const content_type = this.content_type; // Use this.get() to access the field value
-                          console.log('content type is ', content_type);
-            
                           if (content_type === 'list') {
                             // Array is expected for bullet type
                             return Array.isArray(value);

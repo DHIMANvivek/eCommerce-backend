@@ -264,7 +264,6 @@ async function subscribeMail(req, res) {
     try {
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
-            console.log("user exists");
             throw({message:'You are already a user'});
 
             // throw ({ message: 'User already exists! Try to login.' });
@@ -281,7 +280,6 @@ async function subscribeMail(req, res) {
         res.status(200).json({
             message: "You will be notified about latest deal and offers."
         })
-            console.log("doesnt exist");
         }
 
 
@@ -289,7 +287,7 @@ async function subscribeMail(req, res) {
   
     }
     catch(error){
-        console.log(error, "fjndvjk");
+        
     }
 }
 module.exports = {
