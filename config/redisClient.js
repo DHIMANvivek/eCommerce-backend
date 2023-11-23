@@ -10,20 +10,20 @@ const redisClient = redis.createClient({
   port: 6379,
 });
 
-function startSSHTunnel() {
-    const sshCommand = `${process.env.REDIS} -o StrictHostKeyChecking=no`;
+// function startSSHTunnel() {
+//     const sshCommand = `${process.env.REDIS} -o StrictHostKeyChecking=no`;
 
-  const sshProcess = exec(sshCommand);
+//   const sshProcess = exec(sshCommand);
 
-  sshProcess.on('close', (code) => {
-    if (code === 0) {
-      console.log(`SSH tunnel established successfully.`);
-    } else {
-      console.error(`Failed to establish SSH tunnel. Exit code: ${code}`);
-    }
-  });
-}
+//   sshProcess.on('close', (code) => {
+//     if (code === 0) {
+//       console.log(`SSH tunnel established successfully.`);
+//     } else {
+//       console.error(`Failed to establish SSH tunnel. Exit code: ${code}`);
+//     }
+//   });
+// }
 
-startSSHTunnel();
+// startSSHTunnel();
 
 module.exports = redisClient;

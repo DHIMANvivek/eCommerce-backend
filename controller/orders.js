@@ -9,6 +9,7 @@ const productsModel = require('./../models/products');
 
 async function updateLatestOrderDetail(req, res) {
     try {
+        console.log(req.body);
         const buyerId = req.tokenData.id;
         const { newPaymentStatus, transactionId, MOP } = req.body;
         const result = await ordersModel.updateOne(
@@ -51,6 +52,7 @@ async function updateLatestOrderDetail(req, res) {
     res.status(200).json({ message: 'Latest order payment status updated successfully' });
             
         } catch (error) {
+            console.log(error, "error is ")
             res.status(500).json({ error: 'Failed to update the latest order payment status' });
         }
     }
