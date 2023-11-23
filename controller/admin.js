@@ -25,12 +25,20 @@ const { updateItem } = require('./cart');
 async function getOverallInfo(req, res) {
   try {
     let result = {};
-    const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
+    // const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
 
-    const customerCountPrev = await users.find({
-      'role': { $not: { $eq: 'admin' } },
+    // const customerCountPrev = await users.find({
+    //   'role': { $not: { $eq: 'admin' } },
+    //   'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
+    // }).count();
+
+    const customerCountCurr = (await orders.distinct('buyerId', {payment_status: 'success'})).length;
+
+    const customerCountPrev = (await orders.distinct('buyerId', {
+      payment_status: 'success',
       'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
-    }).count();
+    })).length;
+
 
     let customerChange = customerCountPrev ? ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100 : 0;
 
@@ -292,6 +300,7 @@ async function fetchPopularProducts(req, res) {
         $match: {
           payment_status: "success",
           'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
+         //products only for particular month (current)
           $expr: {
             $eq: [
               { $month: "$orderDate" },

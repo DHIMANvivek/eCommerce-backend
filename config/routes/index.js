@@ -24,11 +24,12 @@ router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
 // router.use('/payIntent', require('./v1/stripe/stripe'));
-router.use('/banners', require('./v1/custom-website-elements/banners'))
-router.use('/sales', require('./v1/custom-website-elements/sales'))
+router.use('/banners', require('./v1/custom-website-elements/banners'));
+router.use('/sales', require('./v1/custom-website-elements/sales'));
+router.use('/tc', require('./v1/tc'));
 
-router.use('/deals', require('./v1/custom-website-elements/deals'))
-router.use('/about',require('./v1/custom-website-elements/about'))
+router.use('/deals', require('./v1/custom-website-elements/deals'));
+router.use('/about',require('./v1/custom-website-elements/about'));
 router.use('/razorpay', require('./v1/razorpay/payment'));
 
 router.use('/deals', require('./v1/custom-website-elements/deals'));
@@ -38,9 +39,6 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
-
-
-
 
 // check type of user (Used for purpose of Authguard)
 // router.get('/checkUser', (req, res) => {
