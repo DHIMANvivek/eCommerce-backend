@@ -110,7 +110,7 @@ router.post('/create-payment-intent', async (req, res) => {
             },
         });
 
-          redisClient.set('payment_intent_client_secret', paymentIntent.client_secret, 'EX', 3600, (err, reply) => {
+        redisClient.set('payment_intent_client_secret', paymentIntent.client_secret, 'EX', 100, (err, reply) => {
             if (err) {
               console.error('Error storing client secret:', err);
             } else {

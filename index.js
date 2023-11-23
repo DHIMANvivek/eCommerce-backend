@@ -10,8 +10,17 @@ const app = express();
 const redisClient = require('./config/redisClient');
 redisClient.connect();
 
-redisClient.on('connect', function() {
-  console.log('redis Connected!');
+redisClient.on('connect', () => {
+    console.log('Redis client connected');
+  
+    // Perform Redis operations here
+    redisClient.set('myKey', 'myValue', (err, reply) => {
+        if (err) {
+            console.error('Error setting value:', err);
+        } else {
+            console.log('Value set in Redis:', reply);
+        }
+    });
 });
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -31,13 +40,6 @@ app.post('/send-notification', (req, res) => {
 
   console.log('req.body', req.body);
   const tokens = registration_ids || [token].filter(Boolean);
-
-  // Static registration_ids
-  // const registration_ids = [
-  //   "eIGVynF7qde1Ij5_bZe0cN:APA91bEtmmM8fTh3pVDlqJsrV98gdS1JlHcYRdye1G323pTm2hcnVYAKUHLoYIcJneqWcJ7CI-Vfr8xbRLZs5HU185g4PF57PFdZEfQUTXh19V7L6QayCjoWi8Ovq9dWT_PHrHViLImv",
-  //   "eN1rb5EdCGBl37ihVIwdqL:APA91bGBoAI9CVlNukzoxGwjd8SQxrZT1ceuWtg7eALmVBHe8d7XqeeNGXG_6c5ZrBGHwMXX4_C59wTwzgTjVL5LuZiDPb-A_qQ298fwCZiMSvSJ9Bbiy8wpt2LJqabXmDF9ooNQFSkg",
-  //   "ctnSJmkHSgmcEeL6OCDMYo%3AAPA91bEtlagyQdob5pTe7i4AcZbblpJXXnF0qmjjtuYOpbKLxgdmF0b8KNz6W7oNQd4CjxwK28ysRoQImzPnhmB-XbCjctEwkHkdrCVNYU_PLKoJFymcbCdcwEFNhakP8eeYIgkpF_w7"
-  // ];
 
   const message = {
     notification: {
