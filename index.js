@@ -10,17 +10,8 @@ const app = express();
 const redisClient = require('./config/redisClient');
 redisClient.connect();
 
-redisClient.on('connect', () => {
-    console.log('Redis client connected');
-  
-    // Perform Redis operations here
-    redisClient.set('myKey', 'myValue', (err, reply) => {
-        if (err) {
-            console.error('Error setting value:', err);
-        } else {
-            console.log('Value set in Redis:', reply);
-        }
-    });
+redisClient.on('connect', function() {
+  console.log('redisConnected!');
 });
 
 app.use(bodyParser.json({ limit: '50mb' }));
