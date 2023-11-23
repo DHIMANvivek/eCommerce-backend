@@ -65,12 +65,13 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        if (error.error.message) return res.status(500).json(error);
-
+        if(error.message) {
+            res.status(500).json(error);
+            return;
+        };
         res.status(500).json({
             message: 'Internal Server Error'
         });
-        return;
     }
 }
 
@@ -117,10 +118,7 @@ async function signup(req, res) {
         res.status(200).json({ token, firstName });
 
     } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
+    
 
         res.status(500).json(error);
     }
@@ -266,7 +264,6 @@ async function subscribeMail(req, res) {
         if (user) {
             throw({message:'You are already a user'});
 
-            // throw ({ message: 'User already exists! Try to login.' });
         }
         else {
             const leadCreated = leadModel(req.body);
@@ -287,6 +284,11 @@ async function subscribeMail(req, res) {
   
     }
     catch(error){
+        if(error.message) {
+            res.status(500).json(error);
+            return;
+        };
+
         
     }
 }

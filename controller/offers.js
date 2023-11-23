@@ -67,6 +67,8 @@ async function createOffer(req, res) {
     if (req.body.OfferType == 'discount') {
       req.body.Link=generateLink(req);
     }
+
+    
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
