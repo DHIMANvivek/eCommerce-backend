@@ -6,6 +6,18 @@ const ProductController = require('../controller/products');
 const productsModel = require('./../models/products');
 
 
+async function getLatestOrderId (req, res) {
+    try {
+        const result = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
+        if (!result) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+        res.status(200).json({ orderID: result.orderID });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get the latest order' });
+    }
+}
+
 
 async function updateLatestOrderDetail(req, res) {
     try {
@@ -23,39 +35,41 @@ async function updateLatestOrderDetail(req, res) {
             }
         );
 
-        req.body.products.forEach(async (el) => {
-                 await Products.updateOne(
-                        {
-                            sku: el.sku,
-                            'assets.color': el.color,
-                            'assets.stockQuantity.size': el.size
-                        },
-    
-                        {
-                            $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                        },
-                        {
-                            arrayFilters: [
-                                { "outer.color": el.color },
-                                { "inner.size": el.size }
-                            ]
-                        }
-                    );
-                })
-    
-
-        if(req.body.coupon){
-                  await  updateCoupon(coupon._id);
+        if (!result) {
+            return res.status(404).json({ error: 'Order not found' });
         }
 
+        await Promise.all(req.body.products.map(async (el) => {
+            await Products.updateOne(
+                {
+                    sku: el.sku,
+                    'assets.color': el.color,
+                    'assets.stockQuantity.size': el.size
+                },
+                {
+                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                },
+                {
+                    arrayFilters: [
+                        { "outer.color": el.color },
+                        { "inner.size": el.size }
+                    ]
+                }
+            );
+        }));
 
-    res.status(200).json({ message: 'Latest order payment status updated successfully' });
-            
-        } catch (error) {
-            console.log(error, "error is ")
-            res.status(500).json({ error: 'Failed to update the latest order payment status' });
+        if (req.body.coupon) {
+            await updateCoupon(coupon._id);
         }
+
+        res.status(200).json({ message: 'Latest order payment status updated successfully' });
+
+    } catch (error) {
+        console.log(error, "error is ")
+        res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
+}
+
     
 
     async function VerifyOrder(req,res){
@@ -377,5 +391,6 @@ module.exports = {
     getSellerOrderDetails,
     updateLatestOrderDetail,
     getOverallOrderData,
-    cancelOrderedProduct
+    cancelOrderedProduct,
+    getLatestOrderId
 }
