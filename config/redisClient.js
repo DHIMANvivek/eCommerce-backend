@@ -11,7 +11,7 @@ const redisClient = redis.createClient({
 });
 
 function startSSHTunnel(callback) {
-  const sshCommand = process.env.REDIS;
+    const sshCommand = `${process.env.REDIS} -o StrictHostKeyChecking=no`;
 
   const sshProcess = exec(sshCommand);
 
@@ -33,19 +33,16 @@ function performRedisOperations() {
     } else {
       console.log('Value set in Redis:', reply);
     }
-    redisClient.quit(); // Close the Redis connection after the operation
+    redisClient.quit(); 
   });
 }
 
-// Start SSH tunnel and perform Redis operations once it's established
 startSSHTunnel(() => {
-  // Check if the Redis client is ready before performing operations
   redisClient.on('ready', () => {
     console.log('Redis client connected and ready');
     performRedisOperations();
   });
 
-  // Handle connection errors
   redisClient.on('error', (err) => {
     console.error('Redis connection error:', err);
   });
