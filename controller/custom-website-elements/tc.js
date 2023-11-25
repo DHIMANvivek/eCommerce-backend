@@ -42,23 +42,32 @@ let body = {data:[
 ]}
 async function setDocument (req, res){
     try {
-        await tc.create(body);
+        console.log(req.body, "input");
+        req.body.data=req.body.TandC;
+        // const tcDocument = await tc.findOne();
+        // console.log(tcDocument, "tc doc");
+
+            await tc.updateOne({}, {$set:body},{upsert:true})
+
+
         return res.status(200).json({
             message: "created successfully!"
         })
     }
     catch (error){
+        console.log('error', error);
         res.status(500).json(error);
     }
 }
 async function getDocument(req, res){
     try {
         let Data = await tc.findOne({});
+        console.log(Data, "tc data");
         res.status(200).json(Data);
     }
     catch (error){
         res.status(500).json({
-            message: 'Unable to get Socials data.'
+            message: 'Unable to get tc data.'
         });
     }
 }

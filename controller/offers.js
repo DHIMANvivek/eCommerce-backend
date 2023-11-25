@@ -68,7 +68,21 @@ async function createOffer(req, res) {
       req.body.Link=generateLink(req);
     }
 
+<<<<<<< Updated upstream
     
+=======
+    let query = createQuery(req);
+    let results= await OfferModel.find(query);
+      
+    for(let result of results){
+      if (result && result._id!=req.body.id) {
+        if(result.status.active){
+          req.body.status={deleted:false,active:false};
+        }
+      }
+    }
+
+>>>>>>> Stashed changes
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);

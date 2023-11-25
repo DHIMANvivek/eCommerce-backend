@@ -65,10 +65,16 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
+<<<<<<< Updated upstream
         if(error.message) {
             res.status(500).json(error);
             return;
         };
+=======
+        console.log(error, "error");
+        if (error.error.message) return res.status(500).json(error);
+
+>>>>>>> Stashed changes
         res.status(500).json({
             message: 'Internal Server Error'
         });
@@ -230,32 +236,35 @@ async function updatePassword(req, res) {
 async function changePassword(req, res) {
     try {
         const input = req.body;
+        console.log(input);
         const user = await usersModel.findById(req.tokenData.id)
+
+      
 
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
 
         if (compareOldPassword) {
+            if (input.oldPassword === input.newPassword){
+                throw ({message: "Cannot set Old Password as New Password."})
+            }
             const updatePassword = await usersModel.findByIdAndUpdate({
                 _id: user.id
             }, {
                 password: await bcryptjs.hash(input.newPassword, 10)
             })
             return res.status(200).json({
-                message: "You have changed your password successfully!"
+                message: "Password Reset Successful!"
             })
         }
-        return res.status(201).json({
-            message: "Your old password is incorrect!"
-        })
+        else{
+            throw({message:'Your Password is incorrect'})
+        }
     }
     catch (error) {
         if (error.message) {
             res.status(500).json(error);
             return;
         }
-        res.status(500).json({
-            message: "Your old password is incorrect."
-        })
     }
 }
 async function subscribeMail(req, res) {

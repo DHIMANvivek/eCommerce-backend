@@ -96,10 +96,7 @@ let offerSchema = mongoose.Schema({
     brands:[{type:String,lowercase:true}]    
     },
 
-    status:{
-        type:Boolean,
-        default:true
-    },
+
     couponType: {
         type: String,
         enum: ['global', 'custom','new'],
@@ -140,7 +137,7 @@ let offerSchema = mongoose.Schema({
     status:{
         active: {
             type:Boolean,
-            default:false,
+            default:true,
         },
         deleted:{
             type:Boolean,
