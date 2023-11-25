@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const env = require('dotenv').config(); 
 rootUrl = process.env.dbURL;
 
 mongoose.connect(rootUrl, {

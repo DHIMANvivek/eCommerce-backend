@@ -15,10 +15,10 @@ async function setSocials(req, res) {
                 accountID: input.accountID,
                 accessToken: input.accessToken,
             },
-            // logos: {
-            //     desktop: input.desktopLogo,
-            //     mobile: input.mobileLogo
-            // }
+            logos: {
+                desktop: input.desktopLogo,
+                mobile: input.mobileLogo
+            }
         };
 
         const existingSocials = await Socials.findOne();

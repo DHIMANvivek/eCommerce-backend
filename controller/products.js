@@ -2,11 +2,10 @@ const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
-const { off } = require('../models/address');
+const logger = require('./../logger');
 
 async function fetchProductDetails(req, res, sku = null, admincontroller = null) {
     try {
-
         let query = {};
         let user;
 
@@ -27,7 +26,8 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             }
         )));
 
-
+        if(!product) throw ({ message: 'This Product is not available' });
+        
         product = await getProductPrice((product));
         // getting all the reviews and average
         let reviews_rating;
@@ -43,7 +43,6 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             );
         }
 
-
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
         if (reviews_rating.userReview) {
@@ -57,12 +56,15 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         return product;
 
     } catch (error) {
-        if (req.query.sku) {
-            res.status(500).json({
-                message: 'This Product is not available'
-            });
+        if (error.message) {
+            logger.warn(error.message);
+            res.status(404).json(error);
+            return;
         }
-        throw 404;
+        logger.error(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 

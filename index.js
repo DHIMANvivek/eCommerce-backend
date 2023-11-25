@@ -1,10 +1,6 @@
 const express = require("express");
-const webpush = require("web-push");
 const bodyParser = require("body-parser");
-const path = require("path");
-const crypto = require("crypto");
 const admin = require('firebase-admin');
-const fs = require('fs');
 require('dotenv').config();
 const app = express();
 const redisClient = require('./config/redisClient');
@@ -50,8 +46,6 @@ app.post('/send-notification', (req, res) => {
       res.status(500).send('Error sending notification');
     });
 });
-
-
 
 // app.post('/send-notification', (req, res) => {
 //   const { title, body, icon, token } = req.body;

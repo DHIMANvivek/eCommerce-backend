@@ -422,6 +422,7 @@ async function fetchCategorySalesData(req, res) {
 async function fetchReviewStats(req, res) {
   let sellerData = req.tokenData;
   let controller = req.controller ? true : false;
+  
   try {
     let aggregationPipe = [
       { $unwind: '$reviews' },
