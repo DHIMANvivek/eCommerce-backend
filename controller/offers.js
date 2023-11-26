@@ -68,9 +68,7 @@ async function createOffer(req, res) {
       req.body.Link=generateLink(req);
     }
 
-<<<<<<< Updated upstream
     
-=======
     let query = createQuery(req);
     let results= await OfferModel.find(query);
       
@@ -82,7 +80,6 @@ async function createOffer(req, res) {
       }
     }
 
->>>>>>> Stashed changes
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
