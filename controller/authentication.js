@@ -65,16 +65,13 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-<<<<<<< Updated upstream
-        if(error.message) {
-            res.status(500).json(error);
-            return;
-        };
-=======
+        // if(error.message) {
+        //     res.status(500).json(error);
+        //     return;
+        // };
         console.log(error, "error");
         if (error.error.message) return res.status(500).json(error);
 
->>>>>>> Stashed changes
         res.status(500).json({
             message: 'Internal Server Error'
         });
