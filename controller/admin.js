@@ -22,7 +22,7 @@ const OffersModel = require('../models/offers');
 // const webPush = require('../models/support-ticket/SupportNotificationTokens');
 const { updateItem } = require('./cart');
 
-async function getOverallInfo(req, res) {
+async function getOverallInfo(req, res, controller=false) {
   try {
     let result = {};
     // const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
@@ -185,6 +185,7 @@ async function getOverallInfo(req, res) {
       change: revenue[0].prev ? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
     }
 
+    if (controller) return result;
     res.status(200).json(result);
 
   } catch (err) {

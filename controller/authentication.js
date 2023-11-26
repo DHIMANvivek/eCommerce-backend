@@ -122,7 +122,7 @@ async function signup(req, res) {
 
     } catch (error) {
     
-
+        console.log('error cis ',error);
         res.status(500).json(error);
     }
 

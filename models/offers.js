@@ -16,6 +16,7 @@ let offerSchema = mongoose.Schema({
 
     couponcode: {
         type: String,
+        unique:true,
         required:   function validate() {
                 if (this.OfferType == 'coupon') return true;
             },
@@ -107,8 +108,9 @@ let offerSchema = mongoose.Schema({
     },
     userUsed:[
         {
-        ref:'users',
-        type: mongoose.Schema.Types.ObjectId,
+        // ref:'users',
+        // type: mongoose.Schema.Types.ObjectId,
+        
     }
     ],
     

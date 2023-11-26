@@ -403,15 +403,15 @@ async function getProductPrice(products) {
         return new Promise(async (res, rej) => {
 
             let discount;
-            let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, startDate: { $lte: new Date() } });
+            let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted':false,startDate: { $lte: new Date() } });
 
             if (!offer) {
-                offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true, startDate: { $lte: new Date() } });
+                offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true,'status.deleted':false, startDate: { $lte: new Date() } });
                 if (!offer) {
-                    let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': product.info.category, 'status.active': true, startDate: { $lte: new Date() } });
+                    let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': product.info.category, 'status.active': true,'status.deleted':false, startDate: { $lte: new Date() } });
 
                     if (!offer) {
-                        let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': null, 'status.active': true, startDate: { $lte: new Date() } });
+                        let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': null, 'status.active': true, 'status.deleted':false,startDate: { $lte: new Date() } });
                         discount = offer;
                     }
                     else {
