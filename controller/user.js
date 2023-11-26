@@ -26,6 +26,7 @@ async function getDetails(req, res) {
 
 async function updateDetails(req, res) {
     try {
+        console.log('req body is ',req.body);
         const basicDetails = await Users.findByIdAndUpdate(req.tokenData.id, req.body, { new: true });
         res.status(200).json(basicDetails)
     } catch (error) {

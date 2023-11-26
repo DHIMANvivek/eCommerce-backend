@@ -23,20 +23,42 @@ async function updateLatestOrderDetail(req, res) {
     try {
         console.log(req.body);
         const buyerId = req.tokenData.id;
-        const { newPaymentStatus, transactionId, MOP } = req.body;
+        // let { newPaymentStatus, transactionId, MOP } = req.body;
+     let  newPaymentStatus='success';
         const result = await ordersModel.updateOne(
             { orderID: req.body.orderID },
             {
                 $set: {
                     payment_status: newPaymentStatus,
-                    transactionId: transactionId,
-                    MOP: MOP,
+                    // transactionId: transactionId,
+                    // MOP: MOP,
                 }
             }
         );
 
-        if (!result) {
-            return res.status(404).json({ error: 'Order not found' });
+        // req.body.products.forEach(async (el) => {
+        //     await Products.updateOne(
+        //         {
+        //             sku: el.sku,
+        //             'assets.color': el.color,
+        //             'assets.stockQuantity.size': el.size
+        //         },
+
+        //         {
+        //             $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+        //         },
+        //         {
+        //             arrayFilters: [
+        //                 { "outer.color": el.color },
+        //                 { "inner.size": el.size }
+        //             ]
+        //         }
+        //     );
+        // })
+
+
+        if (req.body.coupon) {
+            await updateCoupon(req.body.coupon._id,buyerId);
         }
 
         await Promise.all(req.body.products.map(async (el) => {
@@ -58,10 +80,6 @@ async function updateLatestOrderDetail(req, res) {
             );
         }));
 
-        if (req.body.coupon) {
-            await updateCoupon(coupon._id);
-        }
-
         res.status(200).json({ message: 'Latest order payment status updated successfully' });
 
     } catch (error) {
@@ -69,8 +87,6 @@ async function updateLatestOrderDetail(req, res) {
         res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
 }
-
-
 
 async function VerifyOrder(req, res) {
     try {
@@ -86,6 +102,8 @@ async function verifyOrderSummary(req, res) {
         let FinalResponse = {};
         FinalResponse.savings = 0;
         FinalResponse.shipping = 0;
+        FinalResponse.total=0;
+        FinalResponse.subTotal=0;
         if (!req.body?.details) {
             req.body.details = req.body.products;
         }
@@ -96,7 +114,6 @@ async function verifyOrderSummary(req, res) {
             if (response?.discount) {
                 FinalResponse.savings += response.discount;
             }
-            element.sellerID = response.sellerID;
             return new Promise((res, rej) => {
                 if (response.info.orderQuantity.includes(element.quantity)) {
                     return res(response.price * element.quantity);
@@ -105,7 +122,6 @@ async function verifyOrderSummary(req, res) {
                 let colorArray = response.assets.filter(el => el.color == element.color);
 
                 let sizeArray = colorArray[0].stockQuantity.filter(el => el.size == element.size);
-
                 element.quantity = sizeArray[0].quantity;
                 if (sizeArray[0].quantity > 0) return res(sizeArray[0].quantity * response.price);
 
@@ -118,7 +134,7 @@ async function verifyOrderSummary(req, res) {
         })
 
         FinalResponse.subTotal = totalAmount;
-
+        FinalResponse.total=FinalResponse.subTotal-FinalResponse.savings;
         if (req.body.CouponApplied) {
             let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
@@ -134,19 +150,16 @@ async function verifyOrderSummary(req, res) {
                 discount = discount >= req.body.amounts.total ? 0 : discount
             }
 
-            totalAmount -= discount;
             FinalResponse.savings += discount;
-            FinalResponse.total = totalAmount;
+            FinalResponse.total-=discount;
         }
 
-
-
-        if (!FinalResponse.total) FinalResponse.total = FinalResponse.subTotal;
         return new Promise((res, rej) => {
             res(FinalResponse);
         });
 
     } catch (error) {
+        console.log('error come up is ',error);
         res.status(500).json(error);
     }
 }
@@ -189,7 +202,7 @@ async function getParicularUserOrders(req, res) {
     }
 }
 
-async function getSellerOrdersInventory(req, res) {
+async function getSellerOrdersInventory(req, res, controller=false) {
     let sellerID = req.tokenData.id;
     let parameters = req.body;
 
@@ -289,7 +302,9 @@ async function getSellerOrdersInventory(req, res) {
             throw "Order not Found";
         }
     } catch (err) {
+
         return res.status(404).json({ message: err });
+
     }
 }
 
