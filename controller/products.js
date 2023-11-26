@@ -26,8 +26,8 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             }
         )));
 
-        if(!product) throw ({ message: 'This Product is not available' });
-        
+        if (!product) throw ({ message: 'This Product is not available' });
+
         product = await getProductPrice((product));
         // getting all the reviews and average
         let reviews_rating;
@@ -162,9 +162,9 @@ async function fetchProducts(req, res) {
 
             delete req.query.sort;
         }
-        else{
+        else {
             aggregationPipe.push({
-                $sort: {'name': 1}
+                $sort: { 'name': 1 }
             })
         }
 
@@ -217,6 +217,30 @@ async function fetchProducts(req, res) {
             }));
         }
 
+        // check for in stock variant
+        matchedProducts.items = matchedProducts.items.map(item => {
+            let matchedIndex = 0;
+            let colorMatched = item.assets.some(asset => {
+                if(sizeVariantMatched(asset)){
+                    return true;
+                }
+                matchedIndex++;
+                return false;
+            });
+
+            if (colorMatched && matchedIndex > 0) {
+                item.matchedIndex = matchedIndex;
+            }
+
+            return item;
+        });
+
+        function sizeVariantMatched(asset) {
+            return asset.stockQuantity.some(stockQ => {
+                if (stockQ.quantity > 0) return true;
+            });
+        }
+
         if (colors) {
             matchedProducts.items = colorDistance(matchedProducts.items);
         }
@@ -265,24 +289,30 @@ async function fetchProducts(req, res) {
             }
 
             products = products.filter((product) => {
-                if (product.assets.some(asset => {
+                let assetIndex = -1;
+                const matchColorExists = product.assets.some(asset => {
+                    assetIndex++;
                     let assetColorRGB = hexToRgb(asset.color);
-                    if (colors.some(color => {
-                        let colorRGB = hexToRgb(color);
+                    if (
+                        colors.some(color => {
+                            let colorRGB = hexToRgb(color);
+                            let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
 
-                        let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
-
-                        if (eucleadianDistance <= 120) {
-                            return true;
-                        }
-                        return false;
-                    })) {
+                            if (eucleadianDistance <= 120) {
+                                return true;
+                            }
+                            return false;
+                        })) {
                         return true;
                     }
                     return false;
-                })) {
+                });
+
+                if (matchColorExists) {
+                    product.matchedIndex = assetIndex;
                     return product;
                 }
+
             });
 
             return products;
@@ -368,9 +398,6 @@ async function fetchUniqueFields(req, res) {
     res.status(200).json({ data });
 }
 
-
-
-
 async function getProductPrice(products) {
     try {
 
@@ -378,7 +405,7 @@ async function getProductPrice(products) {
             discount = await discountQuery(products);
             products = await discountQuery(products);
         }
-        else { 
+        else {
 
             products = await Promise.all(products.map(async (product) => {
                 if (!(product.info)) {
@@ -403,15 +430,15 @@ async function getProductPrice(products) {
         return new Promise(async (res, rej) => {
 
             let discount;
-            let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted':false,startDate: { $lte: new Date() } });
+            let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
 
             if (!offer) {
-                offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true,'status.deleted':false, startDate: { $lte: new Date() } });
+                offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
                 if (!offer) {
-                    let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': product.info.category, 'status.active': true,'status.deleted':false, startDate: { $lte: new Date() } });
+                    let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
 
                     if (!offer) {
-                        let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': null, 'status.active': true, 'status.deleted':false,startDate: { $lte: new Date() } });
+                        let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': null, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
                         discount = offer;
                     }
                     else {
@@ -434,11 +461,10 @@ async function getProductPrice(products) {
                 return;
             }
 
-           
             product.discount = discount.discountAmount;
-            if(product.price-discount.discountAmount<=0){
-                product.discount=0;
-                 res(product);
+            if (product.price - discount.discountAmount <= 0) {
+                product.discount = 0;
+                res(product);
             }
             if (discount.discountType == 'percentage') {
                 product.discountPercentage = discount.discountAmount;
@@ -446,16 +472,14 @@ async function getProductPrice(products) {
                 product.discount = Math.floor((product.price / 100) * discount.discountAmount);
                 if (product.discount > discount.maximumDiscount) {
                     product.discount = Math.floor(discount.maximumDiscount);
-                    product.discountPercentage=Math.floor((product.discount*100)/product.price);
+                    product.discountPercentage = Math.floor((product.discount * 100) / product.price);
                 }
-
-
 
             }
 
             if (product.discount) {
                 product.oldPrice = product.price;
-                product.price =(product.price - product.discount)
+                product.price = (product.price - product.discount)
 
             }
 

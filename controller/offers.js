@@ -101,8 +101,6 @@ async function createOffer(req, res) {
     res.status(500).json(error);
   }
 }
-
-
 async function getOffers(req, res) {
   try {
     const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
