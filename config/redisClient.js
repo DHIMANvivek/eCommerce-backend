@@ -5,10 +5,10 @@ require('dotenv').config();
 
 // fs.chmodSync('config/trade-vogue.pem', 0o400);
 
-const redisClient = redis.createClient({
-  host: '127.0.0.1',
-  port: 6379,
-});
+// const redisClient = redis.createClient({
+//   host: '127.0.0.1',
+//   port: 6379,
+// });
 
 // function startSSHTunnel() {
 //     const sshCommand = `${process.env.REDIS} -o StrictHostKeyChecking=no`;
@@ -26,4 +26,4 @@ const redisClient = redis.createClient({
 
 // startSSHTunnel();
 
-module.exports = redisClient;
+// module.exports = redisClient;

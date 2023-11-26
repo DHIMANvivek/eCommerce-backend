@@ -3,12 +3,12 @@ const bodyParser = require("body-parser");
 const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
-const redisClient = require('./config/redisClient');
-redisClient.connect();
+// const redisClient = require('./config/redisClient');
+// redisClient.connect();
 
-redisClient.on('connect', function() {
-  console.log('redisConnected!');
-});
+// redisClient.on('connect', function() {
+//   console.log('redisConnected!');
+// });
 
 app.use(bodyParser.json({ limit: '50mb' }));
 

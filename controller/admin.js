@@ -40,21 +40,22 @@ async function getOverallInfo(req, res) {
     })).length;
 
 
-    let customerChange = customerCountPrev ? ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100 : 0;
+    let customerChange = customerCountPrev ? (((customerCountCurr - customerCountPrev)) / customerCountPrev) * 100 : 0;
 
     result['customer'] = {
       'count': customerCountCurr,
       'change': Math.floor(customerChange)
     };
 
-    const orderCountTotal = await orders.find({ payment_status: 'success' }).count();
+    const orderCountTotal = await orders.find({ payment_status: 'success', }).count();
 
     const orderCountPrev = await orders.find({
       payment_status: 'success',
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
-    let orderChange = orderCountPrev ? ((orderCountTotal - orderCountPrev) / orderCountTotal) * 100 : 0;
+    let currentOrders=orderCountTotal-orderCountPrev;
+    let orderChange = orderCountPrev ? ((currentOrders-orderCountPrev) / orderCountPrev) * 100 : 0;
 
     result['orders'] = {
       'count': orderCountTotal,
@@ -134,6 +135,7 @@ async function getOverallInfo(req, res) {
             },
             {
               $project: {
+
                 _id: 0,
                 totalSales: {
                   $subtract: [
@@ -425,6 +427,7 @@ async function fetchReviewStats(req, res) {
   
   try {
     let aggregationPipe = [
+
       { $unwind: '$reviews' },
       {
         $group: {
@@ -445,7 +448,8 @@ async function fetchReviewStats(req, res) {
       }
     ];
 
-    if (sellerData == 'seller') {
+    if (sellerData.role == 'seller') {
+
       aggregationPipe.unshift({ $match: { 'productInfo.sellerID': sellerData.id } });
       aggregationPipe.unshift({
         $lookup: {
@@ -454,7 +458,7 @@ async function fetchReviewStats(req, res) {
           foreignField: '_id',
           as: 'productInfo'
         }
-      })
+      });
     }
     const ratingOverView = await reviews.aggregate(aggregationPipe);
 
@@ -597,7 +601,6 @@ async function deleteProductInventory(req, res) {
 async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
   const parameters = req.body;
-
   try {
     aggregationPipe = [
       {
@@ -605,6 +608,7 @@ async function fetchProductInventory(req, res) {
           $or: [
             { 'name': { $regex: parameters.filter['search'], $options: 'i' } },
             { 'info.category': { $regex: parameters.filter['search'], $options: 'i' } },
+            { 'info.brand': { $regex: parameters.filter['search'], $options: 'i' } }
           ]
         }
       },
@@ -712,8 +716,6 @@ async function fetchProductInventory(req, res) {
         }
       );
     }
-
-
 
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       { $skip: (parameters.page - 1) * parameters.limit },

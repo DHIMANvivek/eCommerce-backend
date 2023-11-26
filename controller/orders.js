@@ -6,7 +6,7 @@ const ProductController = require('../controller/products');
 const productsModel = require('./../models/products');
 
 
-async function getLatestOrderId (req, res) {
+async function getLatestOrderId(req, res) {
     try {
         const result = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
         if (!result) {
@@ -70,46 +70,46 @@ async function updateLatestOrderDetail(req, res) {
     }
 }
 
-    
 
-    async function VerifyOrder(req,res){
-            try {
-                const verify=await verifyOrderSummary(req,res);
-                res.status(200).json(verify);
-            } catch (error) {
-                res.status(500).json(error);
-            }
+
+async function VerifyOrder(req, res) {
+    try {
+        const verify = await verifyOrderSummary(req, res);
+        res.status(200).json(verify);
+    } catch (error) {
+        res.status(500).json(error);
     }
+}
 
 async function verifyOrderSummary(req, res) {
     try {
-    let FinalResponse={};
-        FinalResponse.savings=0;
-        FinalResponse.shipping=0;
-        if(!req.body?.details){
-            req.body.details=req.body.products;
+        let FinalResponse = {};
+        FinalResponse.savings = 0;
+        FinalResponse.shipping = 0;
+        if (!req.body?.details) {
+            req.body.details = req.body.products;
         }
 
 
         let result = await Promise.all(req.body.details.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
-            if(response?.discount){
-                FinalResponse.savings+=response.discount;
+            if (response?.discount) {
+                FinalResponse.savings += response.discount;
             }
             element.sellerID = response.sellerID;
             return new Promise((res, rej) => {
                 if (response.info.orderQuantity.includes(element.quantity)) {
                     return res(response.price * element.quantity);
                 }
-                
-                let colorArray=response.assets.filter(el=> el.color==element.color);
 
-                let sizeArray=colorArray[0].stockQuantity.filter(el=>el.size==element.size);
+                let colorArray = response.assets.filter(el => el.color == element.color);
 
-                element.quantity=sizeArray[0].quantity;
-                if(sizeArray[0].quantity>0) return res(sizeArray[0].quantity*response.price);
+                let sizeArray = colorArray[0].stockQuantity.filter(el => el.size == element.size);
 
-                rej({message:'Sorry Order Quantity Selected is not available'});
+                element.quantity = sizeArray[0].quantity;
+                if (sizeArray[0].quantity > 0) return res(sizeArray[0].quantity * response.price);
+
+                rej({ message: 'Sorry Order Quantity Selected is not available' });
             });
         }));
 
@@ -142,7 +142,7 @@ async function verifyOrderSummary(req, res) {
 
 
         if (!FinalResponse.total) FinalResponse.total = FinalResponse.subTotal;
-        return new Promise((res,rej)=>{
+        return new Promise((res, rej) => {
             res(FinalResponse);
         });
 
@@ -154,26 +154,26 @@ async function verifyOrderSummary(req, res) {
 async function createOrder(req, res) {
     try {
 
-        const verifyOrder=await verifyOrderSummary(req,res);
-        req.body.buyerId=req.tokenData.id;
-        if(req.body.coupon){
-           let response= await checkCoupon(req.body.coupon._id,req.tokenData.id);
-           if(!response){ throw({message:'You already use this coupon'})}
+        const verifyOrder = await verifyOrderSummary(req, res);
+        req.body.buyerId = req.tokenData.id;
+        if (req.body.coupon) {
+            let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
+            if (!response) { throw ({ message: 'You already use this coupon' }) }
         }
 
         // order ID creation
-        const UserLastOrder=await ordersModel.findOne({buyerId:req.tokenData.id}).sort({createdAt:-1});
-        if(!UserLastOrder){
-            let result=(req.tokenData.id);
-            req.body.orderID='ORDER-'+result.substring(result.length - 4)+'-'+1;
-        }   
-        else{
-            req.body.orderID=UserLastOrder?.orderID?.slice(0,-1)+(Number(UserLastOrder.orderID.slice(-1))+1);
+        const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
+        if (!UserLastOrder) {
+            let result = (req.tokenData.id);
+            req.body.orderID = 'ORDER-' + result.substring(result.length - 4) + '-' + 1;
+        }
+        else {
+            req.body.orderID = UserLastOrder?.orderID?.slice(0, -1) + (Number(UserLastOrder.orderID.slice(-1)) + 1);
         }
 
-    const orderCreated=ordersModel(req.body);
-    await  orderCreated.save();
-        res.status(200).json({orderId:req.body.orderID});
+        const orderCreated = ordersModel(req.body);
+        await orderCreated.save();
+        res.status(200).json({ orderId: req.body.orderID });
 
     } catch (error) {
         res.status(500).json(error);
@@ -182,7 +182,7 @@ async function createOrder(req, res) {
 
 async function getParicularUserOrders(req, res) {
     try {
-        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id }).sort({createdAt:-1});
+        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
         res.status(200).json(getAllOrders);
     } catch (error) {
         res.status(500).json(error);
@@ -193,31 +193,41 @@ async function getSellerOrdersInventory(req, res) {
     let sellerID = req.tokenData.id;
     let parameters = req.body;
 
+    console.log(parameters);
+
     try {
 
         let aggregationPipe = [
             {
+                $lookup: {
+                    from: "users",
+                    localField: "buyerId",
+                    foreignField: "_id",
+                    as: "buyerInfo",
+                },
+            },
+            {
                 $facet: {
                     orders: [
-                        { $unwind: { path: '$products' } },
-                        {
-                            $lookup: {
-                                from: 'users',
-                                localField: 'buyerId',
-                                foreignField: '_id',
-                                as: 'buyerInfo'
-                            }
-                        },
-                        { $unwind: { path: '$buyerInfo' } },
+                        { $unwind: { path: "$products" } },
+                        { $unwind: { path: "$buyerInfo" } },
                         {
                             $group: {
-                                _id: '$_id',
+                                _id: "$_id",
                                 orderQuantity: {
-                                    $sum: '$products.quantity'
+                                    $sum: "$products.quantity",
                                 },
-                                customer: { $first: { $concat: ['$buyerInfo.name.firstname', ' ', '$buyerInfo.name.lastname'] } },
-                                data: { $first: '$$ROOT' }
-                            }
+                                customer: {
+                                    $first: {
+                                        $concat: [
+                                            "$buyerInfo.name.firstname",
+                                            " ",
+                                            "$buyerInfo.name.lastname",
+                                        ],
+                                    },
+                                },
+                                data: { $first: "$$ROOT" },
+                            },
                         },
                         {
                             $project: {
@@ -225,35 +235,33 @@ async function getSellerOrdersInventory(req, res) {
                                 orderQuantity: 1,
                                 data: 1,
                                 customer: 1,
-                            }
+                            },
                         },
                         {
-                            $sort: { _id: 1 }
-                        }
-
+                            $sort: { _id: 1 },
+                        },
                     ],
                     total: [
                         {
-                            $group:
-                            {
+                            $group: {
                                 _id: null,
                                 count: { $sum: 1 },
-                            }
-                        }
-                    ]
-                }
-            }
+                            },
+                        },
+                    ],
+                },
+            },
         ];
 
 
         Object.keys(parameters.filter).forEach((key) => {
             if (parameters.filter[key]) {
                 if (key == 'search') {
-                    aggregationPipe.push({
+                    aggregationPipe.splice(1, 0, {
                         $match: {
                             $or: [
                                 { 'customer': { $regex: parameters.filter['search'], $options: 'i' } },
-                                { '_id': { $regex: parameters.filter['search'], $options: 'i' } },
+                                { 'orderID': { $regex: parameters.filter['search'], $options: 'i' } },
                             ]
                         }
                     })
@@ -270,13 +278,11 @@ async function getSellerOrdersInventory(req, res) {
             }
         });
 
-        aggregationPipe.unshift({ $match: { 'active': true } });
-        aggregationPipe.push(
+        aggregationPipe[aggregationPipe.length - 1].$facet.orders.push(
             { $skip: (parameters.page - 1) * parameters.limit },
             { $limit: parameters.limit }
         );
         const response = await ordersModel.aggregate(aggregationPipe);
-
         if (response) {
             return res.status(200).json(response[0]);
         } else {
@@ -290,7 +296,7 @@ async function getSellerOrdersInventory(req, res) {
 async function getSellerOrderDetails(req, res) {
     const sellerID = req.tokenData.id;
     const OrderID = req.query.orderID;
-    
+
     try {
         const response = await ordersModel.findOne(
             { _id: OrderID },
@@ -326,7 +332,6 @@ async function getOverallOrderData(req, res) {
     try {
         const statistics = await ordersModel.aggregate([
             { $unwind: '$products' },
-
             {
                 $group: {
                     _id: {
@@ -351,7 +356,8 @@ async function getOverallOrderData(req, res) {
             return res.status(401).send();
         }
         statistics.forEach((stats) => {
-            if (stats.paymentStatus == 'success' || stats.paymentStatus == 'pending') {
+            // stats.paymentStatus == 'success' || stats.paymentStatus == 'pending'
+            if (stats.paymentStatus == 'success') {
                 if (stats.shipmentStatus == 'pending') {
                     stats['status'] = 'confirmed';
                 } else if (stats.shipmentStatus == 'cancelled' || stats.shipmentStatus == 'declined') {
@@ -372,8 +378,8 @@ async function getOverallOrderData(req, res) {
 async function cancelOrderedProduct(req, res) {
     const { id, sku } = req.body;
     try {
-    const orderUpdate=await ordersModel.updateOne({_id:id,'products.sku':sku},{$set:{'products.$.shipmentStatus':'cancelled'}}) 
-    return res.status(200).json({ message: 'Product cancelled successfully' });
+        const orderUpdate = await ordersModel.updateOne({ _id: id, 'products.sku': sku }, { $set: { 'products.$.shipmentStatus': 'cancelled' } })
+        return res.status(200).json({ message: 'Product cancelled successfully' });
     } catch (error) {
         return res.status(500).json({ message: 'Error cancelling the product' });
     }
