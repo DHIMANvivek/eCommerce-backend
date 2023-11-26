@@ -3,12 +3,28 @@ const bodyParser = require("body-parser");
 const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
-// const redisClient = require('./config/redisClient');
+const redisClient = require('./config/redisClient');
 // redisClient.connect();
 
 // redisClient.on('connect', function() {
 //   console.log('redisConnected!');
 // });
+// redisClient.set('key', 'value', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//   } else {
+//     console.log('Set:', res);
+//   }
+// });
+
+// redisClient.get('key', (err, result) => {
+//   if (err) {
+//     console.error(err);
+//   } else {
+//     console.log('Value:', result);
+//   }
+// });
+
 
 app.use(bodyParser.json({ limit: '50mb' }));
 
@@ -132,11 +148,11 @@ app.listen(port, (err) => {
 });
 
 
-const server = app.listen(3000, () => {
-  console.log(`Chat Server listening on port ${3000}`);
-});
+// const server = app.listen(3000, () => {
+//   console.log(`Chat Server listening on port ${3000}`);
+// });
 
-const io = require('socket.io')(server);
+// const io = require('socket.io')(server);
 
 // io.on('connection', (socket) => {
 
@@ -149,23 +165,23 @@ const io = require('socket.io')(server);
 // });
 
 // const Message = require('./models/message');
-const User = require('./models/users')
+// const User = require('./models/users')
 
-io.on('connection', (socket) => {
-    socket.on('chatMessage', (data) => {
-        const user = socket.user; 
-        const newMessage = new Message({
-            user: user, 
-            content: data, 
-        });
+// io.on('connection', (socket) => {
+//     socket.on('chatMessage', (data) => {
+//         const user = socket.user; 
+//         const newMessage = new Message({
+//             user: user, 
+//             content: data, 
+//         });
 
-        newMessage.save()
-            .then(() => {
+//         newMessage.save()
+//             .then(() => {
                 
-                io.emit('message', { user: user, content: newMessage.content });
-            })
-            .catch((error) => {
-                console.error('Error saving message:', error);
-            });
-    });
-});
+//                 io.emit('message', { user: user, content: newMessage.content });
+//             })
+//             .catch((error) => {
+//                 console.error('Error saving message:', error);
+//             });
+//     });
+// });

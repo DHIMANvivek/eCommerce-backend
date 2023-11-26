@@ -128,7 +128,7 @@ async function getAllPaymentKeys(req, res) {
             res.status(200).json(data);
           })
         } catch (error) {
-
+          return;
           res.status(500).json(error);
         }
       }
