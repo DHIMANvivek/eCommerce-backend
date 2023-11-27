@@ -1,38 +1,39 @@
 const PaymentKeys = require('./../../models/custom-website-elements/paymentKeys');
 const redisClient = require('./../../config/redisClient');
+const logger = require('./../../logger');
 
 async function getPaymentKeys(req, res) {
-    try {
-        const paymentKeys = await PaymentKeys.aggregate([
-          {
-            $unwind: "$keys" 
-          },
-          {
-            $match: {
-              "keys.enable": true 
-            }
-          },
-          {
-            $lookup: {
-              from: "users", 
-              localField: "keys.adminId",
-              foreignField: "_id",
-              as: "keys.admin" 
-            }
-          },
-          {
-            $group: {
-              _id: "$_id",
-              keys: { $push: "$keys" } 
-            }
-          }
-        ]);
-    
-        res.status(200).json(paymentKeys);
-      } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json(error);
+  try {
+    const paymentKeys = await PaymentKeys.aggregate([
+      {
+        $unwind: "$keys"
+      },
+      {
+        $match: {
+          "keys.enable": true
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "keys.adminId",
+          foreignField: "_id",
+          as: "keys.admin"
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          keys: { $push: "$keys" }
+        }
       }
+    ]);
+
+    res.status(200).json(paymentKeys);
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json(error);
+  }
 }
 
 async function getAllPaymentKeys(req, res) {
@@ -43,104 +44,105 @@ async function getAllPaymentKeys(req, res) {
 
     res.status(200).json(paymentKeys);
   } catch (error) {
-    console.error('Error:', error);
+    logger.error(error);
     res.status(500).json(error);
   }
 }
 
-  
-      async function addPaymentKeys(req, res) {
-        try {
-          const { publicKey, privateKey, rzpPublicKey, rzpPrivateKey } = req.body;
-          const adminId =  req.tokenData.id
-      
-          let adminKeys = await PaymentKeys.findOne({});
-      
-          if (!adminKeys) {
-            adminKeys = new PaymentKeys({
-              keys: [],
-              razorKey: []
-            });
-          }
-      
-          if (publicKey && privateKey) {
-            adminKeys.keys.push({ adminId, publicKey, privateKey });
-          }
-      
-          if (rzpPublicKey && rzpPrivateKey) {
-            adminKeys.razorKey.push({ adminId, rzpIdKey: rzpPublicKey, rzpSecretKey: rzpPrivateKey });
-          }
-      
-          await adminKeys.save();
-          res.status(200).json({ message: 'Payment Keys added Successfully' });
-        } catch (error) {
-          res.status(500).json(error);
-        }
-      }
-      
-  
-      async function updatePaymentKeys(req, res) {
-        try {
-          const { publicKey, privateKey, id, enable } = req.body;
-          const adminId = id;      
-          await PaymentKeys.updateMany({}, { $set: { 'keys.$[elem].enable': false } }, { arrayFilters: [{ 'elem.enable': true }] });
-      
-          if (enable === true) {
-            const adminKeys = await PaymentKeys.findOneAndUpdate(
-              { 'keys._id': adminId },
-              { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': true } },
-              { new: true }
-            );
-      
-            if (adminKeys) {
-              res.status(200).json({ message: 'Payment Keys updated Successfully' });
-            } else {
-              res.status(404).json({ message: 'No matching document found for the given query.' });
-            }
-          } else {
-            res.status(200).json({ message: 'Received enable is not true.' });
-          }
-        } catch (error) {
-          res.status(500).json(error);
-        }
-      }
-  
-      async function deletePaymentKeys(req, res) {
-        const { id } = req.body;
-        
-        try {
-          const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
 
-          if (data) {
-            res.status(200).json({ message: 'Payment Key deleted Successfully' });
-          } else {
-            res.status(404).json({ message: 'No matching document found for the given query.' });
-          }
-        } catch (error) {
-          res.status(500).json(error);
-        }
-      }
-      
-      async function getRedisData(req, res) {
-        try {
-          await redisClient.get('payment_intent_client_secret').then((data) => {
+async function addPaymentKeys(req, res) {
+  try {
+    const { publicKey, privateKey, rzpPublicKey, rzpPrivateKey } = req.body;
+    const adminId = req.tokenData.id
 
-            res.status(200).json(data);
-          })
-        } catch (error) {
-          return;
-          res.status(500).json(error);
-        }
+    let adminKeys = await PaymentKeys.findOne({});
+
+    if (!adminKeys) {
+      adminKeys = new PaymentKeys({
+        keys: [],
+        razorKey: []
+      });
+    }
+
+    if (publicKey && privateKey) {
+      adminKeys.keys.push({ adminId, publicKey, privateKey });
+    }
+
+    if (rzpPublicKey && rzpPrivateKey) {
+      adminKeys.razorKey.push({ adminId, rzpIdKey: rzpPublicKey, rzpSecretKey: rzpPrivateKey });
+    }
+
+    await adminKeys.save();
+    res.status(200).json({ message: 'Payment Keys added Successfully' });
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json(error);
+  }
+}
+
+
+async function updatePaymentKeys(req, res) {
+  try {
+    const { publicKey, privateKey, id, enable } = req.body;
+    const adminId = id;
+    await PaymentKeys.updateMany({}, { $set: { 'keys.$[elem].enable': false } }, { arrayFilters: [{ 'elem.enable': true }] });
+
+    if (enable === true) {
+      const adminKeys = await PaymentKeys.findOneAndUpdate(
+        { 'keys._id': adminId },
+        { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': true } },
+        { new: true }
+      );
+
+      if (adminKeys) {
+        res.status(200).json({ message: 'Payment Keys updated Successfully' });
+      } else {
+        res.status(404).json({ message: 'No matching document found for the given query.' });
       }
-      
-      
-  
+    } else {
+      res.status(200).json({ message: 'Received enable is not true.' });
+    }
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json(error);
+  }
+}
+
+async function deletePaymentKeys(req, res) {
+  const { id } = req.body;
+
+  try {
+    const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
+
+    if (data) {
+      res.status(200).json({ message: 'Payment Key deleted Successfully' });
+    } else {
+      res.status(404).json({ message: 'No matching document found for the given query.' });
+    }
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json(error);
+  }
+}
+
+async function getRedisData(req, res) {
+  try {
+    await redisClient.get('payment_intent_client_secret').then((data) => {
+
+      res.status(200).json(data);
+    })
+  } catch (error) {
+    logger.error(error);
+    return;
+    res.status(500).json(error);
+  }
+}
 
 module.exports = {
-    deletePaymentKeys,
-    updatePaymentKeys,
-    addPaymentKeys,
-    getPaymentKeys,
-    getAllPaymentKeys,
-    getRedisData
+  deletePaymentKeys,
+  updatePaymentKeys,
+  addPaymentKeys,
+  getPaymentKeys,
+  getAllPaymentKeys,
+  getRedisData
 }

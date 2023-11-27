@@ -6,8 +6,7 @@ const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
 const { SignupTemplate, ForgetTemplate, SubscribeTemplate } = require('../helpers/INDEX');
-
-
+const logger = require('./../logger');
 
 async function login(req, res) {
     try {
@@ -31,7 +30,7 @@ async function login(req, res) {
         const firstName = userFound?.name.firstname
 
         if (!userFound) {
-            throw ({ message: 'User not found! Kindly sign in.' })
+            throw ({ message: 'User not found! Kindly sign up' })
         }
 
         // PURE GOOGLE LOGIN
@@ -65,16 +64,13 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        console.log(error, "error");
-        // if (error.error.message) return res.status(500).json(error);
+        logger.error(error);
         if (error.message) return res.status(500).json(error);
-
         res.status(500).json({
             message: 'Internal Server Error'
         });
     }
 }
-
 
 async function signup(req, res) {
     try {
@@ -118,15 +114,13 @@ async function signup(req, res) {
         res.status(200).json({ token, firstName });
 
     } catch (error) {
-    
-        console.log('error cis ',error);
+        logger.error(error);
         res.status(500).json(error);
     }
 
 }
 
 async function forgotPassword(req, res) {
-
     try {
         const input = req.body;
         const user = await usersModel.findOne({ email: input.email },
@@ -164,11 +158,11 @@ async function forgotPassword(req, res) {
         res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {
+        logger.error(error);
         if (error.message) {
             res.status(500).json(error);
             return;
         }
-
         res.status(500).json(error);
     }
 }
@@ -217,6 +211,7 @@ async function updatePassword(req, res) {
 
     }
     catch (error) {
+        logger.error(error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -255,6 +250,7 @@ async function changePassword(req, res) {
         }
     }
     catch (error) {
+        logger.error(error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -286,12 +282,10 @@ async function subscribeMail(req, res) {
             message: "You will be notified about latest deal and offers."
         })
         }
-
-
-
   
     }
     catch(error){
+        logger.error(error);
         if(error.message){
             res.status(500).json(error);
         }
@@ -309,4 +303,3 @@ module.exports = {
     changePassword,
     subscribeMail,
 }
-

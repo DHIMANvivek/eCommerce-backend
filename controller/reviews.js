@@ -1,4 +1,5 @@
 const Reviews = require('../models/reviews');
+const logger = require('./../logger');
 
 async function fetchReviews(productId, userId = '') {
     try {
@@ -47,6 +48,7 @@ async function fetchReviews(productId, userId = '') {
         }
 
     } catch (error) {
+        logger.error(error);
         return {
             reviews: {},
             avgRating: 0
@@ -112,6 +114,7 @@ async function addOrUpdateReview(req, res) {
 
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
@@ -134,6 +137,7 @@ async function deleteReview(req, res) {
         });
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }

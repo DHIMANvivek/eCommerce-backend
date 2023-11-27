@@ -4,7 +4,7 @@ const { checkCoupon, updateCoupon, } = require('../controller/offers');
 const Products = require('../models/products')
 const ProductController = require('../controller/products');
 const productsModel = require('./../models/products');
-
+const logger = require('./../logger');
 
 async function getLatestOrderId(req, res) {
     try {
@@ -14,6 +14,7 @@ async function getLatestOrderId(req, res) {
         }
         res.status(200).json({ orderID: result.orderID });
     } catch (error) {
+        logger.error(error);
         res.status(500).json({ error: 'Failed to get the latest order' });
     }
 }
@@ -68,6 +69,7 @@ async function updateLatestOrderDetail(req, res) {
         res.status(200).json({ message: 'Latest order payment status updated successfully' });
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
 }
@@ -79,6 +81,7 @@ async function VerifyOrder(req, res) {
         const verify = await verifyOrderSummary(req, res);
         res.status(200).json(verify);
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -153,6 +156,7 @@ async function verifyOrderSummary(req, res) {
         });
 
     } catch (error) {
+        logger.error(error);
         console.log('error come up is ',error);
         res.status(500).json(error);
     }
@@ -183,6 +187,7 @@ async function createOrder(req, res) {
         res.status(200).json({ orderId: req.body.orderID });
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -192,6 +197,7 @@ async function getParicularUserOrders(req, res) {
         const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
         res.status(200).json(getAllOrders);
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -405,6 +411,7 @@ async function cancelOrderedProduct(req, res) {
         const orderUpdate = await ordersModel.updateOne({ _id: id, 'products.sku': sku }, { $set: { 'products.$.shipmentStatus': 'cancelled' } })
         return res.status(200).json({ message: 'Product cancelled successfully' });
     } catch (error) {
+        logger.error(error);
         return res.status(500).json({ message: 'Error cancelling the product' });
     }
 }

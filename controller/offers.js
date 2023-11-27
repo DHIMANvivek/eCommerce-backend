@@ -5,6 +5,7 @@ const moongoose = require('mongoose');
 const { verifyToken } = require('../helpers/jwt');
 const mailer = require('../helpers/nodemailer')
 const { sendDiscountTemplate} = require('../helpers/INDEX');
+const logger = require('./../logger');
 
 function createQuery(req) {
   let query = {};
@@ -46,12 +47,8 @@ function createQuery(req) {
     }
   }
 
-
-
-
   query['status.active'] = true;
   query.OfferType = 'discount';
-
 
   let newquery = {
     $or: [
@@ -66,6 +63,7 @@ function createQuery(req) {
   Object.assign(query, newquery);
   return query;
 }
+
 async function createOffer(req, res) {
   try {
     console.log(req.body, "offer ");
@@ -106,7 +104,7 @@ async function createOffer(req, res) {
     await newOffer.save();
     res.status(200).json(newOffer);
   } catch (error) {
-    console.log('errr cmo,gin is ', error);
+    logger.error(error);
     res.status(500).json(error);
   }
 }
@@ -115,6 +113,7 @@ async function getOffers(req, res) {
     const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
     res.status(200).json(data);
   } catch (error) {
+    logger.error(error);
     res.status(500).json(error);
   }
 }
@@ -134,6 +133,7 @@ async function deleteOffer(req, res) {
 
     return res.status(200).json(data);
   } catch (error) {
+    logger.error(error);
     res.status(500).json(error);
   }
 }
@@ -183,7 +183,6 @@ function generateLink(req) {
 
 async function updateOffer(req, res) {
   try {
-
     if (req.body.OfferType == 'discount') {
       req.body.Link = generateLink(req);
       let query = createQuery(req);
@@ -197,21 +196,18 @@ async function updateOffer(req, res) {
           }
         }
       }
-
-
     }
 
     result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
     res.status(200).json(result);
   } catch (error) {
+    logger.error(error);
     res.status(500).json(error);
   }
 }
 
-
 async function updateOfferStatus(req, res) {
   try {
-
     let status = req.body.status;
     req.body = req.body.data;
     if (req.body.OfferType == 'discount' && status) {
@@ -236,7 +232,7 @@ async function updateOfferStatus(req, res) {
     })
     res.status(200).json({ message: 'offer status updated sucess' })
   } catch (error) {
-    console.log('error is ', error);
+    logger.error(error);
     res.status(500).json(error)
   }
 }
@@ -278,8 +274,7 @@ async function getCoupons(req, res) {
   res.status(200).json(getAllCoupons);
 
 } catch (error) {
-
-  console.log('error is ',error);
+  logger.error(error);
   res.status(500).json(error);
 }
 }
@@ -312,6 +307,7 @@ async function checkCoupon(couponId, userId) {
     })
 
   } catch (error) {
+    logger.error(error);
   }
 }
 
@@ -324,12 +320,10 @@ async function updateCoupon(couponId, userId) {
     })
 
   } catch (error) {
-
+    logger.error(error);
     
   }
 }
-
-
 
 async function searchOffer(req, res) {
   try {
@@ -353,10 +347,10 @@ async function searchOffer(req, res) {
     res.status(200).json(findsearchedOffers);
 
   } catch (error) {
+    logger.error(error);
     res.status(500).json(error);
   }
 }
-
 
 module.exports = {
   createOffer,

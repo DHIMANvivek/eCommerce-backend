@@ -1,6 +1,7 @@
 const Cart = require('../models/cart');
 const productsController = require('../controller/products');
 const { verifyToken } = require('./../helpers/jwt');
+const logger = require('./../logger');
 
 async function fetchCart(req, res) {
     try {
@@ -12,7 +13,7 @@ async function fetchCart(req, res) {
                 total: 0
             }
         };
-        
+
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
             delete req.headers;
@@ -21,12 +22,12 @@ async function fetchCart(req, res) {
         if (req.tokenData) {
             let userId = req.tokenData.id;
             let cartExists = await Cart.findOne({ userId: userId });
-            cart.details = (cartExists ? cartExists : {items: []}).items;
+            cart.details = (cartExists ? cartExists : { items: [] }).items;
         }
         else {
             cart.details = req.body;
         }
-        
+
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
             let product = await productsController.fetchProductDetails(req, res, item.sku);
@@ -71,6 +72,7 @@ async function fetchCart(req, res) {
         res.status(200).json(cart);
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Problem while fetching Cart'
         });
@@ -98,7 +100,7 @@ async function addItems(req, res) {
 
         if (existingCart) {
             items = checkIfSameConfigAlreadyExists(existingCart?.items, items);
-            if(items.length == 0){
+            if (items.length == 0) {
                 res.status(200).json({
                     added: false,
                     message: "Item with same config already Exists"
@@ -116,18 +118,19 @@ async function addItems(req, res) {
         })
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Problem while adding item/s to Cart'
         });
     }
 }
 
-function checkIfSameConfigAlreadyExists(existingCart, newItems){
+function checkIfSameConfigAlreadyExists(existingCart, newItems) {
     actualNewItems = newItems.filter(item => {
         return !(existingCart.some(existingItem => {
-            return (item.sku == existingItem.sku && 
+            return (item.sku == existingItem.sku &&
                 item.color == existingItem.color &&
-                item.size == existingItem.size );
+                item.size == existingItem.size);
         }))
     })
 
@@ -150,6 +153,7 @@ async function removeItem(req, res) {
             message: 'Item removed from cart'
         });
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Problem while removing Item from Cart'
         });
@@ -166,7 +170,7 @@ async function removeItems(req, res) {
         }
 
         const skusToRemove = receivedData.flatMap(item => item.id);
-        
+
         const promises = skusToRemove.map(async (sku) => {
             await Cart.updateOne({ userId: userId }, { $pull: { items: { sku: sku } } });
         });
@@ -175,19 +179,10 @@ async function removeItems(req, res) {
 
         return res.status(200).json({ message: 'Items removed from cart' });
     } catch (error) {
+        logger.error(error);
         return res.status(500).json({ message: 'Problem while removing items from cart' });
     }
 }
-
-
-
-
-
-
-
-
-    
-
 
 async function updateItem(req, res) {
     try {
@@ -208,6 +203,7 @@ async function updateItem(req, res) {
         });
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Problem while updating Item from Cart',
             updated: false
@@ -225,6 +221,7 @@ async function clearCart(req, res) {
         });
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Problem while clearing Cart',
             updated: false
@@ -239,5 +236,4 @@ module.exports = {
     removeItem,
     clearCart,
     removeItems
-   
 }

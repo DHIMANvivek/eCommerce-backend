@@ -1,7 +1,7 @@
 const Users = require('../models/users');
 const Reviews = require('../models/reviews');
 const faqData = require('../models/custom-website-elements/faq');
-
+const logger = require('./../logger');
 const Notification = require('../models/notifications/notifications');
 const Title = require('../models/support-ticket/TicketStatus');
 const Ticket = require('../models/support-ticket/supportTicket');
@@ -20,6 +20,7 @@ async function getDetails(req, res) {
         const basicDetails = await Users.findById(req.tokenData.id);
         res.status(200).json(basicDetails)
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -29,6 +30,7 @@ async function updateDetails(req, res) {
         const basicDetails = await Users.findByIdAndUpdate(req.tokenData.id, req.body, { new: true });
         res.status(200).json(basicDetails)
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -55,6 +57,7 @@ try {
   
 
 } catch (error) {
+    logger.error(error);
     return  new Promise((res,rej)=>{
         rej(0);
     })
@@ -82,6 +85,7 @@ async function getAddress(req, res) {
         res.status(200).json(data[0]);
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -97,6 +101,7 @@ async function getPaginatedData(req, res) {
 
       res.status(200).json(data);
     } catch (error) {
+        logger.error(error);
       console.error(error);
       res.status(500).json({ message: 'Internal server error' });
     }
@@ -114,6 +119,7 @@ const response=await getActiveAddresses(req,res);
 res.status(200).json(response[0].addresses);
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json(error)
     }
 }
@@ -130,6 +136,7 @@ async function deleteAddress(req, res) {
         });
         res.status(200).json(updatedValue);
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -149,6 +156,7 @@ async function updateAddress(req, res) {
 
         res.status(200).json(req.body);
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error)
     }
 }
@@ -163,6 +171,7 @@ const result=await getActiveAddresses(req);
 res.status(200).json(result[0].addresses);
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error)
     }
 }
@@ -171,6 +180,7 @@ async function getOrders(req, res) {
     try {
         res.status(200).json(userOrders);
     } catch (error) {
+        logger.error(error);
         if (error.message) {
             res.status(500).json(error);
             return;
@@ -190,6 +200,7 @@ async function addReview(req, res) {
 
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -215,6 +226,7 @@ async function usedCoupon(req, res) {
         await findCoupon.save();
         res.status(200).json(findCoupon);
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -238,6 +250,7 @@ async function UserCoupon(req,res){
         await findCoupon.save();
         res.status(200).json(findCoupon);
     } catch (error) {
+        logger.error(error);
         
     }
 }

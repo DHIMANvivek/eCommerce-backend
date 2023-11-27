@@ -1,11 +1,9 @@
 const nodemailer = require("nodemailer")
-const {ForgetTemplate,SignupTemplate, SubscribeTemplate, TicketStatusTemplate, sendInvoiceTemplate}=require('../helpers/INDEX');
+const { ForgetTemplate, SignupTemplate, SubscribeTemplate, TicketStatusTemplate, sendInvoiceTemplate } = require('../helpers/INDEX');
+const logger = require('./../logger');
 
 async function sendMail(data, Template) {
-  console.log(data, "data");
-  console.log(Template, "template");
     try {
-        console.log('mail send started ---->');
         const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -21,15 +19,14 @@ async function sendMail(data, Template) {
         }
         await transport.sendMail(details, (error) => {
             if (error) {
-                console.log('error inside sendmail si ',error);
+                logger.error(error);
             }
         })
 
-        console.log('mail send finished ---->');
     }
     catch (error) {
-        console.log(error);
-      res.status(500).json(error);
+        logger.error(error);
+        res.status(500).json(error);
     }
 }
 

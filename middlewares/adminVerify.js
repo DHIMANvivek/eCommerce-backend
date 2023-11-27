@@ -1,5 +1,5 @@
 const { verifyToken } = require('../helpers/jwt');
-
+const logger = require('./../logger');
 async function AdminVerify(req, res, next) {
     try {
         let data;
@@ -14,11 +14,9 @@ async function AdminVerify(req, res, next) {
 
         next();
     } catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }
 
-
-
 module.exports = AdminVerify;
-

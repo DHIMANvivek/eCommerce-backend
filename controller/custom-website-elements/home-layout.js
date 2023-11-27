@@ -1,4 +1,5 @@
 const HomeLayout = require('./../../models/custom-website-elements/home-layout');
+const logger = require('./../../logger');
 
 // fetches only active layout 
 async function fetch(req, res) {
@@ -10,6 +11,7 @@ async function fetch(req, res) {
         res.status(200).json(activeLayout);
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to fetch Layout right now'
         });
@@ -57,6 +59,7 @@ async function updateOrCreate(req, res) {
         });
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to update/create Layout right now'
         });
@@ -70,6 +73,7 @@ async function fetchAll(req, res) {
         res.status(200).json(layouts);
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to fetch Layouts right now'
         });
@@ -91,6 +95,7 @@ async function deleteLayout(req, res){
         res.status(202).json({});
     } 
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to delete this Layout right now'
         });

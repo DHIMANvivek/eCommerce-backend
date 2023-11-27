@@ -1,4 +1,5 @@
 const Socials = require('./../../models/custom-website-elements/socials');
+const logger = require('./../../logger');
 
 async function setSocials(req, res) {
     try {
@@ -34,6 +35,7 @@ async function setSocials(req, res) {
             message: 'Successfully updated Social Details'
         })
     } catch (error) {
+        logger.error(error);
         res.status(409).json({
             message: 'Cannot Set Social links right now.'
         });
@@ -46,6 +48,7 @@ async function getSocials(req, res){
         res.status(200).json(socialsData);
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to get Socials data.'
         });

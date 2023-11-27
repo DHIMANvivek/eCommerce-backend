@@ -1,7 +1,6 @@
-const { db } = require('../models/users');
 const wishlist = require('../models/wishlist')
 const mongoose = require('mongoose')
-const users = require('../models/users')
+const logger = require('./../logger');
 
 async function showWishlists(req, res) {
     try {
@@ -32,6 +31,7 @@ async function showWishlists(req, res) {
         }
     }
     catch (error) {
+        logger.error(error);
         return res.status(500).json({
             message: "Error in showing wishlists!"
         })
@@ -96,6 +96,7 @@ async function addToWishlist(req, res) {
         })
     }
     catch (error) {
+        logger.error(error);
         return res.status(500).json({
             message: "Error while adding product to wishlist!"
         })
@@ -146,6 +147,7 @@ async function deleteWishlist(req, res) {
         })
     }
     catch (error) {
+        logger.error(error);
         return res.status(500).json({
             message: "Couldn't delete wishlist"
         })
@@ -193,6 +195,7 @@ async function showWishlistCount(req, res) {
         // )
     }
     catch (error) {
+        logger.error(error);
     }
 
 }
@@ -234,6 +237,7 @@ async function showWishlistedData(req, res) {
         return res.status(200).json(products)
     }
     catch (error) {
+        logger.error(error);
         return res.status(500).json(products)
     }
 }
@@ -272,6 +276,7 @@ async function removeFromWishlist(req, res) {
 
 
     catch (error) {
+        logger.error(error);
         res.status(500).json(error);
     }
 }

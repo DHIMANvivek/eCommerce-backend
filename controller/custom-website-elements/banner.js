@@ -1,4 +1,5 @@
-const banners = require('../../models/custom-website-elements/customBanner')
+const banners = require('../../models/custom-website-elements/customBanner');
+const logger = require('./../../logger');
 
 async function setBanners(req, res) {
     try {
@@ -9,6 +10,7 @@ async function setBanners(req, res) {
         })
     }
     catch (error) {
+        logger.error(error);
     }
 }
 async function getBanners(req, res) {
@@ -21,6 +23,7 @@ async function getBanners(req, res) {
         res.status(200).json(bannersData);
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to get banners.'
         });
@@ -35,6 +38,7 @@ async function deleteBanner(req, res) {
         })
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to delete banner.'
         });
@@ -54,6 +58,7 @@ async function updateBanner(req, res) {
         })
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: "Error in updating banner!"
         })
@@ -76,6 +81,7 @@ async function toggleBanner(req, res) {
         })
     }
     catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: "Error in updating banner!"
         })

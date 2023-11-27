@@ -1,4 +1,5 @@
 const tc = require('../../models/custom-website-elements/tc')
+const logger = require('./../../logger');
 
 let body = {
     data: [
@@ -147,8 +148,8 @@ async function setDocument(req, res) {
             message: "Document updated successfully!"
         })
     }
-    catch (error) {
-        console.log('error', error);
+    catch (error){
+        logger.error(error);
         res.status(500).json(error);
     }
 }
@@ -157,7 +158,8 @@ async function getDocument(req, res) {
         let Data = await tc.findOne({});
         res.status(200).json(Data);
     }
-    catch (error) {
+    catch (error){
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to get tc data.'
         });

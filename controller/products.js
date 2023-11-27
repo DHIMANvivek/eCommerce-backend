@@ -57,6 +57,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         return product;
 
     } catch (error) {
+        logger.error(error);
         if (error.message) {
             logger.warn(error.message);
             res.status(404).json(error);
@@ -320,6 +321,7 @@ async function fetchProducts(req, res) {
         }
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to fetch Products'
         });
@@ -357,8 +359,6 @@ async function fetchUniqueFields(req, res) {
                 }
             }
 
-
-
             for (let filter in (filterObject)) {
                 if (filter in data) {
                     target = data;
@@ -387,9 +387,7 @@ async function fetchUniqueFields(req, res) {
 
         });
 
-
         if (parameter != 'all') {
-
             return filterObject2;
         }
         return uniqueData;
@@ -422,6 +420,7 @@ async function getProductPrice(products) {
         })
 
     } catch (error) {
+        logger.error(error);
     }
 
     async function discountQuery(parameter) {
@@ -531,7 +530,7 @@ async function ReduceProductQuantity(products) {
             );
         })
     } catch (error) {
-
+        logger.error(error);
     }
 }
 module.exports = {
