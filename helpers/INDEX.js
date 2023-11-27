@@ -18,6 +18,8 @@ function ForgetTemplate(token) {
     }
     .outer-div{
       background-color : #f5f6f7;
+      padding-top : 50px;
+      padding-bottom : 50px;
     }
     td {
       padding: 8px;
@@ -44,10 +46,11 @@ function ForgetTemplate(token) {
   </tr>
   <tr>
     <td class="content" colspan="2">
+    <img src="http://drive.google.com/uc?export=view&id=1Bxzu7SoWFK1soNkb_R99kft1X3cWJqyE" alt="logo" width="150" height="50">
       <p>Dear Sir/Ma'am,</p>
       <p>A password reset event has been triggered. The password reset window is limited to two hours.</p>
       <p>If you do not reset your password within two hours, you will need to submit a new request.</p>
-      <p>o complete the password reset process, visit the following link:</p>
+      <p>Complete the password reset process, visit the following link:</p>
       <a href=http://localhost:4200/auth/forgetPassword/${token}> Forget Password</a>
     </td>
   </tr>
@@ -62,14 +65,13 @@ function ForgetTemplate(token) {
 
 }
 
-function SignupTemplate(email) {
+function SignupTemplate() {
   let html =
     `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
-    /* Add inline CSS for better email client compatibility */
     table {
       font-family: Arial, sans-serif;
       border-collapse: collapse;
@@ -78,12 +80,12 @@ function SignupTemplate(email) {
     }
 
     table, td {
-      border: 1px solid #ddd;
-      margin-block: 30px;
+      border: 0.5px solid #ddd;
     }
     .outer-div{
       background-color : #f5f6f7;
-      padding-block : 30px;
+      padding-top : 50px;
+      padding-bottom : 50px;
     }
     td {
       padding: 8px;
@@ -96,7 +98,6 @@ function SignupTemplate(email) {
     tr, td {
       background-color: #ffffff;
     }
-
   </style>
 </head>
 <body>
@@ -104,12 +105,11 @@ function SignupTemplate(email) {
 <table >
   <tr>
     <td class="header" colspan="2">
-      <h1>Welcome to Trade Vogue!
-      
+      <img src="http://drive.google.com/uc?export=view&id=1Bxzu7SoWFK1soNkb_R99kft1X3cWJqyE" alt="logo" width="150" height="50">
     </td>
   </tr>
-  <tr>
-    <td class="content" colspan="2">
+  <tr >
+    <td colspan="2" style="padding: 15px">
       <p>Dear Sir/Ma'am,</p>
       <p>Welcome to Trade Vogue! We're thrilled to have you join our online shopping community. Thank you for signing up and becoming a part of our family.</p>
       <p>As a member of Trade Vogue, you'll enjoy exclusive benefits, personalized recommendations, and access to a wide range of products and deals.</p>
@@ -129,7 +129,7 @@ function SignupTemplate(email) {
   return html;
 }
 
-function SubscribeTemplate(email) {
+function SubscribeTemplate() {
   let html =
     `<!DOCTYPE html>
   <html>
@@ -149,6 +149,8 @@ function SubscribeTemplate(email) {
       }
       .outer-div{
         background-color : #f5f6f7;
+        padding-top : 50px;
+        padding-bottom : 50px;
       }
       td {
         padding: 8px;
@@ -193,7 +195,7 @@ function SubscribeTemplate(email) {
 
 
 async function TicketStatusTemplate(mailData) {
-  let statusText = mailData.status === 'open' ? 'Open' : 'Closed'; 
+  let statusText = mailData.status === 'open' ? 'Open' : 'Closed';
 
   let html = `
 <!DOCTYPE html>
@@ -216,6 +218,8 @@ async function TicketStatusTemplate(mailData) {
     .outer-div {
       background-color: #f5f6f7;
       padding-block: 30px;
+      padding-top : 50px;
+      padding-bottom : 50px;
     }
 
     td {
@@ -362,6 +366,86 @@ async function sendInvoiceTemplate(paymentData) {
   return html;
 }
 
+async function sendDiscountTemplate(discountData) {
+  console.log(discountData, "template");
+  
+  let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        /* Add inline CSS for better email client compatibility */
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f5f5f5;
+          margin: 0;
+          padding: 0;
+        }
+
+        .outer-div {
+          width: 70%;
+          margin: 20px auto;
+          background-color: #fff;
+          border-radius: 5px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+        }
+
+        h1 {
+          color: #333;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        th {
+          background-color: #f2f2f2;
+          padding: 8px;
+          border: 1px solid #dddddd;
+        }
+
+        td {
+          padding: 8px;
+          border: 1px solid #dddddd;
+        }
+
+        a {
+          text-decoration: none;
+          color: #007bff;
+        }
+        img {
+          width : 100%;
+          height: 200px;
+        }
+
+        a:hover {
+          color: #0056b3;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="outer-div">
+        <h1>New Discount</h1>
+        <p>Dear Customer,</p>
+        <p>Hurry! As we have discount going up in our products</p>
+    <a href="${discountData.Link}"><img src=${discountData.Image}  alt="img" width="200" height="100"></a>
+        <h2><strong>${discountData.Title}</strong></h2>
+        <h2><strong>${discountData.Description}</strong></h2>
+        <h2><strong>${discountData.startDate}</strong></h2>
+        <h2><strong>${discountData.endDate}</strong></h2>
+        <p>We hope that you will enjoy our offers and discounts.</p>
+        <p>Best regards,</p>
+        <p>The Support Team</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return html;
+}
+
 
 
 
@@ -369,4 +453,11 @@ async function sendInvoiceTemplate(paymentData) {
 
 // <img src="https://cdn.filestackcontent.com/orYXP4hDTryz5vNbCfBo" alt="logo" width="140" height="35"/>
 
-module.exports = { ForgetTemplate, SignupTemplate, SubscribeTemplate, TicketStatusTemplate , sendInvoiceTemplate}
+module.exports = {
+  ForgetTemplate,
+  SignupTemplate,
+  SubscribeTemplate,
+  TicketStatusTemplate,
+  sendInvoiceTemplate,
+  sendDiscountTemplate,
+}

@@ -25,10 +25,11 @@ async function getOverallStatus(req, res) {
     try {
         console.log("HELLo");
         const overStats = await adminController.getOverallInfo(req, res, true);
-        const orderStats = await  orderController.getSellerOrdersInventory(req, res);
-
+        const orderStats = await  orderController.getSellerOrdersInventory(req, res, true);
+    
         console.log(overStats, ' ' ,orderStats);
     } catch (err) {
+        console.log('erorr is ',err);
 
     }
 }

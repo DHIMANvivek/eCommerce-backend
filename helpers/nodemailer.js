@@ -2,7 +2,8 @@ const nodemailer = require("nodemailer")
 const {ForgetTemplate,SignupTemplate, SubscribeTemplate, TicketStatusTemplate, sendInvoiceTemplate}=require('../helpers/INDEX');
 
 async function sendMail(data, Template) {
-  
+  console.log(data, "data");
+  console.log(Template, "template");
     try {
         console.log('mail send started ---->');
         const transport = nodemailer.createTransport({
@@ -27,7 +28,7 @@ async function sendMail(data, Template) {
         console.log('mail send finished ---->');
     }
     catch (error) {
-        console.log('error come up is ',error);
+        console.log(error);
       res.status(500).json(error);
     }
 }

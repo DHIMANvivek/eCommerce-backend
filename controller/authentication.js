@@ -5,7 +5,7 @@ const bcryptjs = require('bcryptjs');
 const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
-const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
+const { SignupTemplate, ForgetTemplate, SubscribeTemplate } = require('../helpers/INDEX');
 
 
 
@@ -67,6 +67,7 @@ async function login(req, res) {
     } catch (error) {
         console.log(error, "error");
         // if (error.error.message) return res.status(500).json(error);
+        if (error.message) return res.status(500).json(error);
 
         res.status(500).json({
             message: 'Internal Server Error'
@@ -108,7 +109,7 @@ async function signup(req, res) {
             email: req.body.email,
             subject: "We're Thrilled to Have You, Welcome to Trade Vogue!",
         }
-        const mailSent = await mailer(mailData, SignupTemplate)
+        const mailSent = await mailer(mailData, SignupTemplate())
         const tokenData = {
             id: userCreated._id,
             role: userCreated.role
@@ -139,7 +140,7 @@ async function forgotPassword(req, res) {
             throw { message: "This email doesn't exist." }
         }
         if (user.provider == 'GOOGLE') {
-            throw ({ message: 'You cannot change your password as you are a Google user.' });
+            throw ({ message: 'Google user cannot change password' });
         }
         const hasRequested = await passwordModel.findOne({
             UserId: user._id
@@ -205,10 +206,10 @@ async function updatePassword(req, res) {
             }, {
                 $set: { 'password': await bcryptjs.hash(input.password, 10) }
             })
-            res.status(200).json({ message: 'Password Changed Successfully!' })
             const delUser = await passwordModel.deleteOne({
                 UserId: tokenData.id
             })
+            return res.status(200).json({ message: 'Password Changed Successfully!' })
         }
         return res.status(400).json({
             message: "Please request for Reset Password again."
@@ -238,7 +239,7 @@ async function changePassword(req, res) {
 
         if (compareOldPassword) {
             if (input.oldPassword === input.newPassword){
-                throw ({message: "Cannot set Old Password as New Password."})
+                throw ({message: "New password cannot be same as last"})
             }
             const updatePassword = await usersModel.findByIdAndUpdate({
                 _id: user.id
@@ -268,14 +269,19 @@ async function subscribeMail(req, res) {
 
         }
         else {
+
+            const findLead=await leadModel.findOne(req.body);
+            if(findLead){
+                throw({message:'You are already in our Mailing List :)'})
+            }
             const leadCreated = leadModel(req.body);
             await leadCreated.save();
             const mailData = {
             email: req.body.email,
-            subject: "Thank You for Subscribing - Enjoy 25% Off!"
+            subject: "Thank You for Subscribing to TradeVogue"
 
         }
-        const mailSent = await mailer(mailData, SubscribeTemplate);
+        const mailSent = await mailer(mailData, SubscribeTemplate());
         res.status(200).json({
             message: "You will be notified about latest deal and offers."
         })
@@ -286,12 +292,13 @@ async function subscribeMail(req, res) {
   
     }
     catch(error){
-        if(error.message) {
+        if(error.message){
             res.status(500).json(error);
-            return;
-        };
-
-        
+        }
+        else{
+            res.status(500).json({message:'Internal Server Error'});
+        }
+        return;
     }
 }
 module.exports = {

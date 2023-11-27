@@ -3,6 +3,8 @@ const ordersModel = require('./../models/order');
 const Users = require('../models/users');
 const moongoose = require('mongoose');
 const { verifyToken } = require('../helpers/jwt');
+const mailer = require('../helpers/nodemailer')
+const { sendDiscountTemplate} = require('../helpers/INDEX');
 
 function createQuery(req) {
   let query = {};
@@ -66,6 +68,7 @@ function createQuery(req) {
 }
 async function createOffer(req, res) {
   try {
+    console.log(req.body, "offer ");
     if (req.body.OfferType == 'discount') {
       req.body.Link = generateLink(req);
       let query = createQuery(req);
@@ -82,6 +85,7 @@ async function createOffer(req, res) {
       }
     }
 
+    
     let query = createQuery(req);
     let results= await OfferModel.find(query);
       
@@ -93,6 +97,11 @@ async function createOffer(req, res) {
       }
     }
 
+    const mailData = {
+      email: 'jahnavisingh0611@gmail.com',
+      subject: "New Discount Offer",
+  }
+  const mailSent = await mailer(mailData, sendDiscountTemplate(req.body))
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
@@ -308,6 +317,7 @@ async function checkCoupon(couponId, userId) {
 
 async function updateCoupon(couponId, userId) {
   try {
+    console.log('update coupon called--------------------------------------------------> ',couponId," userId",userId);
     const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) } });
     return new Promise((res, rej) => {
       res(response);

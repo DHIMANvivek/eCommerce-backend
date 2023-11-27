@@ -21,46 +21,25 @@ async function getLatestOrderId(req, res) {
 
 async function updateLatestOrderDetail(req, res) {
     try {
-        console.log(req.body);
+        console.log('update order called ');
         const buyerId = req.tokenData.id;
-        // let { newPaymentStatus, transactionId, MOP } = req.body;
-     let  newPaymentStatus='success';
+        const { newPaymentStatus, transactionId, MOP } = req.body;
         const result = await ordersModel.updateOne(
             { orderID: req.body.orderID },
             {
                 $set: {
                     payment_status: newPaymentStatus,
-                    // transactionId: transactionId,
-                    // MOP: MOP,
+                    transactionId: transactionId,
+                    MOP: MOP,
                 }
             }
         );
 
-        // req.body.products.forEach(async (el) => {
-        //     await Products.updateOne(
-        //         {
-        //             sku: el.sku,
-        //             'assets.color': el.color,
-        //             'assets.stockQuantity.size': el.size
-        //         },
-
-        //         {
-        //             $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-        //         },
-        //         {
-        //             arrayFilters: [
-        //                 { "outer.color": el.color },
-        //                 { "inner.size": el.size }
-        //             ]
-        //         }
-        //     );
-        // })
-
-
-        if (req.body.coupon) {
-            await updateCoupon(req.body.coupon._id,buyerId);
+        if (!result) {
+            return res.status(404).json({ error: 'Order not found' });
         }
 
+        console.log('coming to reduce producdts ',req.body.products);
         await Promise.all(req.body.products.map(async (el) => {
             await Products.updateOne(
                 {
@@ -80,12 +59,20 @@ async function updateLatestOrderDetail(req, res) {
             );
         }));
 
+
+        console.log('coming to coupon', req.body.coupon);
+        if (req.body.coupon) {
+            await updateCoupon(coupon._id);
+        }
+
         res.status(200).json({ message: 'Latest order payment status updated successfully' });
 
     } catch (error) {
         res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
 }
+
+
 
 async function VerifyOrder(req, res) {
     try {
@@ -108,6 +95,7 @@ async function verifyOrderSummary(req, res) {
         }
 
 
+        console.log('req bod is ',req.body);
         let result = await Promise.all(req.body.details.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
             if (response?.discount) {
@@ -124,11 +112,15 @@ async function verifyOrderSummary(req, res) {
                 element.quantity = sizeArray[0].quantity;
                 if (sizeArray[0].quantity > 0) return res(sizeArray[0].quantity * response.price);
 
+
+                element.quantity = sizeArray[0].quantity;
+                if (sizeArray[0].quantity > 0) return res(sizeArray[0].quantity * response.price);
+
                 rej({ message: 'Sorry Order Quantity Selected is not available' });
             });
         }));
 
-        let totalAmount = result.reduce((accumlater, currentValue) => {
+        let totalAmount = result?.reduce((accumlater, currentValue) => {
             return accumlater + currentValue;
         })
 
@@ -153,6 +145,9 @@ async function verifyOrderSummary(req, res) {
             FinalResponse.total-=discount;
         }
 
+
+
+        if (!FinalResponse.total) FinalResponse.total = FinalResponse.subTotal;
         return new Promise((res, rej) => {
             res(FinalResponse);
         });
@@ -202,7 +197,7 @@ async function getParicularUserOrders(req, res) {
 }
 
 async function getSellerOrdersInventory(req, res, controller=false) {
-    let sellerID = req.tokenData.id;
+    // let sellerID = req.tokenData.id;
     let parameters = req.body;
 
     try {

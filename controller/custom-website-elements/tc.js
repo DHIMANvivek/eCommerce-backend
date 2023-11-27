@@ -140,24 +140,24 @@ let body = {
 
     ]
 }
-async function setDocument (req, res){
+async function setDocument(req, res) {
     try {
-        await tc.updateOne({}, {$set:{data:req.body.TandC}},{upsert:true})
+        await tc.updateOne({}, { $set: { data: req.body.TandC } }, { upsert: true })
         return res.status(200).json({
             message: "Document updated successfully!"
         })
     }
-    catch (error){
+    catch (error) {
         console.log('error', error);
         res.status(500).json(error);
     }
 }
-async function getDocument(req, res){
+async function getDocument(req, res) {
     try {
         let Data = await tc.findOne({});
         res.status(200).json(Data);
     }
-    catch (error){
+    catch (error) {
         res.status(500).json({
             message: 'Unable to get tc data.'
         });
