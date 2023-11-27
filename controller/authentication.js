@@ -65,10 +65,6 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        // if(error.message) {
-        //     res.status(500).json(error);
-        //     return;
-        // };
         console.log(error, "error");
         // if (error.error.message) return res.status(500).json(error);
 

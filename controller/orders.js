@@ -83,7 +83,6 @@ async function updateLatestOrderDetail(req, res) {
         res.status(200).json({ message: 'Latest order payment status updated successfully' });
 
     } catch (error) {
-        console.log(error, "error is ")
         res.status(500).json({ error: 'Failed to update the latest order payment status' });
     }
 }
@@ -206,8 +205,6 @@ async function getSellerOrdersInventory(req, res, controller=false) {
     let sellerID = req.tokenData.id;
     let parameters = req.body;
 
-    console.log(parameters);
-
     try {
 
         let aggregationPipe = [
@@ -220,26 +217,43 @@ async function getSellerOrdersInventory(req, res, controller=false) {
                 },
             },
             {
+                $unwind: {
+                    path: "$buyerInfo",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $project: {
+                    customer: {
+                        $concat: [
+                            "$buyerInfo.name.firstname",
+                            " ",
+                            "$buyerInfo.name.lastname",
+                        ],
+                    },
+                    orderDetails: "$$ROOT",
+                },
+            },
+            {
                 $facet: {
                     orders: [
-                        { $unwind: { path: "$products" } },
-                        { $unwind: { path: "$buyerInfo" } },
+                        {
+                            $unwind: {
+                                path: "$orderDetails.products",
+                            },
+                        },
                         {
                             $group: {
                                 _id: "$_id",
                                 orderQuantity: {
-                                    $sum: "$products.quantity",
+                                    $sum: "$orderDetails.products.quantity",
+                                },
+                                data: {
+                                    $first: "$$ROOT.orderDetails",
                                 },
                                 customer: {
-                                    $first: {
-                                        $concat: [
-                                            "$buyerInfo.name.firstname",
-                                            " ",
-                                            "$buyerInfo.name.lastname",
-                                        ],
-                                    },
-                                },
-                                data: { $first: "$$ROOT" },
+                                    $first: "$$ROOT.customer"
+                                }
                             },
                         },
                         {
@@ -251,7 +265,7 @@ async function getSellerOrdersInventory(req, res, controller=false) {
                             },
                         },
                         {
-                            $sort: { _id: 1 },
+                            $sort: { 'data.orderDate': -1, },
                         },
                     ],
                     total: [
@@ -273,7 +287,7 @@ async function getSellerOrdersInventory(req, res, controller=false) {
                     aggregationPipe.splice(1, 0, {
                         $match: {
                             $or: [
-                                { 'customer': { $regex: parameters.filter['search'], $options: 'i' } },
+                                { 'buyerInfo.customer': { $regex: parameters.filter['search'], $options: 'i' } },
                                 { 'orderID': { $regex: parameters.filter['search'], $options: 'i' } },
                             ]
                         }

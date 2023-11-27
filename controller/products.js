@@ -45,11 +45,12 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
 
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
+
         if (reviews_rating.userReview) {
             product.userReview = reviews_rating.userReview;
         }
 
-        if (req.query.sku) {
+        if (req.query.sku && !admincontroller) {
             res.status(200).json(product);
             return;
         }

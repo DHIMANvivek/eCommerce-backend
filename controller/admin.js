@@ -485,10 +485,13 @@ async function addProduct(req, res) {
       let seller_info = await sellerInfo.findOne({ sellerID: sellerID });
 
       data.forEach((product) => {
+
+
+        // Purpose -> extracting any unique category or brands  
+        // not inside the seller inventory
         if (!seller_info['categories'].includes(product.info.category.toLowerCase())) {
           seller_info['categories'].push(product.info.category);
         }
-
         if (!seller_info['brands'].includes(product.info.brand)) {
           seller_info['brands'].push(product.info.brand);
         }
@@ -516,6 +519,7 @@ async function addProduct(req, res) {
         productObject.data[key] = productObject.data.basicinfo[key];
       });
       productObject.data.sellerID = sellerID;
+      productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
       productObject.data.sku = await SKU_generater.generateSKU(productObject.data);
       response = await products.create(productObject.data);
     }
@@ -563,6 +567,7 @@ async function updateProduct(req, res) {
     });
     delete productObject.data['basicinfo'];
     delete productObject.data['_id'];
+    productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
 
     const response = await products.findOneAndUpdate({
       '_id': _id,
