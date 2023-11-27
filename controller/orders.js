@@ -311,6 +311,7 @@ async function getSellerOrdersInventory(req, res, controller=false) {
             { $limit: parameters.limit }
         );
         const response = await ordersModel.aggregate(aggregationPipe);
+
         if (response) {
             return res.status(200).json(response[0]);
         } else {
@@ -356,8 +357,8 @@ async function getSellerOrderDetails(req, res) {
     }
 }
 
-async function getOverallOrderData(req, res) {
-    const sellerID = req.tokenData.id;
+async function getOverallOrderData(req, res, controller=false) {
+    // const sellerID = req.tokenData.id;
 
     try {
         const statistics = await ordersModel.aggregate([
@@ -385,6 +386,7 @@ async function getOverallOrderData(req, res) {
         if (!statistics) {
             return res.status(401).send();
         }
+        
         statistics.forEach((stats) => {
             // stats.paymentStatus == 'success' || stats.paymentStatus == 'pending'
             if (stats.paymentStatus == 'success') {
@@ -398,7 +400,10 @@ async function getOverallOrderData(req, res) {
                 stats['status'] = 'cancelled';
             } else { }
         });
+
+        // if(controller) return statistics;
         return res.status(200).json(statistics);
+
     } catch (err) {
         res.status(500).json({ "message": "Error Occureed" });
     }

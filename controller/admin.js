@@ -172,7 +172,7 @@ async function getOverallInfo(req, res, controller=false) {
       change: revenue[0].prev ? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
     }
 
-    if (controller) return result;
+    // if (controller) return result;
     res.status(200).json(result);
 
   } catch (err) {
@@ -290,6 +290,7 @@ async function fetchPopularProducts(req, res) {
         $match: {
           payment_status: "success",
           'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
+
          //products only for particular month (current)
           $expr: {
             $eq: [
@@ -316,14 +317,20 @@ async function fetchPopularProducts(req, res) {
       {
         $group: {
           _id: "$products.info._id",
-          revenue: { $sum: "$products.amount" },
+          revenue: {
+            $sum: { 
+              $subtract: [ "$products.amount", "$discount" ],
+            },
+          },
           profit: {
             $sum: {
               $subtract: [
-                "$products.amount",
+                {
+                  $subtract: [ "$products.amount", "$discount" ],
+                },
                 {
                   $multiply: [
-                    "$products.quantity",
+                    "$products.quantity", 
                     "$products.info.costPrice",
                   ],
                 },
@@ -384,12 +391,7 @@ async function fetchCategorySalesData(req, res) {
         $group: {
           _id: "$products.info.info.category",
           sales: {
-            $sum: {
-              $multiply: [
-                "$products.price",
-                "$products.quantity",
-              ],
-            },
+            $sum: "$products.amount",
           },
         },
       },
@@ -505,17 +507,19 @@ async function addProduct(req, res) {
       }
 
     } else {
+
+
       Object.keys(productObject.data.basicinfo).forEach((key) => {
         productObject.data[key] = productObject.data.basicinfo[key];
       });
       productObject.data.sellerID = sellerID;
       productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
       productObject.data.sku = await SKU_generater.generateSKU(productObject.data);
+
       response = await products.create(productObject.data);
     }
 
-    if (!response) throw "Not Uploaded"
-    return res.status(200).json("uploaded");
+    if (response) return res.status(200).json("uploaded");
 
   } catch (err) {
     logger.error(err);
