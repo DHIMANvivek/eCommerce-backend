@@ -4,6 +4,7 @@ const {ForgetTemplate,SignupTemplate, SubscribeTemplate, TicketStatusTemplate, s
 async function sendMail(data, Template) {
   
     try {
+        console.log('mail send started ---->');
         const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -19,11 +20,14 @@ async function sendMail(data, Template) {
         }
         await transport.sendMail(details, (error) => {
             if (error) {
+                console.log('error inside sendmail si ',error);
             }
         })
 
+        console.log('mail send finished ---->');
     }
     catch (error) {
+        console.log('error come up is ',error);
       res.status(500).json(error);
     }
 }

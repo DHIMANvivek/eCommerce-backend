@@ -70,7 +70,7 @@ async function login(req, res) {
         //     return;
         // };
         console.log(error, "error");
-        if (error.error.message) return res.status(500).json(error);
+        // if (error.error.message) return res.status(500).json(error);
 
         res.status(500).json({
             message: 'Internal Server Error'

@@ -131,7 +131,7 @@ async function deleteOffer(req, res) {
 
 
 function generateLink(req) {
-  let link = 'http://localhost:4200/explore'
+  let link = 'http://localhost:4200/explore?'
 
   for (let i = 0; i < req.body.ExtraInfo?.brands?.length; i++) {
     let value = req.body.ExtraInfo.brands[i];
