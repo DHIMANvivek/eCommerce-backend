@@ -144,7 +144,7 @@ async function setDocument (req, res){
     try {
         await tc.updateOne({}, {$set:{data:req.body.TandC}},{upsert:true})
         return res.status(200).json({
-            message: "created successfully!"
+            message: "Document updated successfully!"
         })
     }
     catch (error){
