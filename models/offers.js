@@ -94,7 +94,7 @@ let offerSchema = mongoose.Schema({
     //    type: Object,
     //     lowercase: true 
     categories:[{type:String,lowercase:true}],
-    brands:[{type:String,lowercase:true}]    
+    brands:[{type:String}]    
     },
 
 

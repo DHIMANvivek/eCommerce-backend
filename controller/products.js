@@ -425,11 +425,20 @@ async function getProductPrice(products) {
 
     async function discountQuery(parameter) {
         let product = JSON.parse(JSON.stringify(parameter));
-        product.info.brand = (product.info.brand).toLowerCase();
-        product.info.category = (product.info.category).toLowerCase();
+        // product.info.brand = (product.info.brand).toupp();
+        let brandArr=product.info.brand=product.info.brand.split(' ');
+        let brand='';
+        brandArr.forEach((el,index)=>{
+            brand+=el.charAt(0).toUpperCase() + el.slice(1);
+            if(index<brandArr.length-1) brand+=' ';
+        })
+        // product.info.brand=product.info.brand.charAt(0).toUpperCase() + product.info.brand.slice(1);
+        product.info.brand=brand;
+        // product.info.category = (product.info.category).toLowerCase();
         return new Promise(async (res, rej) => {
 
             let discount;
+            console.log('product info brand is ',product.info.brand);
             let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
 
             if (!offer) {
@@ -455,6 +464,7 @@ async function getProductPrice(products) {
             else {
                 discount = offer;
             }
+            console.log('discount come up is ',discount.discountAmount,"product sku is ",product.sku);
 
             if (discount == null) {
                 res(product);

@@ -10,39 +10,41 @@ const logger = require('./../logger');
 function createQuery(req) {
   let query = {};
   req.body = JSON.parse(JSON.stringify(req.body));
-  if (req.body.ExtraInfo.categories && req.body.ExtraInfo.categories.length == 0) {
+  if (req.body?.ExtraInfo?.categories && req.body.ExtraInfo.categories.length == 0) {
     req.body.ExtraInfo.categories = null;
   }
 
-  if (req.body.ExtraInfo.brands && req.body.ExtraInfo.brands.length == 0) {
+  if (req.body?.ExtraInfo?.brands && req.body?.ExtraInfo.brands.length == 0) {
     req.body.ExtraInfo.brands = null;
   }
 
   //  GLOBAL QUERY 
-  if (!req.body.ExtraInfo.brands && !req.body.ExtraInfo.categories) {
+  if (!req.body?.ExtraInfo?.brands && !req.body?.ExtraInfo?.categories) {
     query['ExtraInfo.categories'] = null,
       query['ExtraInfo.brands'] = null
   }
 
-  if (req.body.ExtraInfo.brands && req.body.ExtraInfo.categories) {
-    query['ExtraInfo.brands'] = req.body.ExtraInfo.brands;
-    query['ExtraInfo.categories'] = req.body.ExtraInfo.categories;
+  if (req.body?.ExtraInfo.brands && req.body?.ExtraInfo?.categories) {
+    query['ExtraInfo.brands'] = {$in:req.body.ExtraInfo.brands};
+    query['ExtraInfo.categories'] = {$in:req.body.ExtraInfo.categories};
   }
 
-  else if (req.body.ExtraInfo.brands && !req.body.ExtraInfo.categories) {
+ 
+
+  else if (req.body?.ExtraInfo?.brands && !req.body?.ExtraInfo?.categories) {
     query = {
       $and: [
-        { 'ExtraInfo.brands': req.body.ExtraInfo.brands },  // At least one of these brands must be present
+        { 'ExtraInfo.brands': {$in:req.body.ExtraInfo.brands} },  // At least one of these brands must be present
         { 'ExtraInfo.categories': null }
       ]
     }
   }
 
-  else if (!req.body.ExtraInfo.brands && req.body.ExtraInfo.categories) {
+  else if (!req.body?.ExtraInfo?.brands && req.body?.ExtraInfo?.categories) {
     query = {
       $and: [
         { 'ExtraInfo.brands': null },
-        { 'ExtraInfo.categories': req.body.ExtraInfo.categories }
+        { 'ExtraInfo.categories': {$in:req.body.ExtraInfo.categories} }
       ]
     }
   }
@@ -66,7 +68,6 @@ function createQuery(req) {
 
 async function createOffer(req, res) {
   try {
-    console.log(req.body, "offer ");
     if (req.body.OfferType == 'discount') {
       req.body.Link = generateLink(req);
       let query = createQuery(req);
@@ -83,7 +84,6 @@ async function createOffer(req, res) {
       }
     }
 
-    
     let query = createQuery(req);
     let results= await OfferModel.find(query);
       
@@ -95,26 +95,66 @@ async function createOffer(req, res) {
       }
     }
 
-    const mailData = {
-      email: 'jahnavisingh0611@gmail.com',
-      subject: "New Discount Offer",
-  }
-  const mailSent = await mailer(mailData, sendDiscountTemplate(req.body))
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
   } catch (error) {
-    logger.error(error);
+    console.log('error comnig is ',error);
     res.status(500).json(error);
   }
 }
 async function getOffers(req, res) {
   try {
-    const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
+    
+   let parameters =req.body; 
+    const skip =  (parameters.currentPage - 1) * parameters.limit ;
+    const limit= parameters.limit;
+    
+    const query = { $regex: parameters.search, $options: "i" };
+    let aggregationPipe = [
+      {
+        $match: {
+          "status.deleted": false,
+          $or: [
+            { OfferType: query },
+            { discountType: query },
+            { Title: query },
+            { couponcode: query },
+          ],
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          count: {
+            $sum: 1,
+          },
+          document: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $project: {
+          count: 1,
+          document: { $slice: ['$document', skip, limit] },
+        },
+      }
+    ];
+    
+
+    const data=await OfferModel.aggregate(aggregationPipe);
+    console.log('data come up is ',data);
     res.status(200).json(data);
+
   } catch (error) {
-    logger.error(error);
-    res.status(500).json(error);
+    console.log(error);
+    res.status(500).json({message:'Internal Server Error'});
   }
 }
 
@@ -188,7 +228,6 @@ async function updateOffer(req, res) {
       let query = createQuery(req);
       req.body['status.active'] = true;
       let results = await OfferModel.find(query);
-
       for (let result of results) {
         if (result && result._id != req.body.id) {
           if (result.status.active) {
@@ -197,7 +236,7 @@ async function updateOffer(req, res) {
         }
       }
     }
-
+    
     result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
     res.status(200).json(result);
   } catch (error) {
@@ -287,9 +326,6 @@ async function checkCoupon(couponId, userId) {
         { OfferType: 'coupon' },
         { _id: couponId },
         { userUsed: { $nin: [userId] } },
-        // {$gte:{'couponUsersLimit':1}},
-        // { couponUsersLimit: { $gte: 1 } },
-        // { UserEmails: { $nin: [userId] } },
         { startDate: { $lte: new Date() } },
         { endDate: { $gte: new Date() } },
         { 'status.active': true }
@@ -313,51 +349,25 @@ async function checkCoupon(couponId, userId) {
 
 async function updateCoupon(couponId, userId) {
   try {
-    const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, 
-      { $push: { userUsed: (userId) },$inc:{couponUsersLimit:-1} });
+    const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) } });
     return new Promise((res, rej) => {
       res(response);
     })
 
   } catch (error) {
-    logger.error(error);
+
     
   }
 }
 
-async function searchOffer(req, res) {
-  try {
-    const query = { $regex: req.body.searchWord, $options: "i" };
-    const findsearchedOffers = await OfferModel.find(
 
-
-      {
-        'status.deleted': false,
-        // 'status.active': true,
-        $or: [
-          { OfferType: query },
-          { discountType: query },
-          { Title: query },
-          { couponcode: query },
-
-        ]
-      }
-    )
-
-    res.status(200).json(findsearchedOffers);
-
-  } catch (error) {
-    logger.error(error);
-    res.status(500).json(error);
-  }
-}
 
 module.exports = {
   createOffer,
   getOffers,
   updateCoupon,
   deleteOffer,
-  searchOffer,
+
   updateOfferStatus,
   getCoupons,
   updateOffer,

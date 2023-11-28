@@ -24,20 +24,9 @@ async function getAboutPageDetails(req, res) {
     }
 }
 
-async function getOverallStatus(req, res) {
-    try {
-        const overStats = await adminController.getOverallInfo(req, res, true);
-        const orderStats = await orderController.getSellerOrdersInventory(req, res, true);
-
-        console.log(overStats, ' ', orderStats);
-    }
-    catch (err) {
-        logger.error(err);
-    }
-}
 
 module.exports = {
     updateAboutPage,
     getAboutPageDetails,
-    getOverallStatus
+
 }

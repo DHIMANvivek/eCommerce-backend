@@ -36,14 +36,46 @@ async function updateLatestOrderDetail(req, res) {
             }
         );
 
-        if (!result) {
-            return res.status(404).json({ error: 'Order not found' });
-        }
 
-        const response = await ordersModel.findOne({ orderID: req.body.orderID }, { _id: 0, coupon: 1, products: 1 });
-        console.log('hello davinder');
-        if (response?.coupon) {
-            await updateCoupon(response.coupon, buyerId);
+
+
+        const response=await ordersModel.findOne({ orderID: req.body.orderID },{_id:0,coupon:1,products:1});
+        if(response?.coupon){
+            await updateCoupon(response.coupon,buyerId); 
+        }
+        if(response?.products){
+            await Promise.all(response.products.map(async (el) => {
+                await Products.updateOne(
+                    {
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    },
+                    {
+                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    },
+                    {
+                        arrayFilters: [
+                            { "outer.color": el.color },
+                            { "inner.size": el.size }
+                        ]
+                    }
+                );
+            
+          let particularProduct=  await Products.findOne({sku:el.sku});
+          const allStockZero = particularProduct.assets.every(color => {
+            return color.stockQuantity.every(size => size.quantity === 0);
+          });
+
+
+          console.log('');
+          if(allStockZero){
+            await Products.updateOne({active:false});
+          }
+
+        }));
+           
+            
         }
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
@@ -198,8 +230,45 @@ async function createOrder(req, res) {
 
 async function getParicularUserOrders(req, res) {
     try {
-        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'success'}).sort({ createdAt: -1 });
-        res.status(200).json(getAllOrders);
+        // const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'sucess'}).sort({ createdAt: -1 });
+        let parameters =req.body;
+        const skip =  (parameters.currentPage - 1) * parameters.limit ;
+        const limit= parameters.limit;
+        
+        let aggregationPipe = [
+            {
+              $match: {
+                buyerId:req.tokenData.id,
+                payment_status:'success'
+              },
+            },
+            {
+                $sort: {
+                  createdAt: -1,
+                },
+              },
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
+                document: {
+                  $push: "$$ROOT",
+                },
+              },
+            },
+          
+            {
+              $project: {
+                count:1,
+                document: { $slice: [ '$document', skip, limit]}
+              }
+            }
+          ];
+      
+          const data=await ordersModel.aggregate(aggregationPipe);
+        res.status(200).json(data);
     } catch (error) {
         logger.error(error);
         res.status(500).json({message:'Internal Server Error'});

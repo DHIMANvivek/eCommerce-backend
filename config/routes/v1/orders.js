@@ -9,7 +9,8 @@ router.post('/verifyOrder',jwtVerify,orderController.VerifyOrder)
 router.post('/verifyOrderWithoutCoupon',orderController.VerifyOrder);
 // router.use();
 router.post('/create',jwtVerify,orderController.createOrder);
-router.get('/getparticularUserOrders',jwtVerify,orderController.getParicularUserOrders);
+router.post('/update',jwtVerify,orderController.updateLatestOrderDetail)
+router.post('/getparticularUserOrders',jwtVerify,orderController.getParicularUserOrders);
 router.post('/cancelOrder', jwtVerify,orderController.cancelOrderedProduct );
 
 router.post('/sellerOrders', adminVerify, orderController.getSellerOrdersInventory);

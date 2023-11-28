@@ -68,20 +68,7 @@ try {
 
 async function getAddress(req, res) {
     try {
-    // const data=await Users.aggregate([
-    //     {$match:{_id:new mongoose.Types.ObjectId( req.tokenData.id)}},
-    //     {$unwind:'$info.address'},
-    //     {$match:{'info.address.status':true}},
-    //     {$project:{'info.address':1}},
-    //     {$group:{
-    //         _id:'$_id',
-    //         addresses:{$push:'$info.address'}
-    //     }}
-
-    // ])
-
     const data=await getActiveAddresses(req);
-    // const data=await Users.findOne()
         res.status(200).json(data[0]);
     }
     catch (error) {
@@ -109,6 +96,7 @@ async function getPaginatedData(req, res) {
 
 async function addAddress(req, res) {
     try {
+        console.log('req body is ',req.body);
         const findUserAddress=await getActiveAddresses(req);
 if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
     throw({message:'You cannot add more than 3 addresses'});
