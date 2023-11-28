@@ -1,5 +1,5 @@
 const printLogger = require('./printLogger');
-const productionLogger = require('./printLogger');
+const productionLogger = require('./productionLogger');
 
 let logger = null;
 

@@ -93,7 +93,7 @@ async function addOrUpdateReview(req, res) {
 
         }
         else {
-            // User does'nt has a review, add it
+            // User doesn't has a review, add it
             await Reviews.updateOne(
                 { productID: input.productId },
                 {

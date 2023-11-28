@@ -22,7 +22,7 @@ async function getLatestOrderId(req, res) {
 
 async function updateLatestOrderDetail(req, res) {
     try {
-        console.log('update order called ');
+        console.log('HELLLOOOOOOOO VIVEK');
         const buyerId = req.tokenData.id;
         const { newPaymentStatus, transactionId, MOP } = req.body;
         const result = await ordersModel.updateOne(
@@ -41,6 +41,7 @@ async function updateLatestOrderDetail(req, res) {
         }
 
         const response = await ordersModel.findOne({ orderID: req.body.orderID }, { _id: 0, coupon: 1, products: 1 });
+        console.log('hello davinder');
         if (response?.coupon) {
             await updateCoupon(response.coupon, buyerId);
         }
@@ -64,7 +65,10 @@ async function updateLatestOrderDetail(req, res) {
                 );
 
                 let particularProduct = await Products.findOne({ sku: el.sku });
+                // console.log(particularProduct);
                 const allStockZero = particularProduct.assets.every(color => {
+                    // console.log('colkor si ',color,);
+                    // console.log(color.stockQuantity.every(size => size.quantity === 0), 'hehe');
                     return color.stockQuantity.every(size => size.quantity === 0);
                 });
 
@@ -108,28 +112,20 @@ async function verifyOrderSummary(req, res) {
         }
 
 
-        console.log('req bod is ', req.body);
         let result = await Promise.all(req.body.details.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
             if (response?.discount) {
                 FinalResponse.savings += response.discount;
             }
             return new Promise((res, rej) => {
-                if (response.info.orderQuantity.includes(element.quantity)) {
-                    return res(response.price * element.quantity);
-                }
-
-                let colorArray = response.assets.filter(el => el.color == element.color);
-
-                let sizeArray = colorArray[0].stockQuantity.filter(el => el.size == element.size);
-                element.quantity = sizeArray[0].quantity;
-                if (sizeArray[0].quantity > 0) return res(sizeArray[0].quantity * response.price);
-
-
-                element.quantity = sizeArray[0].quantity;
-                if (sizeArray[0].quantity > 0) return res(sizeArray[0].quantity * response.price);
-
-                rej({ message: 'Sorry Order Quantity Selected is not available' });
+                let colorArray = response.assets?.filter(el => el.color == element.color);
+                let particularColor=colorArray?.filter(el=>el.color==element.color);
+                particularColor=particularColor[0].stockQuantity;
+                let particularColorSize=particularColor?.filter(el=>el.size==element.size);
+               if( particularColorSize[0].quantity<=0){
+                   rej({ message: response.sku + 'is out of stock' });
+               }
+               res(response.price * element.quantity);
             });
         }));
 
@@ -138,8 +134,8 @@ async function verifyOrderSummary(req, res) {
         })
 
         FinalResponse.subTotal = totalAmount;
-        FinalResponse.total = FinalResponse.subTotal - FinalResponse.savings;
-        if (req.body.CouponApplied) {
+        FinalResponse.total=FinalResponse.subTotal-FinalResponse.savings;
+        if (req.body.CouponApplied && req?.tokenData?.id) {
             let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
@@ -167,11 +163,9 @@ async function verifyOrderSummary(req, res) {
 
     } catch (error) {
         logger.error(error);
-        console.log('error come up is ', error);
         res.status(500).json(error);
     }
 }
-
 async function createOrder(req, res) {
     try {
 
@@ -204,12 +198,11 @@ async function createOrder(req, res) {
 
 async function getParicularUserOrders(req, res) {
     try {
-        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id }).sort({ orderDate: -1 });
-        console.log('get all orders is ', getAllOrders);
+        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'success'}).sort({ createdAt: -1 });
         res.status(200).json(getAllOrders);
     } catch (error) {
         logger.error(error);
-        res.status(500).json(error);
+        res.status(500).json({message:'Internal Server Error'});
     }
 }
 

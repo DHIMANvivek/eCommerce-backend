@@ -13,7 +13,6 @@ const productionLogger = () => {
             myFormat,
             format.json(),
           ),
-
         transports: [
           new transports.File({ filename: './logger/logs/error.log', level: 'error' }),
           new transports.File({ filename: './logger/logs/combined.log' }),
