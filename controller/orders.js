@@ -40,32 +40,42 @@ async function updateLatestOrderDetail(req, res) {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        console.log('coming to reduce producdts ',req.body.products);
-        await Promise.all(req.body.products.map(async (el) => {
-            await Products.updateOne(
-                {
-                    sku: el.sku,
-                    'assets.color': el.color,
-                    'assets.stockQuantity.size': el.size
-                },
-                {
-                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                },
-                {
-                    arrayFilters: [
-                        { "outer.color": el.color },
-                        { "inner.size": el.size }
-                    ]
-                }
-            );
-        }));
-
-
-        console.log('coming to coupon', req.body.coupon);
-        if (req.body.coupon) {
-            await updateCoupon(coupon._id);
+        const response = await ordersModel.findOne({ orderID: req.body.orderID }, { _id: 0, coupon: 1, products: 1 });
+        if (response?.coupon) {
+            await updateCoupon(response.coupon, buyerId);
         }
+        if (response?.products) {
+            await Promise.all(response.products.map(async (el) => {
+                await Products.updateOne(
+                    {
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    },
+                    {
+                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    },
+                    {
+                        arrayFilters: [
+                            { "outer.color": el.color },
+                            { "inner.size": el.size }
+                        ]
+                    }
+                );
 
+                let particularProduct = await Products.findOne({ sku: el.sku });
+                const allStockZero = particularProduct.assets.every(color => {
+                    return color.stockQuantity.every(size => size.quantity === 0);
+                });
+
+                if (allStockZero) {
+                    await Products.updateOne({ active: false });
+                }
+
+            }));
+
+
+        }
         res.status(200).json({ message: 'Latest order payment status updated successfully' });
 
     } catch (error) {
@@ -91,14 +101,14 @@ async function verifyOrderSummary(req, res) {
         let FinalResponse = {};
         FinalResponse.savings = 0;
         FinalResponse.shipping = 0;
-        FinalResponse.total=0;
-        FinalResponse.subTotal=0;
+        FinalResponse.total = 0;
+        FinalResponse.subTotal = 0;
         if (!req.body?.details) {
             req.body.details = req.body.products;
         }
 
 
-        console.log('req bod is ',req.body);
+        console.log('req bod is ', req.body);
         let result = await Promise.all(req.body.details.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
             if (response?.discount) {
@@ -128,7 +138,7 @@ async function verifyOrderSummary(req, res) {
         })
 
         FinalResponse.subTotal = totalAmount;
-        FinalResponse.total=FinalResponse.subTotal-FinalResponse.savings;
+        FinalResponse.total = FinalResponse.subTotal - FinalResponse.savings;
         if (req.body.CouponApplied) {
             let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
@@ -145,7 +155,7 @@ async function verifyOrderSummary(req, res) {
             }
 
             FinalResponse.savings += discount;
-            FinalResponse.total-=discount;
+            FinalResponse.total -= discount;
         }
 
 
@@ -157,7 +167,7 @@ async function verifyOrderSummary(req, res) {
 
     } catch (error) {
         logger.error(error);
-        console.log('error come up is ',error);
+        console.log('error come up is ', error);
         res.status(500).json(error);
     }
 }
@@ -194,7 +204,8 @@ async function createOrder(req, res) {
 
 async function getParicularUserOrders(req, res) {
     try {
-        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
+        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id }).sort({ orderDate: -1 });
+        console.log('get all orders is ', getAllOrders);
         res.status(200).json(getAllOrders);
     } catch (error) {
         logger.error(error);
@@ -202,7 +213,7 @@ async function getParicularUserOrders(req, res) {
     }
 }
 
-async function getSellerOrdersInventory(req, res, controller=false) {
+async function getSellerOrdersInventory(req, res, controller = false) {
     // let sellerID = req.tokenData.id;
     let parameters = req.body;
 
@@ -357,7 +368,7 @@ async function getSellerOrderDetails(req, res) {
     }
 }
 
-async function getOverallOrderData(req, res, controller=false) {
+async function getOverallOrderData(req, res, controller = false) {
     // const sellerID = req.tokenData.id;
 
     try {
@@ -386,7 +397,7 @@ async function getOverallOrderData(req, res, controller=false) {
         if (!statistics) {
             return res.status(401).send();
         }
-        
+
         statistics.forEach((stats) => {
             // stats.paymentStatus == 'success' || stats.paymentStatus == 'pending'
             if (stats.paymentStatus == 'success') {

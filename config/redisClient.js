@@ -46,20 +46,20 @@
 
 // module.exports = redisClient;
 
-// const { createClient } =  require("redis")
+const { createClient } =  require("redis")
               
-// const redisClient = createClient ({
-//   url : "rediss://default:0fd9871da5b3445485be5787efff606e@us1-wise-kit-40103.upstash.io:40103"
-// });
+const redisClient = createClient ({
+  url : "rediss://default:31f65167c5264c6294190242a6ad6b37@strong-eel-43513.upstash.io:43513"
+});
 
-// redisClient.on("connect", function(err, data) {
-//     console.log("redis connected");
-//   });
+redisClient.on("connect", function(err, data) {
+    console.log("redis connected");
+  });
 
-// redisClient.on("error", function(err) {
-//   throw err;
-// });
-// redisClient.connect()
-// redisClient.set('foo','bar');
+redisClient.on("error", function(err) {
+  throw err;
+});
+redisClient.connect()
+redisClient.set('foo','bar');
 
-//  module.exports = redisClient;
+ module.exports = redisClient;

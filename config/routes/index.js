@@ -7,11 +7,8 @@ const { SubscribeTemplate } = require('../../helpers/INDEX');
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
-const redisClient = require('./../../config/redisClient');
 const paginateResults = require('../../helpers/pagination');
-const Notification = require('../../models/notifications/notifications')
-const axios = require('axios');
-const notifications = require('../../models/notifications/notifications');
+const redisClient = require('../../config/redisClient');
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));

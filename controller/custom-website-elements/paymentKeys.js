@@ -49,6 +49,80 @@ async function getAllPaymentKeys(req, res) {
   }
 }
 
+  
+      async function addPaymentKeys(req, res) {
+        try {
+          const { publicKey, privateKey, rzpPublicKey, rzpPrivateKey } = req.body;
+          const adminId =  req.tokenData.id
+      
+          let adminKeys = await PaymentKeys.findOne({});
+      
+          if (!adminKeys) {
+            adminKeys = new PaymentKeys({
+              keys: [],
+              razorKey: []
+            });
+          }
+      
+          if (publicKey && privateKey) {
+            adminKeys.keys.push({ adminId, publicKey, privateKey });
+          }
+      
+          if (rzpPublicKey && rzpPrivateKey) {
+            adminKeys.razorKey.push({ adminId, rzpIdKey: rzpPublicKey, rzpSecretKey: rzpPrivateKey });
+          }
+      
+          await adminKeys.save();
+          res.status(200).json({ message: 'Payment Keys added Successfully' });
+        } catch (error) {
+          res.status(500).json(error);
+        }
+      }
+      
+  
+      async function updatePaymentKeys(req, res) {
+        try {
+            const { publicKey, privateKey, id, enable, rzpIdKey, rzpSecretKey } = req.body;
+            const adminId = id;
+    
+            console.log(req.body);
+    
+            // Disable all keys
+            if (publicKey && privateKey) {
+                await PaymentKeys.updateMany({}, { $set: { 'keys.$[].enable': false } });
+            } else if (rzpIdKey && rzpSecretKey) {
+                await PaymentKeys.updateMany({}, { $set: { 'razorKey.$[].enable': false } });
+            }
+    
+            if (enable === true && publicKey && privateKey) {
+                const adminKeys = await PaymentKeys.findOneAndUpdate(
+                    { 'keys._id': adminId },
+                    { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': true } },
+                    { new: true }
+                );
+                if (adminKeys) {
+                    res.status(200).json({ message: 'Payment Keys updated Successfully' });
+                    return; // Exit the function after sending the response
+                }
+            } else if (enable === true && rzpIdKey && rzpSecretKey) {
+                const adminKeys = await PaymentKeys.findOneAndUpdate(
+                    { 'razorKey._id': adminId },
+                    { $set: { 'razorKey.$.rzpIdKey': rzpIdKey, 'razorKey.$.rzpSecretKey': rzpSecretKey, 'razorKey.$.enable': true } },
+                    { new: true }
+                );
+                if (adminKeys) {
+                    res.status(200).json({ message: 'Payment Keys updated Successfully' });
+                    return; // Exit the function after sending the response
+                }
+            }
+    
+            res.status(404).json({ message: 'No matching document found for the given query.' });
+        } catch (error) {
+            res.status(500).json({ message: 'An error occurred while updating payment keys.', error });
+        }
+    }
+    
+      
 
 async function addPaymentKeys(req, res) {
   try {
@@ -74,34 +148,6 @@ async function addPaymentKeys(req, res) {
 
     await adminKeys.save();
     res.status(200).json({ message: 'Payment Keys added Successfully' });
-  } catch (error) {
-    logger.error(error);
-    res.status(500).json(error);
-  }
-}
-
-
-async function updatePaymentKeys(req, res) {
-  try {
-    const { publicKey, privateKey, id, enable } = req.body;
-    const adminId = id;
-    await PaymentKeys.updateMany({}, { $set: { 'keys.$[elem].enable': false } }, { arrayFilters: [{ 'elem.enable': true }] });
-
-    if (enable === true) {
-      const adminKeys = await PaymentKeys.findOneAndUpdate(
-        { 'keys._id': adminId },
-        { $set: { 'keys.$.publicKey': publicKey, 'keys.$.privateKey': privateKey, 'keys.$.enable': true } },
-        { new: true }
-      );
-
-      if (adminKeys) {
-        res.status(200).json({ message: 'Payment Keys updated Successfully' });
-      } else {
-        res.status(404).json({ message: 'No matching document found for the given query.' });
-      }
-    } else {
-      res.status(200).json({ message: 'Received enable is not true.' });
-    }
   } catch (error) {
     logger.error(error);
     res.status(500).json(error);
