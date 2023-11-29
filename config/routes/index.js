@@ -20,7 +20,6 @@ router.use('/wishlist', jwtVerify, require('./v1/wishlist'));
 router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
-// router.use('/payIntent', require('./v1/stripe/stripe'));
 router.use('/banners', require('./v1/custom-website-elements/banners'));
 router.use('/sales', require('./v1/custom-website-elements/sales'));
 router.use('/tc', require('./v1/tc'));
@@ -37,8 +36,8 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
 router.use('/tc', require('./v1/tc')) ;
+router.use('/payment', require('./v1/stripe/stripe'));
 
-// check type of user (Used for purpose of Authguard)
 // router.get('/checkUser', (req, res) => {
 
 //     const token = req.headers.authorization;
@@ -111,7 +110,7 @@ router.post('/create-payment-intent', async (req, res) => {
     try {
         const { items } = req.body;
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(items[0].price * 100),
+            amount: 1000,
             currency: "inr",
             description: JSON.stringify(items),
             metadata: {
