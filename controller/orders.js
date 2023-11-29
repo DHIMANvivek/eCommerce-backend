@@ -426,7 +426,7 @@ async function getSellerOrderDetails(req, res) {
             res.status(200).json(order);
         }
     } catch (err) {
-        res.status(500).json(error);
+        res.status(500).json(err);
     }
 }
 

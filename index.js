@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
-const redisClient = require('./config/redisClient');
+// const redisClient = require('./config/redisClient');
 // redisClient.connect();
 
 // redisClient.on('connect', function() {
