@@ -97,7 +97,7 @@ router.get('/checkUser',(req,res)=>{
 // payment intent
 router.post('/create-payment-intent', async (req, res) => {
 
-    const response = await fetch('http://localhost:1000/paymentKeys/get');
+    const response = await fetch('https://tradevogue-backend.onrender.com/paymentKeys/get');
 
     if (!response.ok) {
         throw new Error('Network response was not ok');
