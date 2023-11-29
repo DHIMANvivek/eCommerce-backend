@@ -83,18 +83,6 @@ async function createOffer(req, res) {
         }
       }
     }
-
-    let query = createQuery(req);
-    let results= await OfferModel.find(query);
-      
-    for(let result of results){
-      if (result && result._id!=req.body.id) {
-        if(result.status.active){
-          req.body.status={deleted:false,active:false};
-        }
-      }
-    }
-
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
@@ -153,8 +141,9 @@ async function getOffers(req, res) {
     res.status(200).json(data);
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(500).json({message:'Internal Server Error'});
+
   }
 }
 

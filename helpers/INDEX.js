@@ -40,16 +40,16 @@ function ForgetTemplate(token) {
 <table >
   <tr>
     <td class="header" colspan="2">
-      <h1>Password Reset
+    <img src="http://drive.google.com/uc?export=view&id=1Bxzu7SoWFK1soNkb_R99kft1X3cWJqyE" alt="logo" width="150" height="50">
       
     </td>
   </tr>
   <tr>
     <td class="content" colspan="2">
-    <img src="http://drive.google.com/uc?export=view&id=1Bxzu7SoWFK1soNkb_R99kft1X3cWJqyE" alt="logo" width="150" height="50">
+   
       <p>Dear Sir/Ma'am,</p>
-      <p>A password reset event has been triggered. The password reset window is limited to two hours.</p>
-      <p>If you do not reset your password within two hours, you will need to submit a new request.</p>
+      <p>A password reset event has been triggered. The password reset window is limited to 5 minutes.</p>
+      <p>If you do not reset your password within five minutes, you will need to submit a new request.</p>
       <p>Complete the password reset process, visit the following link:</p>
       <a href=http://localhost:4200/auth/forgetPassword/${token}> Forget Password</a>
     </td>

@@ -11,6 +11,7 @@ const logger = require('./../logger');
 async function login(req, res) {
     try {
         const input = req.body;
+        console.log(req.body, "login input");
         if (input.token) {
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
@@ -27,20 +28,25 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
+
+        console.log(userFound, "user found");
         const firstName = userFound?.name.firstname
 
-        if (!userFound) {
-            throw ({ message: 'User not found! Kindly sign up' })
-        }
-
         // PURE GOOGLE LOGIN
-        if (userFound.provider == 'GOOGLE' && input.token) {
+        if (input.token) {
+            if(!userFound){
+                const userCreated = usersModel(req.body);
+                await userCreated.save();      
+            }
             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
             res.status(200).json({ token, firstName });
             return;
         }
-
+        
+        if (!userFound) {
+            throw ({ message: 'Kindly Signup!' })
+        }
         // GOOGLE USER TRYING TO LOGIN MANUALLY.
         if (userFound.provider == 'GOOGLE') {
             throw ({ message: 'Try login with Google, you already have account registered with it.' });
@@ -130,6 +136,7 @@ async function forgotPassword(req, res) {
                 'provider': 1,
             });
 
+       
         if (!user) {
             throw { message: "This email doesn't exist." }
         }
@@ -176,14 +183,14 @@ async function updatePassword(req, res) {
             UserId: tokenData.id
         })
 
+        if (!requesterFound) {
+            throw ({ message: "Please request for reset password." })
+        }
         let currentTime = new Date().getTime();
         let requesterTime = requesterFound.createdAt.getTime();
 
         const checkTime = (currentTime - requesterTime) / 60000;
 
-        if (!requesterFound) {
-            throw ({ message: "Please request for reset password." })
-        }
 
         if (checkTime < 5) {
 
@@ -192,7 +199,7 @@ async function updatePassword(req, res) {
             const compare = await bcryptjs.compare(input.password, user.password)
             if (compare) {
                 throw ({
-                    message: 'Cannot set same password as before'
+                    message: 'Cannot set same password as before!'
                 })
             }
             await usersModel.updateOne({
@@ -228,13 +235,17 @@ async function changePassword(req, res) {
         console.log(input);
         const user = await usersModel.findById(req.tokenData.id)
 
-      
+        console.log(user, "user");
 
+        if (user.provider == 'GOOGLE'){
+            throw ({message: "Cannot change password since you are a Google user!"})
+        }
+      
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
 
         if (compareOldPassword) {
             if (input.oldPassword === input.newPassword){
-                throw ({message: "New password cannot be same as last"})
+                throw ({message: "Cannot set same password as before!"})
             }
             const updatePassword = await usersModel.findByIdAndUpdate({
                 _id: user.id
@@ -262,10 +273,8 @@ async function subscribeMail(req, res) {
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
             throw({message:'You are already a user'});
-
         }
         else {
-
             const findLead=await leadModel.findOne(req.body);
             if(findLead){
                 throw({message:'You are already in our Mailing List :)'})

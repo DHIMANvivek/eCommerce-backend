@@ -72,7 +72,6 @@ const productSchema = mongoose.Schema({
     },
     brand: {
       type: String,
-      lowercase: true,
       required: true
     },
     weight: {
