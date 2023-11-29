@@ -1,13 +1,31 @@
 const express = require("express");
-const webpush = require("web-push");
 const bodyParser = require("body-parser");
-const path = require("path");
-const crypto = require("crypto");
 const admin = require('firebase-admin');
-const fs = require('fs');
 require('dotenv').config();
-
 const app = express();
+// const redisClient = require('./config/redisClient');
+// redisClient.connect();
+
+// redisClient.on('connect', function() {
+//   console.log('redisConnected!');
+// });
+// redisClient.set('key', 'value', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//   } else {
+//     console.log('Set:', res);
+//   }
+// });
+
+// redisClient.get('key', (err, result) => {
+//   if (err) {
+//     console.error(err);
+//   } else {
+//     console.log('Value:', result);
+//   }
+// });
+
+
 app.use(bodyParser.json({ limit: '50mb' }));
 
 const serviceAccount = require('./tradevogue-firebase-adminsdk-mohjp-c7361ba1b1.json');
@@ -20,18 +38,9 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-
 app.post('/send-notification', (req, res) => {
   const { title, body, icon, url, token , registration_ids } = req.body;
   const tokens = registration_ids || [token].filter(Boolean);
-
-  // Static registration_ids
-  // const registration_ids = [
-  //   "eIGVynF7qde1Ij5_bZe0cN:APA91bEtmmM8fTh3pVDlqJsrV98gdS1JlHcYRdye1G323pTm2hcnVYAKUHLoYIcJneqWcJ7CI-Vfr8xbRLZs5HU185g4PF57PFdZEfQUTXh19V7L6QayCjoWi8Ovq9dWT_PHrHViLImv",
-  //   "eN1rb5EdCGBl37ihVIwdqL:APA91bGBoAI9CVlNukzoxGwjd8SQxrZT1ceuWtg7eALmVBHe8d7XqeeNGXG_6c5ZrBGHwMXX4_C59wTwzgTjVL5LuZiDPb-A_qQ298fwCZiMSvSJ9Bbiy8wpt2LJqabXmDF9ooNQFSkg",
-  //   "ctnSJmkHSgmcEeL6OCDMYo%3AAPA91bEtlagyQdob5pTe7i4AcZbblpJXXnF0qmjjtuYOpbKLxgdmF0b8KNz6W7oNQd4CjxwK28ysRoQImzPnhmB-XbCjctEwkHkdrCVNYU_PLKoJFymcbCdcwEFNhakP8eeYIgkpF_w7"
-  // ];
-
   const message = {
     notification: {
       title,
@@ -53,8 +62,6 @@ app.post('/send-notification', (req, res) => {
       res.status(500).send('Error sending notification');
     });
 });
-
-
 
 // app.post('/send-notification', (req, res) => {
 //   const { title, body, icon, token } = req.body;
@@ -141,11 +148,11 @@ app.listen(port, (err) => {
 });
 
 
-const server = app.listen(3000, () => {
-  console.log(`Chat Server listening on port ${3000}`);
-});
+// const server = app.listen(3000, () => {
+//   console.log(`Chat Server listening on port ${3000}`);
+// });
 
-const io = require('socket.io')(server);
+// const io = require('socket.io')(server);
 
 // io.on('connection', (socket) => {
 
@@ -158,23 +165,23 @@ const io = require('socket.io')(server);
 // });
 
 // const Message = require('./models/message');
-const User = require('./models/users')
+// const User = require('./models/users')
 
-io.on('connection', (socket) => {
-    socket.on('chatMessage', (data) => {
-        const user = socket.user; 
-        const newMessage = new Message({
-            user: user, 
-            content: data, 
-        });
+// io.on('connection', (socket) => {
+//     socket.on('chatMessage', (data) => {
+//         const user = socket.user; 
+//         const newMessage = new Message({
+//             user: user, 
+//             content: data, 
+//         });
 
-        newMessage.save()
-            .then(() => {
+//         newMessage.save()
+//             .then(() => {
                 
-                io.emit('message', { user: user, content: newMessage.content });
-            })
-            .catch((error) => {
-                console.error('Error saving message:', error);
-            });
-    });
-});
+//                 io.emit('message', { user: user, content: newMessage.content });
+//             })
+//             .catch((error) => {
+//                 console.error('Error saving message:', error);
+//             });
+//     });
+// });

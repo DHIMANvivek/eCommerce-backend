@@ -16,6 +16,7 @@ let offerSchema = mongoose.Schema({
 
     couponcode: {
         type: String,
+        unique:true,
         required:   function validate() {
                 if (this.OfferType == 'coupon') return true;
             },
@@ -92,14 +93,11 @@ let offerSchema = mongoose.Schema({
     ExtraInfo:{
     //    type: Object,
     //     lowercase: true 
-    categories:[{type:String,}],
+    categories:[{type:String,lowercase:true}],
     brands:[{type:String}]    
     },
 
-    status:{
-        type:Boolean,
-        default:true
-    },
+
     couponType: {
         type: String,
         enum: ['global', 'custom','new'],
@@ -110,8 +108,9 @@ let offerSchema = mongoose.Schema({
     },
     userUsed:[
         {
-        ref:'users',
-        type: mongoose.Schema.Types.ObjectId,
+        // ref:'users',
+        // type: mongoose.Schema.Types.ObjectId,
+        
     }
     ],
     
@@ -140,7 +139,7 @@ let offerSchema = mongoose.Schema({
     status:{
         active: {
             type:Boolean,
-            default:false,
+            default:true,
         },
         deleted:{
             type:Boolean,

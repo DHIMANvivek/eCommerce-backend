@@ -1,7 +1,7 @@
-const { db } = require('../models/users');
 const wishlist = require('../models/wishlist')
 const mongoose = require('mongoose')
-const users = require('../models/users')
+const logger = require('./../logger');
+const UserModel = require('../models/users')
 
 async function showWishlists(req, res) {
     try {
@@ -28,42 +28,15 @@ async function showWishlists(req, res) {
                 }
             )
         }
-        else {
-            console.log("Wishlister not found. Please signup.")
-        }
     }
     catch (error) {
-        return res.status(500).json({
-            message: "Error in showing wishlists!"
-        })
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
-
-// async function addWishlist(req, res) {
-//     try {
-//         const input = req.body;
-//         const user = req.tokenData;
-
-//         const wishlister = await wishlist.findOne({
-//             userId: user.id
-//         })
-
-//         const newWishlist = {
-//             wishlistName: input.wishlistName,
-//             products: []
-//         }
-//         const add = await wishlister.wishlists.push(newWishlist)
-//         wishlister.save()
-//         return res.status(200).json({
-//             message: "New Wishlist created successfully!"
-//         })
-//     }
-//     catch (error) {
-//         return res.status(500).json({
-//             message: "Error in creating new wishlist!"
-//         })
-//     }
-// }
 
 async function addToWishlist(req, res) {
     try {
@@ -72,8 +45,17 @@ async function addToWishlist(req, res) {
 
         const wishlister = await wishlist.findOne({
             userId: user.id,
-            'wishlists.wishlistName': input.wishlistName
-        })
+            // $exp: {
+            //     $eq: [
+            //         '$wishlists.wishlistName'.toLowerCase(),
+            //         input.wishlistName.toLowerCase()
+            //     ]
+            // }
+            'wishlists.wishlistName': input.wishlistName.trim().toLowerCase()
+        });
+        if (wishlister && input.type) {
+            throw ({ message: 'Wishlist of same name already exists!' })
+        }
 
         if (!wishlister) {
             const newWishlist = {
@@ -93,42 +75,17 @@ async function addToWishlist(req, res) {
         });
 
         return res.status(200).json({
-            message: "Product successfully added to wishlist!"
+            message: "Added to " + input.wishlistName + '!'
         })
     }
     catch (error) {
-        return res.status(500).json({
-            message: "Error while adding product to wishlist!"
-        })
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
-
-// async function removeFromWishlist(req, res) {
-//     try {
-//         const input = req.body;
-//         const user = req.tokenData;
-
-//         const wishlister = await wishlist.findOne({
-//             userId: user.id
-//         })
-
-//         if (wishlister) {
-//             const remove = await wishlist.updateOne({
-//                 userId: user.id,
-//                 'wishlists.wishlistsName': input.WishlistName
-//             }, {
-//                 $pull: {
-//                     'wishlists.products': {
-
-//                     }
-//                 }
-//             })
-//         }
-//     }
-//     catch {
-
-//     }
-// }
 
 async function deleteWishlist(req, res) {
     try {
@@ -147,9 +104,11 @@ async function deleteWishlist(req, res) {
         })
     }
     catch (error) {
-        return res.status(500).json({
-            message: "Couldn't delete wishlist"
-        })
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
@@ -194,8 +153,13 @@ async function showWishlistCount(req, res) {
         // )
     }
     catch (error) {
-        console.log('error is ', error);
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
+
 }
 
 async function showWishlistedData(req, res) {
@@ -226,16 +190,20 @@ async function showWishlistedData(req, res) {
                     'productDetails.assets': 1,
                     'productDetails.price': 1,
                     'productDetails.info.brand': 1,
-                    'productDetails._id': 1
+                    'productDetails._id': 1,
+                    'productDetails.active': 1,
                 }
             }
-
         ])
 
         return res.status(200).json(products)
     }
     catch (error) {
-        return res.status(500).json(products)
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
@@ -243,17 +211,19 @@ async function removeFromWishlist(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
-        if(!input.wishlistName){
-            const find=await wishlist.findOne({userId:user.id,
+        if (!input.wishlistName) {
+            const find = await wishlist.findOne({
+                userId: user.id,
                 'wishlists':
-                {$elemMatch:
-                    {'products':{$in:[input.productId]}}
+                {
+                    $elemMatch:
+                        { 'products': { $in: [input.productId] } }
                 }
-            },{'wishlists.$':1}   
+            }, { 'wishlists.$': 1 }
             );
-                input.wishlistName=find.wishlists[0].wishlistName;
+            input.wishlistName = find.wishlists[0].wishlistName;
         }
-      
+
         const response = await wishlist.updateOne(
             {
                 userId: user.id,
@@ -270,56 +240,43 @@ async function removeFromWishlist(req, res) {
             response
         })
     }
-
-
     catch (error) {
-        console.log('erroris ', error);
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
 
+// used in case of emergency 
 
-
-// async function insertWishlists(req, res) {
+// async function createDefault(req, res) {
 //     try {
-
-//         let findAllusersId = await users.find({}, { _id: 1 });
-//         findAllusersId = JSON.parse(JSON.stringify(findAllusersId));
-//         findAllusersId = Promise.all(findAllusersId.map(async (el) => {
-//             // return { userId: el._id };
-
-//             const ab = await wishlist.updateMany({userId:el._id},
-//                 {
-    
-//                     $set: {
-//                         'wishlists': [{
-//                             'wishlistName': 'My Wishlist',
-//                             'products': []
-//                         }]
-//                     }
-//                 },
-//                 {
-//                     "upsert": true
-//                 }
-//             )
-//         }))
-
-//         // return;
-
-//     }
-
-
-//     catch (error) {
+//         const getAllusers = await UserModel.find({}, { _id: 1 });
+//         console.log('get all user si ', getAllusers);
+//         getAllusers.forEach(async (el) => {
+//             const defaultWishlist = {
+//                 wishlistName: 'my wishlist',
+//                 products: []
+//             }
+//             await wishlist.create({
+//                 userId: el._id,
+//                 wishlists: [defaultWishlist]
+//             });
+//         })
+//     } catch (error) {
+//         console.log('error is ', error);
 //     }
 // }
 
 module.exports = {
     showWishlists,
-    // addWishlist,
     addToWishlist,
     removeFromWishlist,
     deleteWishlist,
     showWishlistCount,
     showWishlistedData,
-    // insertWishlists,
+    // createDefault
 }

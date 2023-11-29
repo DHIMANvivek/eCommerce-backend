@@ -10,6 +10,7 @@ const wishlistSchema = mongoose.Schema({
         {
             wishlistName: {
                 type: String,
+                lowercase: true
             },
             products: [
                 {
@@ -18,7 +19,15 @@ const wishlistSchema = mongoose.Schema({
                 },
             ]
         },
-    ]
-});
+    ],
+    active : {
+        type : Boolean,
+        default: true
+    }
+},
+    {
+        timestamps: true,
+        autoIndex: true,
+    });
 
 module.exports = mongoose.model('wishlist', wishlistSchema);

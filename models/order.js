@@ -37,17 +37,17 @@ const orderSchema = mongoose.Schema(
                 //  name , photo, category, color , sku, shipment  status,qty,price
                 amount: {
                     type: Number,
-                    default:function(){ return this.quantity*this.price}
+                    default: function () { return this.quantity * this.price }
                     // set:function(){return this.quantity*this.price}
                 },
-                price:{
-                    type:Number,
-                    required:true
+                price: {
+                    type: Number,
+                    required: true
                 },
                 shipmentStatus: {
-                        type: String,
-                        enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
-                        default: 'pending',
+                    type: String,
+                    enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
+                    default: 'pending',
 
                 },
                 name: {
@@ -55,24 +55,24 @@ const orderSchema = mongoose.Schema(
                     required: true
                 },
                 //  NEW FIELDS
-                SellerId:{
+                SellerId: {
                     type: mongoose.Schema.Types.ObjectId,
-                        ref: 'sellerdetails',
+                    ref: 'sellerdetails',
                 },
-                image:{
-                    type:String,
-                    required:true
+                image: {
+                    type: String,
+                    required: true
                 },
- 
+
 
             }
         ],
         invoice_status: {
             type: Boolean,
-            default: false 
+            default: false
         },
-        orderID:{
-            type:String,
+        orderID: {
+            type: String,
         },
 
         orderAmount: {
@@ -88,46 +88,42 @@ const orderSchema = mongoose.Schema(
         payment_status: {
             type: String,
             enum: ['success', 'pending', 'cancelled', 'failed', 'refund'],
-            default: 'failed'
+            default: 'pending'
         },
-        active:{
-            type:Boolean,
-            default:true,
+        active: {
+            type: Boolean,
+            default: true,
         },
-        transactionId:{
-            type:String,
-            
+        transactionId: {
+            type: String,
+
         },
 
         // METHOD OF PAYMENT
-        MOP:{
-            type:String
+        MOP: {
+            type: String
         },
 
 
-        coupon:{
-        //   type:String
-        type: mongoose.Schema.Types.ObjectId,
+        coupon: {
+            //   type:String
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Offers',
         },
-        discount:{
-            type:Number,
-            default:0,
-            required:function (){
+        discount: {
+            type: Number,
+            default: 0,
+            required: function () {
                 return this.coupon;
             }
         },
-        
+
         orderValueAfterDiscount: {
             type: Number,
-            default:this.orderAmount
-          },
+            default: this.orderAmount
+        },
 
-        active: {
-            type: Boolean,
-            default: true
-        }
-       
+
     },
     {
         timestamps: true,
@@ -140,15 +136,15 @@ orderSchema.pre('save', function (next) {
 
     this.orderAmount = this.products.reduce((totalAmount, product) => {
         return totalAmount + product.amount;
-    },0);
+    }, 0);
 
     if (!this.coupon) {
         this.orderValueAfterDiscount = this.orderAmount;
     }
 
-    if(this.coupon){
-        this.orderValueAfterDiscount =this.orderAmount-this.discount;
-      }
+    if (this.coupon) {
+        this.orderValueAfterDiscount = this.orderAmount - this.discount;
+    }
 
     next();
 });

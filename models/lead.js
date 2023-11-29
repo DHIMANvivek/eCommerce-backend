@@ -6,7 +6,6 @@ const leadSchema = mongoose.Schema({
         required: true,
         unique: true
     },
-
 },
 {
     timestamps: true,

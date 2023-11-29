@@ -20,39 +20,17 @@ const aboutSchema = new mongoose.Schema({
         description: createBasicField(String),
       },
     },
-  
-  StoreImages: {
-    img: [createBasicField(String)],
-  },
+  StoreImages:  [createBasicField(String)],  
 },
-  active: createBasicField(Boolean),
-  Statistics: {
-    Sales: {
-      Number: createBasicField(Number,false),
-      color: createBasicField(String),
-      active: createBasicField(Boolean),
-    },
-    HappyCustomers: {
-      Number: createBasicField(Number,false),
-      color: createBasicField(String),
-      active: createBasicField(Boolean),
-    },
-    ShippedProducts: {
-      Number: createBasicField(Number,false),
-      color: createBasicField(String),
-      active: createBasicField(Boolean),
-    },
-    active: createBasicField(Boolean),
-  },
-  TeamMembers: {
-    memberInfo: [
+
+
+  TeamMembers: [
+
       {
         name: createBasicField(String),
-        imgLink: createBasicField(String),
+        img: createBasicField(String),
       },
     ],
-    active: createBasicField(Boolean),
   },
-});
-
-module.exports = mongoose.model('aboutPage', aboutSchema);
+);
+module.exports = mongoose.model('About', aboutSchema);

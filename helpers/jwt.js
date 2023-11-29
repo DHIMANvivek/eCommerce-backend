@@ -1,5 +1,6 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 require('dotenv').config()
+const logger = require('./../logger');
 
 function verifyToken(token) {
     try {
@@ -11,6 +12,7 @@ function verifyToken(token) {
         return details;
         
     } catch (error) {
+        logger.error(error);
         throw error;
     }
 }
@@ -24,6 +26,7 @@ function createToken(tokenData) {
 
     }
     catch (error) {
+        logger.error(error);
         throw error;
     }
 }

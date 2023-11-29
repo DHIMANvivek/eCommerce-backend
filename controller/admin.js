@@ -2,59 +2,47 @@ const users = require('../models/users');
 const products = require('../models/products');
 const reviews = require('../models/reviews');
 const orders = require('../models/order');
-
 const sellerInfo = require('../models/sellerDetails');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-// // const faqData = require('../models/faq');
-// const Ticket = require('../models/supportTicket');
-// const Title = require('../models/createTicket');
 const faqData = require('../models/custom-website-elements/faq');
-const Ticket = require('../models/support-ticket/supportTicket');
-const Title = require('../models/support-ticket/TicketStatus');
 const SKU_generater = require('../helpers/sku');
-// const PaymentKeys = require('../models/paymentKeys');
-// const paginateResults = require('../helpers/pagination');
-
 const productController = require('../controller/products');
-const Notification = require('../models/notifications/notifications')
-const OffersModel = require('../models/offers');
-// const webPush = require('../models/support-ticket/SupportNotificationTokens');
-const { updateItem } = require('./cart');
+const logger = require('./../logger');
 
-async function getOverallInfo(req, res) {
+async function getOverallInfo(req, res, controller=false) {
   try {
     let result = {};
+    // const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
 
-    // Review Data
-    req['controller'] = true;
-    result['customerReview'] = await fetchReviewStats(req, res);
-    result['salesStats'] = await fetchProductSalesData(req, res);
-    result['categorySales'] = await fetchCategorySalesData(req, res);
-    result['popularStats'] = await fetchPopularProducts(req, res);
+    // const customerCountPrev = await users.find({
+    //   'role': { $not: { $eq: 'admin' } },
+    //   'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
+    // }).count();
 
-    
-    const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
-    
-    const customerCountPrev = await users.find({
-      'role': { $not: { $eq: 'admin' } },
+    const customerCountCurr = (await orders.distinct('buyerId', {payment_status: 'success'})).length;
+
+    const customerCountPrev = (await orders.distinct('buyerId', {
+      payment_status: 'success',
       'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
-    }).count();
-    
-    let customerChange = customerCountPrev ? ((customerCountCurr - customerCountPrev) / customerCountCurr) * 100 : 0;
-    
+    })).length;
+
+    let customerChange = customerCountPrev ? (((customerCountCurr - customerCountPrev)) / customerCountPrev) * 100 : 0;
+
     result['customer'] = {
       'count': customerCountCurr,
       'change': Math.floor(customerChange)
     };
 
-    const orderCountTotal = await orders.find({}).count();
+    const orderCountTotal = await orders.find({ payment_status: 'success', }).count();
 
     const orderCountPrev = await orders.find({
+      payment_status: 'success',
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
-    let orderChange = orderCountPrev ?  ((orderCountTotal - orderCountPrev) / orderCountTotal) * 100 : 0;
+    let currentOrders=orderCountTotal-orderCountPrev;
+    let orderChange = orderCountPrev ? ((currentOrders-orderCountPrev) / orderCountPrev) * 100 : 0;
 
     result['orders'] = {
       'count': orderCountTotal,
@@ -89,7 +77,7 @@ async function getOverallInfo(req, res) {
                       $arrayElemAt: [
                         "$$ROOT.info.orderQuantity",
                         0]
-                      },
+                    },
                   ]
                 }, 1, 0],
             },
@@ -134,6 +122,7 @@ async function getOverallInfo(req, res) {
             },
             {
               $project: {
+
                 _id: 0,
                 totalSales: {
                   $subtract: [
@@ -180,24 +169,26 @@ async function getOverallInfo(req, res) {
 
     result['revenue'] = {
       total: revenue[0].total[0].totalSales,
-      change: revenue[0].prev? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
+      change: revenue[0].prev ? 0 : Math.floor(((revenue[0].total[0].totalSales - revenue[0].prev[0].totalSales) / revenue[0].total[0].totalSales) * 100)
     }
 
+    // if (controller) return result;
     res.status(200).json(result);
 
   } catch (err) {
-
+    logger.error(err);
   }
 }
 
 async function fetchProductSalesData(req, res) {
   let controller = req.controller ? true : false;
   const data = req.tokenData;
+  const type = req.query.type;
 
   try {
     if (data.role == 'admin') {
 
-      const salesStats = await orders.aggregate([
+      let aggregationPipe = [
         {
           $unwind: "$products",
         },
@@ -220,27 +211,41 @@ async function fetchProductSalesData(req, res) {
             payment_status: "success",
             'products.shipmentStatus': { $nin: ['cancelled', 'declined'] }
           },
-        },
-        {
-          $group: {
-            _id: {
-              year: { $year: "$orderDate" },
-              month: { $month: "$orderDate" },
-            },
-            overallDiscount: { $sum: "$discount" },
-            totalsales: {
-              $sum: "$products.amount"
-            },
-            totalExpenses: {
-              $sum: {
-                $multiply: [
-                  "$products.info.costPrice",
-                  "$products.quantity",
-                ],
-              }
-            }
+        }
+      ];
+
+      let groupbyQuery = {
+
+        $group: {
+          _id: {
+            year: { $year: "$orderDate" },
+            month: { $month: "$orderDate" },
           },
+          overallDiscount: { $sum: "$discount" },
+          totalsales: {
+            $sum: "$products.amount"
+          },
+          totalExpenses: {
+            $sum: {
+              $multiply: [
+                "$products.info.costPrice",
+                "$products.quantity",
+              ],
+            }
+          }
         },
+      };
+
+      if (type == 'yearly') {
+        delete groupbyQuery.$group._id.date;
+        aggregationPipe.push(
+        )
+      } else {
+        groupbyQuery.$group._id.date = { $dayOfMonth: "$orderDate" };
+      }
+
+      aggregationPipe.push(
+        groupbyQuery,
         {
           $project: {
             _id: 1,
@@ -256,16 +261,20 @@ async function fetchProductSalesData(req, res) {
             }
           }
         },
-        { $sort: { _id: 1 } }
-      ]);
+        {
+          $sort: { _id: 1 }
+        }
+      );
+
+      const salesStats = await orders.aggregate(aggregationPipe);
       if (!salesStats) throw 401;
       if (controller) return salesStats;
 
       return res.status(200).json(salesStats);
     }
   } catch (err) {
+    logger.error(err);
     return res.status(401).send();
-
   }
 }
 
@@ -281,6 +290,8 @@ async function fetchPopularProducts(req, res) {
         $match: {
           payment_status: "success",
           'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
+
+         //products only for particular month (current)
           $expr: {
             $eq: [
               { $month: "$orderDate" },
@@ -306,14 +317,20 @@ async function fetchPopularProducts(req, res) {
       {
         $group: {
           _id: "$products.info._id",
-          revenue: { $sum: "$products.amount" },
+          revenue: {
+            $sum: { 
+              $subtract: [ "$products.amount", "$discount" ],
+            },
+          },
           profit: {
             $sum: {
               $subtract: [
-                "$products.amount",
+                {
+                  $subtract: [ "$products.amount", "$discount" ],
+                },
                 {
                   $multiply: [
-                    "$products.quantity",
+                    "$products.quantity", 
                     "$products.info.costPrice",
                   ],
                 },
@@ -339,6 +356,7 @@ async function fetchPopularProducts(req, res) {
     return res.status(200).json(popularProductStats);
 
   } catch (err) {
+    logger.error(err);
     return res.status(401).send();
   }
 }
@@ -373,12 +391,7 @@ async function fetchCategorySalesData(req, res) {
         $group: {
           _id: "$products.info.info.category",
           sales: {
-            $sum: {
-              $multiply: [
-                "$products.price",
-                "$products.quantity",
-              ],
-            },
+            $sum: "$products.amount",
           },
         },
       },
@@ -396,14 +409,17 @@ async function fetchCategorySalesData(req, res) {
 
     return res.status(200).json({ 'categoryStats': categoryStats });
   } catch (err) {
+    logger.error(err);
   }
 }
 
 async function fetchReviewStats(req, res) {
   let sellerData = req.tokenData;
   let controller = req.controller ? true : false;
+  
   try {
     let aggregationPipe = [
+
       { $unwind: '$reviews' },
       {
         $group: {
@@ -424,7 +440,8 @@ async function fetchReviewStats(req, res) {
       }
     ];
 
-    if (sellerData == 'seller') {
+    if (sellerData.role == 'seller') {
+
       aggregationPipe.unshift({ $match: { 'productInfo.sellerID': sellerData.id } });
       aggregationPipe.unshift({
         $lookup: {
@@ -433,7 +450,7 @@ async function fetchReviewStats(req, res) {
           foreignField: '_id',
           as: 'productInfo'
         }
-      })
+      });
     }
     const ratingOverView = await reviews.aggregate(aggregationPipe);
 
@@ -442,6 +459,7 @@ async function fetchReviewStats(req, res) {
     res.status(200).json(ratingOverView[0]);
 
   } catch (err) {
+    logger.error(err);
     res.status(401).send();
   }
 }
@@ -456,27 +474,56 @@ async function addProduct(req, res) {
     if (productObject.type == 'bulk') {
       let data = productObject.data;
 
-      data = await Promise.all(data.map(async (product) => {
+      let seller_info = await sellerInfo.findOne({ sellerID: sellerID });
+
+      data.forEach((product) => {
+
+
+        // Purpose -> extracting any unique category or brands  
+        // not inside the seller inventory
+        if (!seller_info['categories'].includes(product.info.category.toLowerCase())) {
+          seller_info['categories'].push(product.info.category);
+        }
+        if (!seller_info['brands'].includes(product.info.brand)) {
+          seller_info['brands'].push(product.info.brand);
+        }
+        product.info.tags.forEach((tag) => {
+          if (!seller_info['tags'].includes(tag.toLowerCase())) {
+            seller_info['tags'].push(tag);
+          }
+        });
+      })
+
+      await sellerInfo.updateOne({ sellerID: sellerID }, { $set: seller_info });
+
+      for (const product of data) {
+        // Add the sellerID for each product
         product['sellerID'] = sellerID;
+
+        // Generate SKU for the product
         product['sku'] = await SKU_generater.generateSKU(product);
-        return product;
-      }));
-      response = await products.insertMany(productObject.data);
+
+        response = await products.create(product);
+      }
+
     } else {
+
+
       Object.keys(productObject.data.basicinfo).forEach((key) => {
         productObject.data[key] = productObject.data.basicinfo[key];
       });
       productObject.data.sellerID = sellerID;
+      productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
       productObject.data.sku = await SKU_generater.generateSKU(productObject.data);
+
       response = await products.create(productObject.data);
     }
 
-    if (!response) throw "Not Uploaded"
-    return res.status(200).json("uploaded");
+    if (response) return res.status(200).json("uploaded");
 
   } catch (err) {
+    logger.error(err);
     return res.status(401).json(err);
-
   }
 }
 
@@ -499,6 +546,7 @@ async function updateHighlightProduct(req, res) {
     return res.status(200).json({ 'highlightCount': highlightCount });
 
   } catch (err) {
+    logger.error(err);
     return res.status(401).send();
   }
 }
@@ -515,6 +563,7 @@ async function updateProduct(req, res) {
     });
     delete productObject.data['basicinfo'];
     delete productObject.data['_id'];
+    productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
 
     const response = await products.findOneAndUpdate({
       '_id': _id,
@@ -525,6 +574,7 @@ async function updateProduct(req, res) {
 
     return res.status(200).json("uploaded");
   } catch (err) {
+    logger.error(err);
   }
 }
 
@@ -546,6 +596,7 @@ async function deleteProductInventory(req, res) {
 
     return res.status(200).json({ message: 'Products Deleted' })
   } catch (err) {
+    logger.error(err);
     return res.status(409).json({ message: 'Products not Deleted' })
   }
 }
@@ -554,7 +605,6 @@ async function deleteProductInventory(req, res) {
 async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
   const parameters = req.body;
-
   try {
     aggregationPipe = [
       {
@@ -562,6 +612,7 @@ async function fetchProductInventory(req, res) {
           $or: [
             { 'name': { $regex: parameters.filter['search'], $options: 'i' } },
             { 'info.category': { $regex: parameters.filter['search'], $options: 'i' } },
+            { 'info.brand': { $regex: parameters.filter['search'], $options: 'i' } }
           ]
         }
       },
@@ -629,7 +680,7 @@ async function fetchProductInventory(req, res) {
       }
     ];
 
-
+    let sortFilter = false;
     Object.keys(parameters.filter).forEach((key) => {
       if (parameters.filter[key]) {
         if (key == 'categories') {
@@ -637,15 +688,17 @@ async function fetchProductInventory(req, res) {
         }
         if (key == 'rating') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'avgRating': parameters.filter[key] } });
+          sortFilter = true;
         }
         else if (key == 'stockQuantity') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'inventory': parameters.filter[key] } });
+          sortFilter = true;
         }
       }
     });
 
-
     aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } });
+
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       {
         $lookup: {
@@ -657,19 +710,27 @@ async function fetchProductInventory(req, res) {
       },
       {
         $unwind: '$productInfo'
-      },
-      {
-        $sort: { 'productInfo.name': 1 }
-      },
-      { $skip: (parameters.page - 1) * parameters.limit },
-      { $limit: parameters.limit },
+      }
     );
 
+    if (!sortFilter) {
+      aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
+        {
+          $sort: { 'productInfo.name': 1 }
+        }
+      );
+    }
+
+    aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
+      { $skip: (parameters.page - 1) * parameters.limit },
+      { $limit: parameters.limit }
+    );
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
     res.status(200).json(response[0]);
 
   } catch (err) {
+    logger.error(err);
   }
 }
 
@@ -683,6 +744,7 @@ async function fetchProductDetail(req, res) {
     return res.status(200).json(response);
 
   } catch (err) {
+    logger.error(err);
     return res.status(404).json({ message: err });
   }
 }
@@ -707,6 +769,7 @@ async function fetchFeatures(req, res) {
     }
     throw "404";
   } catch (err) {
+    logger.error(err);
     return res.status(404).send();
   }
 }
@@ -723,17 +786,17 @@ async function updateFeatures(req, res) {
     }
     throw "404";
   } catch (err) {
+    logger.error(err);
     return res.status(404).send();
   }
 }
 
 async function updateDetails(req, res) {
 
-  const userToken = req.body.data.info.token;
-  const payload = JSON.parse(atob(userToken.split('.')[1]));
-
-  const email = payload.email;
-  const role = payload.role;
+  const id = req.tokenData.id;
+  const emails = await users.findOne({ _id: req.tokenData.id }, { email: 1, _id: 0 });
+  const email = emails.email
+  const role = req.tokenData.role;
   const data = req.body.data;
 
   if (data && role == 'admin' && email && data.name && data.name.firstname !== undefined) {
@@ -741,10 +804,10 @@ async function updateDetails(req, res) {
 
     try {
       const response = await users.updateOne(
-        { 'email': email, 'role': role },
+        { '_id': id, 'role': role },
         {
           $set: {
-            email: data.email,
+            email: email,
             'name.firstname': firstname,
             'name.lastname': data.name.lastname,
             'mobile': data.mobile,
@@ -762,25 +825,25 @@ async function updateDetails(req, res) {
         return res.status(404).json({ error: 'User not found or no changes were made' });
       }
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Internal Server Error' });
+      logger.error(err);
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   } else {
-    return res.status(400).json({ error: 'Invalid data structure or missing firstname' });
+    return res.status(400).json({ message: 'Invalid data structure or missing firstname' });
   }
 }
 
 async function getAdminDetails(req, res) {
-  const userToken = req.query.token;
-  const payload = JSON.parse(atob(userToken.split('.')[1]));
+  const id = req.tokenData.id;
 
   try {
-    const response = await users.find({ role: 'admin', email: payload.email });
+    const response = await users.find({ role: 'admin', _id: id });
     if (response) {
       return res.status(200).json(response);
     }
     throw "404";
   } catch (err) {
+    logger.error(err);
     return res.status(404).send();
   }
 }
@@ -842,7 +905,7 @@ async function updateFaq(req, res) {
 
     res.json(result);
   } catch (err) {
-    console.error(err, "error");
+    logger.error(err);
     res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
   }
 }
@@ -862,8 +925,9 @@ async function addFaq(req, res) {
     await category.save();
 
     return res.status(200).json({ success: true, message: 'Children added to the category' });
-  } catch (error) {
-    console.error(error);
+  } 
+  catch (error) {
+    logger.error(error);
     return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
   }
 }
@@ -882,7 +946,7 @@ async function deleteFaq(req, res) {
     );
   }
   catch (err) {
-    console.error(err);
+    logger.error(err);
     res.status(500).json({ error: 'An error occurred while deleting the FAQ item' });
   }
 }
@@ -892,7 +956,7 @@ async function getPaymentKeys(req, res) {
     const paymentKeys = await PaymentKeys.find({}).populate('keys.adminId');
     res.status(200).json(paymentKeys);
   } catch (error) {
-    console.error('Error:', error);
+    logger.error(error);
     res.status(500).json(error);
   }
 }
@@ -912,7 +976,7 @@ async function getPaymentKeys(req, res) {
 async function addPaymentKeys(req, res) {
   try {
     const { publicKey, privateKey } = req.body;
-    const decodedPayload = atob(req.body.adminId);
+    // const decodedPayload = atob(req.body.adminId);
     const admin = JSON.parse(decodedPayload);
     const adminId = admin.id;
 
@@ -929,6 +993,7 @@ async function addPaymentKeys(req, res) {
     await adminKeys.save();
     res.status(200).json({ message: 'Payment Keys added Successfully' });
   } catch (error) {
+    logger.error(error);
     res.status(500).json(error);
   }
 }
@@ -946,6 +1011,7 @@ async function updatePaymentKeys(req, res) {
 
     res.status(200).json({ message: 'Payment Keys updated Successfully' });
   } catch (error) {
+    logger.error(error);
     res.status(500).json(error);
   }
 }
@@ -967,7 +1033,7 @@ async function getPaginatedData(req, res) {
 
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 }
@@ -1007,4 +1073,3 @@ module.exports = {
   deletePaymentKeys,
   getPaginatedData,
 }
-

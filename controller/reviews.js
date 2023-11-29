@@ -1,12 +1,26 @@
 const Reviews = require('../models/reviews');
+const logger = require('./../logger');
 
 async function fetchReviews(productId, userId = '') {
     try {
-        let reviews = (await Reviews.findOne({ productID: productId })
-            .populate({
-                path: 'reviews.userId',
-                select: 'name'
-            })).reviews;
+        let reviews = JSON.parse(JSON.stringify((await Reviews.findOne({ productID: productId })
+        .populate({
+            path: 'reviews.userId',
+            select: 'name'
+        })).reviews));
+        
+        console.log('s', reviews);
+        reviews = reviews.map(review => {
+            if (review.userId === null) {
+                review.userId = {
+                    name: {
+                        firstname: 'Deleted',
+                        lastname: 'User'
+                    }
+                };
+            }
+            return review;
+        })
 
         // getting avg rating 
         let avgRating = reviews.reduce((accumulator, current) => {
@@ -35,6 +49,8 @@ async function fetchReviews(productId, userId = '') {
         }
 
     } catch (error) {
+        console.log('here', error);
+        logger.error(error);
         return {
             reviews: {},
             avgRating: 0
@@ -45,7 +61,7 @@ async function fetchReviews(productId, userId = '') {
 async function addOrUpdateReview(req, res) {
     try {
 
-        if(req.tokenData.role == 'admin'){
+        if (req.tokenData.role == 'admin') {
             res.status(403).json({
                 message: 'Admin not allowed to review a product'
             });
@@ -79,7 +95,7 @@ async function addOrUpdateReview(req, res) {
 
         }
         else {
-            // User does'nt has a review, add it
+            // User doesn't has a review, add it
             await Reviews.updateOne(
                 { productID: input.productId },
                 {
@@ -100,6 +116,7 @@ async function addOrUpdateReview(req, res) {
 
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
@@ -122,6 +139,7 @@ async function deleteReview(req, res) {
         });
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }

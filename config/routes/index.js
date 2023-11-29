@@ -8,9 +8,7 @@ const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
 const { sendInvoiceTemplate } = require('../../helpers/INDEX');
 const paginateResults = require('../../helpers/pagination');
-const Notification = require('../../models/notifications/notifications')
-const axios = require('axios');
-const notifications = require('../../models/notifications/notifications');
+const redisClient = require('../../config/redisClient');
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
@@ -23,11 +21,12 @@ router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
 router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
 // router.use('/payIntent', require('./v1/stripe/stripe'));
-router.use('/banners', require('./v1/custom-website-elements/banners'))
-router.use('/sales', require('./v1/custom-website-elements/sales'))
+router.use('/banners', require('./v1/custom-website-elements/banners'));
+router.use('/sales', require('./v1/custom-website-elements/sales'));
+router.use('/tc', require('./v1/tc'));
 
-router.use('/deals', require('./v1/custom-website-elements/deals'))
-router.use('/about',require('./v1/custom-website-elements/about'))
+router.use('/deals', require('./v1/custom-website-elements/deals'));
+router.use('/about',require('./v1/custom-website-elements/about'));
 router.use('/razorpay', require('./v1/razorpay/payment'));
 
 router.use('/deals', require('./v1/custom-website-elements/deals'));
@@ -37,41 +36,63 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
-
-
-
+router.use('/tc', require('./v1/tc')) ;
 
 // check type of user (Used for purpose of Authguard)
-router.get('/checkUser', (req, res) => {
+// router.get('/checkUser', (req, res) => {
 
+//     const token = req.headers.authorization;
+//     try {
+//         if (token) {
+//             const data = verifyToken(token.split(' ')[1]);
+//             if (data.role != 'admin') {
+//                 throw ({ message: 'You are not an admin.' })
+//             }
+//             return res.json("sucess");
+//         }
+//         throw { message: 'Please login/signup first.' };
+//     } catch (error) {
+//         return res.status(404).json(error);
+//     }
+// })
+
+// router.get('/checkUser',(req,res)=>{
+//     const token = req.headers.authorization;
+//     try {
+//         if (token) {
+//             const data = verifyToken(token.split(' ')[1]);
+//             if (data.role != 'admin') {
+//                 throw ({ message: 'You are not an admin.' })
+//             }
+//             return res.json("sucess");
+//         }
+//         throw { message: 'Please login/signup first.' };
+//     } catch (error) {
+//         return res.status(404).json(error);
+//     }
+// })
+
+router.get('/checkUser',(req,res)=>{
     const token = req.headers.authorization;
-    try {
-        if (token) {
-            const data = verifyToken(token.split(' ')[1]);
-            if (data.role != 'admin') {
-                throw ({ message: 'You are not an admin.' })
-            }
-            return res.json("sucess");
-        }
-        throw { message: 'Please login/signup first.' };
-    } catch (error) {
-        return res.status(404).json(error);
+    if(token){
+    return res.status(200).json(verifyToken(token.split(' ')[1]).role);
     }
+    return res.status(500).json(null);
+
 })
 
 //send subscribe mail 
-router.post('/sendMail', async (req, res) => {
-    const mailData = {
-        email: req.body.email,
-        subject: "Thank You for Subscribing - Enjoy 25% Off!"
-    }
-    const mailSent = await mailer(mailData, SubscribeTemplate);
+// router.post('/sendMail', async (req, res) => {
+//     const mailData = {
+//         email: req.body.email,
+//         subject: "Thank You for Subscribing - Enjoy 25% Off!"
+//     }
+//     const mailSent = await mailer(mailData, SubscribeTemplate);
 
-    res.status(200).json({
-        message: "done"
-    })
-
-})
+//     res.status(200).json({
+//         message: "done"
+//     })
+// })
 
 // payment intent
 router.post('/create-payment-intent', async (req, res) => {
@@ -100,6 +121,12 @@ router.post('/create-payment-intent', async (req, res) => {
                 enabled: true,
             },
         });
+
+        redisClient.set('payment_intent_client_secret', paymentIntent.client_secret, 'EX', 10, (err, reply) => {
+            if (err) {
+              console.error('Error storing client secret:', err);
+            }
+          });
 
         res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
     } catch (error) {
@@ -143,7 +170,7 @@ try {
         message: "done"
     })
 } catch (error) {
-    console.log(error , "error is ")
+
 }
 })
 

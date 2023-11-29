@@ -1,5 +1,6 @@
 const { set } = require('../../models/address');
 const faqData = require('./../../models/custom-website-elements/faq');
+const logger = require('./../../logger');
 
 /* getFaq without aggregation 
 async function getFaq(req, res) {
@@ -43,6 +44,7 @@ async function getFaq(req, res) {
     }
     throw "404";
   } catch (err) {
+        logger.error(err);
     return res.status(404).send();
   }
 }
@@ -64,6 +66,7 @@ async function updateFaq(req, res) {
       return res.status(404).json({ error: 'FAQ item not found' });
     }
   } catch (err) {
+        logger.error(err);
     console.error(err);
     res.status(500).json({ error: 'An error occurred while updating the FAQ item' });
   }
@@ -141,7 +144,8 @@ async function deleteFaq(req, res) {
     );
   }
   catch (err) {
-    console.error(err);
+        logger.error(err);
+    
     res.status(500).json({ error: 'An error occurred while deleting the FAQ item' });
   }
 }

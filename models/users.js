@@ -93,8 +93,9 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.post('save', async function (){
+    console.log("when am i called?");
     const defaultWishlist = {
-        wishlistName : 'My Wishlist',
+        wishlistName : 'my wishlist',
         products : []
     }
     await wishlist.create({
@@ -104,3 +105,4 @@ userSchema.post('save', async function (){
 })
 
 module.exports = mongoose.model('users', userSchema);
+

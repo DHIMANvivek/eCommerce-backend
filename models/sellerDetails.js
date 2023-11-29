@@ -13,7 +13,7 @@ const sellerSchema = mongoose.Schema({
     }],
     brands: [{
         type: String,
-        lowercase: true,
+        // lowercase: true,
         unique: true
     }],
     sizes: [{

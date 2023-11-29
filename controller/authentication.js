@@ -5,74 +5,9 @@ const bcryptjs = require('bcryptjs');
 const passwordModel = require('../models/forgetPassword')
 const mailer = require('../helpers/nodemailer')
 const { OAuth2Client } = require('google-auth-library');
-const { SignupTemplate, ForgetTemplate } = require('../helpers/INDEX');
+const { SignupTemplate, ForgetTemplate, SubscribeTemplate } = require('../helpers/INDEX');
+const logger = require('./../logger');
 
-
-// async function login(req, res) {
-//     try {
-//         const input = req.body;
-//         const userFound = await usersModel.findOne({
-//             email: input.email
-//         })
-//         if (input.token) {
-//             const googleOathClient = new OAuth2Client();
-//             const googleToken = await googleOathClient.verifyIdToken({
-//                 idToken: req.body.token.credential
-//             });
-//             input.email = googleToken.getPayload().email;
-//             input.provider = 'GOOGLE';
-//             req.body.name = {
-//                 firstname: googleToken.getPayload().given_name,
-//                 lastname: googleToken.getPayload().family_name
-//             }
-
-//             // const firstName = req.body.name.firstname; 
-//         }
-//         const firstName = userFound?.name.firstname
-
-//         if (!userFound) {
-//             throw ({ message: 'User not found! Kindly sign in.' })
-//         }
-
-
-//         // PURE GOOGLE LOGIN
-//         if (userFound.provider == 'GOOGLE' && input.token) {
-//             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
-//             const token = createToken(tokenData);
-//             res.status(200).json({ message: 'login sucece', token, firstName });
-//             return;
-//         }
-
-//         // GOOGLE USER TRYING TO LOGIN MANUALLY.
-//         if (userFound.provider == 'GOOGLE') {
-//             throw ({ message: 'Try login with Google, you already have account registered with it.' });
-//         }
-
-//         // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
-//         if (userFound.provider == 'direct' && input.token) {
-//             throw ({ message: 'Try to login manually.' });
-//         }
-
-//         // PURE MANUAL LOGIN
-//         const compare = await bcryptjs.compare(input.password, userFound.password);
-//         if (!compare) {
-//             throw ({ message: 'Incorrect Password!' })
-//         }
-
-//         const tokenData = { id: userFound._id, role: userFound.role }
-//         const token = createToken(tokenData);
-
-//         res.status(200).json({
-//             message: "Login Successful",
-//             token, firstName
-//         })
-//     } catch (error) {
-//         if (error.message) {
-//             res.status(500).json(error);
-//             return;
-//         }
-//     }
-// }
 async function login(req, res) {
     try {
         const input = req.body;
@@ -92,20 +27,25 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
+
+        console.log(userFound, "user found");
         const firstName = userFound?.name.firstname
 
-        if (!userFound) {
-            throw ({ message: 'User not found! Kindly sign in.' })
-        }
-
         // PURE GOOGLE LOGIN
-        if (userFound.provider == 'GOOGLE' && input.token) {
+        if (input.token) {
+            if(!userFound){
+                const userCreated = usersModel(req.body);
+                await userCreated.save();      
+            }
             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
-            res.status(200).json({ message: 'login sucece', token, firstName });
+            res.status(200).json({ token, firstName });
             return;
         }
-
+        
+        if (!userFound) {
+            throw ({ message: 'Kindly Signup!' })
+        }
         // GOOGLE USER TRYING TO LOGIN MANUALLY.
         if (userFound.provider == 'GOOGLE') {
             throw ({ message: 'Try login with Google, you already have account registered with it.' });
@@ -126,14 +66,14 @@ async function login(req, res) {
 
         const token = createToken(tokenData);
         res.status(200).json({
-            message: "Login Successful",
             token, firstName
         })
     } catch (error) {
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
         res.status(500).json({
-            message: 'No User found'
+            message: 'Internal Server Error'
         });
-        return;
     }
 }
 
@@ -153,8 +93,21 @@ async function signup(req, res) {
             }
         }
         const firstName = req.body.name.firstname;
-
+        
         const user = await usersModel.findOne({ email: req.body.email });
+
+        //google signup/login
+        if (req.body.token) {
+            if(!user){
+                const userCreated = usersModel(req.body);
+                await userCreated.save();      
+            }
+            const tokenData = { email: user.email, id: user._id, role: user.role }
+            const token = createToken(tokenData);
+            res.status(200).json({ token, firstName });
+            return;
+        }
+      
         if (user) {
             throw ({ message: 'User already exists! Try to login.' });
         }
@@ -170,27 +123,25 @@ async function signup(req, res) {
             email: req.body.email,
             subject: "We're Thrilled to Have You, Welcome to Trade Vogue!",
         }
-        const mailSent = await mailer(mailData, SignupTemplate)
+        const mailSent = await mailer(mailData, SignupTemplate())
         const tokenData = {
             id: userCreated._id,
             role: userCreated.role
         }
         const token = createToken(tokenData);
-        res.status(200).json({ token, message: 'Signup Successful!', firstName });
+        res.status(200).json({ token, firstName });
 
     } catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
-
-        res.status(500).json(error);
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 
 }
 
 async function forgotPassword(req, res) {
-
     try {
         const input = req.body;
         const user = await usersModel.findOne({ email: input.email },
@@ -200,11 +151,12 @@ async function forgotPassword(req, res) {
                 'provider': 1,
             });
 
+       
         if (!user) {
             throw { message: "This email doesn't exist." }
         }
         if (user.provider == 'GOOGLE') {
-            return res.status(500).json({ message: 'You cannot change your password as you are a Google user.' });
+            throw ({ message: 'Google user cannot change password' });
         }
         const hasRequested = await passwordModel.findOne({
             UserId: user._id
@@ -228,11 +180,11 @@ async function forgotPassword(req, res) {
         res.status(200).json({ passwordToken, message: "Mail Sent Successfully" });
 
     } catch (error) {
+        logger.error(error);
         if (error.message) {
             res.status(500).json(error);
             return;
         }
-
         res.status(500).json(error);
     }
 }
@@ -246,24 +198,23 @@ async function updatePassword(req, res) {
             UserId: tokenData.id
         })
 
+        if (!requesterFound) {
+            throw ({ message: "Please request for reset password." })
+        }
         let currentTime = new Date().getTime();
-
         let requesterTime = requesterFound.createdAt.getTime();
 
         const checkTime = (currentTime - requesterTime) / 60000;
 
-        if (!requesterFound) {
-            throw ({ message: "Please request for reset password." })
-        }
 
         if (checkTime < 5) {
 
             const user = await usersModel.findById(tokenData.id)
-            const compare = await bcryptjs.compare(input.password, user.password)
 
+            const compare = await bcryptjs.compare(input.password, user.password)
             if (compare) {
-                return res.status(400).json({
-                    message: 'Cannot set same password as before'
+                throw ({
+                    message: 'Cannot set same password as before!'
                 })
             }
             await usersModel.updateOne({
@@ -271,10 +222,10 @@ async function updatePassword(req, res) {
             }, {
                 $set: { 'password': await bcryptjs.hash(input.password, 10) }
             })
-            res.status(200).json({ message: 'Password Changed Successfully!' })
             const delUser = await passwordModel.deleteOne({
                 UserId: tokenData.id
             })
+            return res.status(200).json({ message: 'Password Changed Successfully!' })
         }
         return res.status(400).json({
             message: "Please request for Reset Password again."
@@ -282,12 +233,11 @@ async function updatePassword(req, res) {
 
     }
     catch (error) {
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
-
-        res.status(500).json(error);
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 
 }
@@ -297,56 +247,77 @@ async function changePassword(req, res) {
         const input = req.body;
         const user = await usersModel.findById(req.tokenData.id)
 
+        console.log(user, "user");
+
+        if (user.provider == 'GOOGLE'){
+            throw ({message: "Cannot change password since you are a Google user!"})
+        }
+      
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
 
         if (compareOldPassword) {
+            if (input.oldPassword === input.newPassword){
+                throw ({message: "Cannot set same password as before!"})
+            }
             const updatePassword = await usersModel.findByIdAndUpdate({
                 _id: user.id
             }, {
                 password: await bcryptjs.hash(input.newPassword, 10)
             })
             return res.status(200).json({
-                message: "You have changed your password successfully!"
+                message: "Password Reset Successful!"
             })
         }
-        return res.status(201).json({
-            message: "Your old password is incorrect!"
-        })
+        else{
+            throw({message:'Your Password is incorrect'})
+        }
     }
     catch (error) {
-        // if (error.message) {
-        //     res.status(500).json(error);
-        //     return;
-        // }
-        // res.status(500).json({
-        //     message : "Your old password is incorrect!"
-        // });
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
         res.status(500).json({
-            message: "Your old password is incorrect."
-        })
+            message: 'Internal Server Error'
+        });
     }
 }
+async function subscribeMail(req, res) {
+    try {
+        const user = await usersModel.findOne({ email: req.body.email });
+        if (user) {
+            throw({message:'You are already a user'});
+        }
+        else {
+            const findLead=await leadModel.findOne(req.body);
+            if(findLead){
+                throw({message:'You are already in our Mailing List :)'})
+            }
+            const leadCreated = leadModel(req.body);
+            await leadCreated.save();
+            const mailData = {
+            email: req.body.email,
+            subject: "Thank You for Subscribing to TradeVogue"
 
+        }
+        const mailSent = await mailer(mailData, SubscribeTemplate());
+        res.status(200).json({
+            message: "You will be notified about latest deal and offers."
+        })
+        }
+  
+    }
+    catch(error){
+        logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+}
 module.exports = {
     signup,
     login,
     forgotPassword,
     updatePassword,
-    changePassword
+    changePassword,
+    subscribeMail,
 }
-
-// if (tokenData.password === user.password) {
-//     await usersModel.updateOne({
-//         email: user.email
-//     }, {
-//         $set: { 'password': await bcryptjs.hash(input.password, 10) }
-//     })
-
-//     await passwordModel.deleteOne({
-//         UserId: tokenData.id
-//     })
-
-//     return res.status(200).json({
-//         message: "Password Changed Successfully!"
-//     })
-// }

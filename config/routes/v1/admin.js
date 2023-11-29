@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router();
-const adminController = require('../../../controller/admin')
+const adminController = require('../../../controller/admin');
+const jwtVerify = require('../../../middlewares/jwtVerify')
 router.get('/getOverallInfo', adminController.getOverallInfo);
 router.get('/fetchSalesData', adminController.fetchProductSalesData);
 router.get('/fetchCategoryData', adminController.fetchCategorySalesData);
@@ -21,7 +22,7 @@ router.post('/deleteProducts', adminController.deleteProductInventory);
 router.post('/fetchProductFeatures', adminController.fetchFeatures);
 router.post('/updateProductFeature', adminController.updateFeatures);
 router.post('/deleteProductFeature', adminController.updateFeatures);
-router.post('/updateDetails', adminController.updateDetails);
+router.post('/updateDetails', jwtVerify , adminController.updateDetails);
 router.get('/getAdminDetails', adminController.getAdminDetails);
 
 

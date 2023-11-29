@@ -2,11 +2,10 @@ const Products = require('../models/products');
 const reviewsController = require('../controller/reviews');
 const OffersModel = require('../models/offers');
 const { verifyToken } = require('../helpers/jwt');
-const { off } = require('../models/address');
+const logger = require('./../logger');
 
 async function fetchProductDetails(req, res, sku = null, admincontroller = null) {
     try {
-
         let query = {};
         let user;
 
@@ -27,6 +26,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             }
         )));
 
+        if (!product) throw ({ message: 'This Product is not available' });
 
         product = await getProductPrice((product));
         // getting all the reviews and average
@@ -43,33 +43,36 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
             );
         }
 
-
         product.avgRating = reviews_rating.avgRating;
         product.reviews = reviews_rating.reviews;
+
         if (reviews_rating.userReview) {
             product.userReview = reviews_rating.userReview;
         }
 
-        if (req.query.sku) {
+        if (req.query.sku && !admincontroller) {
             res.status(200).json(product);
             return;
         }
         return product;
 
     } catch (error) {
-        if (req.query.sku) {
-            res.status(500).json({
-                message: 'This Product is not available'
-            });
+        logger.error(error);
+        if (error.message) {
+            logger.warn(error.message);
+            res.status(404).json(error);
+            return;
         }
-        throw 404;
+        logger.error(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
 // exploring, searching and filtering
 async function fetchProducts(req, res) {
     try {
-        req.query = req.query ? req.query : req.body;
         // Search
         let search = req.query.search || '';
         delete req.query.search;
@@ -127,6 +130,7 @@ async function fetchProducts(req, res) {
                     info: { $first: '$$ROOT.info' },
                     price: { $first: '$$ROOT.price' },
                     createdAt: { $first: '$$ROOT.createdAt' },
+                    highlight: { $first: '$$ROOT.highlight' },
                     avgRating: {
                         $avg: {
                             $ifNull: [{ $avg: "$rating.reviews.rating" }, 0]
@@ -136,13 +140,8 @@ async function fetchProducts(req, res) {
             },
         ];
 
-        popularQuery = {
-            $match: {
-                'higlight': true
-            }
-        }
-
         let priceSortValue;
+
         if (req.query.sort) {
             let keyCanContain = ['avgRating', 'price', 'createdAt'];
             let key = (req.query.sort).split(':')[0];
@@ -150,7 +149,8 @@ async function fetchProducts(req, res) {
 
             //defaults to if some other value is input
             if (!(keyCanContain.includes(key))) {
-                key = 'createdAt';
+                key = 'name';
+                value = 1;
             }
 
             if (key == 'price') {
@@ -164,6 +164,11 @@ async function fetchProducts(req, res) {
 
             delete req.query.sort;
         }
+        else {
+            aggregationPipe.push({
+                $sort: { 'name': 1 }
+            })
+        }
 
 
         let limit = Number(req.query.limit) || '';
@@ -174,6 +179,7 @@ async function fetchProducts(req, res) {
         if (req.query.page) delete req.query.page;
 
         if ((Object.keys(req.query)).length > 0) {
+
             aggregationPipe.unshift(
                 {
                     $match: getFilterQuery(req.query)
@@ -185,17 +191,11 @@ async function fetchProducts(req, res) {
             total: 0
         };
 
-        aggregationPipe.push(
-            {
-                $sort: { 'name': 1 }
-            }
-        );
-
         // fetching the data
         let products = await Products.aggregate(aggregationPipe);
+
         matchedProducts.total = products.length;
         matchedProducts.items = await getProductPrice((products));
-
 
         if (priceSortValue) {
             matchedProducts.items = matchedProducts.items.sort((a, b) => {
@@ -217,6 +217,30 @@ async function fetchProducts(req, res) {
             matchedProducts.items = (matchedProducts.items.filter((item) => {
                 return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
             }));
+        }
+
+        // check for in stock variant
+        matchedProducts.items = matchedProducts.items.map(item => {
+            let matchedIndex = 0;
+            let colorMatched = item.assets.some(asset => {
+                if(sizeVariantMatched(asset)){
+                    return true;
+                }
+                matchedIndex++;
+                return false;
+            });
+
+            if (colorMatched && matchedIndex > 0) {
+                item.matchedIndex = matchedIndex;
+            }
+
+            return item;
+        });
+
+        function sizeVariantMatched(asset) {
+            return asset.stockQuantity.some(stockQ => {
+                if (stockQ.quantity > 0) return true;
+            });
         }
 
         if (colors) {
@@ -267,30 +291,37 @@ async function fetchProducts(req, res) {
             }
 
             products = products.filter((product) => {
-                if (product.assets.some(asset => {
+                let assetIndex = -1;
+                const matchColorExists = product.assets.some(asset => {
+                    assetIndex++;
                     let assetColorRGB = hexToRgb(asset.color);
-                    if (colors.some(color => {
-                        let colorRGB = hexToRgb(color);
+                    if (
+                        colors.some(color => {
+                            let colorRGB = hexToRgb(color);
+                            let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
 
-                        let eucleadianDistance = Math.sqrt(Math.pow((colorRGB.r - assetColorRGB.r), 2) + Math.pow((colorRGB.g - assetColorRGB.g), 2) + Math.pow((colorRGB.b - assetColorRGB.b), 2))
-
-                        if (eucleadianDistance <= 120) {
-                            return true;
-                        }
-                        return false;
-                    })) {
+                            if (eucleadianDistance <= 120) {
+                                return true;
+                            }
+                            return false;
+                        })) {
                         return true;
                     }
                     return false;
-                })) {
+                });
+
+                if (matchColorExists) {
+                    product.matchedIndex = assetIndex;
                     return product;
                 }
+
             });
 
             return products;
         }
 
     } catch (error) {
+        logger.error(error);
         res.status(500).json({
             message: 'Unable to fetch Products'
         });
@@ -303,7 +334,7 @@ async function fetchUniqueFields(req, res) {
 
     function getData(products, parameter = input) {
         const uniqueData = {
-            gender:[],
+            gender: [],
             brand: [],
             category: [],
             // tags: [],
@@ -321,14 +352,12 @@ async function fetchUniqueFields(req, res) {
         products.forEach((data) => {
             if (parameter != 'all') {
                 if (data.info.gender == 'male') {
-                    filterObject=filterObject2.male;
+                    filterObject = filterObject2.male;
                 }
                 else {
-                    filterObject=filterObject2.female;
+                    filterObject = filterObject2.female;
                 }
             }
-
-
 
             for (let filter in (filterObject)) {
                 if (filter in data) {
@@ -358,41 +387,25 @@ async function fetchUniqueFields(req, res) {
 
         });
 
-
-        if(parameter!='all') {  
-
+        if (parameter != 'all') {
             return filterObject2;
         }
         return uniqueData;
     }
 
     const data = getData(products, input);
-    console.log('data come up is ',data);
     res.status(200).json({ data });
-
-}
-
-
-function uppecaseConverter(option){
-    option=option.split(' ');
-    let parameter='';
-    for(let i=0;i<option.length;i++){
-      parameter+=option[i].charAt(0).toUpperCase() + option[i].slice(1);
-        if(i!=option.length-1){
-            parameter+=' ';
-        }
-    }
-
-    return parameter;
 }
 
 async function getProductPrice(products) {
     try {
+
         if (!Array.isArray(products)) {
             discount = await discountQuery(products);
             products = await discountQuery(products);
         }
         else {
+
             products = await Promise.all(products.map(async (product) => {
                 if (!(product.info)) {
                     product = await Products.findOne({ sku: product.sku });
@@ -400,70 +413,82 @@ async function getProductPrice(products) {
                 product = await discountQuery(product);
                 return product;
             }))
+
         }
         return new Promise((res, rej) => {
             res(products);
         })
 
     } catch (error) {
+        logger.error(error);
     }
 
     async function discountQuery(parameter) {
         let product = JSON.parse(JSON.stringify(parameter));
-        product.info.brand=uppecaseConverter(product.info.brand);
-        product.info.category=uppecaseConverter(product.info.category);
+        // product.info.brand = (product.info.brand).toupp();
+        let brandArr=product.info.brand=product.info.brand.split(' ');
+        let brand='';
+        brandArr.forEach((el,index)=>{
+            brand+=el.charAt(0).toUpperCase() + el.slice(1);
+            if(index<brandArr.length-1) brand+=' ';
+        })
+        product.info.brand=brand;
         return new Promise(async (res, rej) => {
 
             let discount;
-            let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':product.info.brand,'ExtraInfo.categories':product.info.category ,'status.active': true ,startDate:{$lte:new Date()}});
-            if(!offer){
-                 offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':product.info.brand ,'ExtraInfo.categories':null  ,'status.active': true ,startDate:{$lte:new Date()}});
-                if(!offer){
-                    let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':null,'ExtraInfo.categories':product.info.category ,'status.active': true ,startDate:{$lte:new Date()}});
-                    
-                    if(!offer){
-                        let offer = await OffersModel.findOne({ OfferType: 'discount','ExtraInfo.brands':null,'ExtraInfo.categories':null ,'status.active': true ,startDate:{$lte:new Date()}});
-                        discount=offer;
+            let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
+
+            if (!offer) {
+                offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': product.info.brand, 'ExtraInfo.categories': null, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
+                if (!offer) {
+                    let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': product.info.category, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
+
+                    if (!offer) {
+                        let offer = await OffersModel.findOne({ OfferType: 'discount', 'ExtraInfo.brands': null, 'ExtraInfo.categories': null, 'status.active': true, 'status.deleted': false, startDate: { $lte: new Date() } });
+                        discount = offer;
                     }
-                    else{
-                        discount=offer;
+                    else {
+                        discount = offer;
                     }
                 }
-                else{
-                    discount=offer;
-                    
+                else {
+                    discount = offer;
+
                 }
-                
+
             }
 
-            else{
-                discount=offer;
+            else {
+                discount = offer;
             }
-
             if (discount == null) {
                 res(product);
                 return;
             }
+
             product.discount = discount.discountAmount;
+            if (product.price - discount.discountAmount <= 0) {
+                product.discount = 0;
+                res(product);
+            }
             if (discount.discountType == 'percentage') {
                 product.discountPercentage = discount.discountAmount;
-                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
 
+                product.discount = Math.floor((product.price / 100) * discount.discountAmount);
                 if (product.discount > discount.maximumDiscount) {
                     product.discount = Math.floor(discount.maximumDiscount);
+                    product.discountPercentage = Math.floor((product.discount * 100) / product.price);
                 }
-
-
 
             }
 
             if (product.discount) {
                 product.oldPrice = product.price;
-                product.price = (product.price - product.discount) <= 0 ? 0 : (product.price - product.discount)
+                product.price = (product.price - product.discount)
 
             }
 
-           
+
             res(product);
         });
     }
@@ -478,41 +503,40 @@ const hexToRgb = (hex) => {
     return { r, g, b };
 }
 
-async function ReduceProductQuantity(products){
+async function ReduceProductQuantity(products) {
 
     try {
-        products.forEach(async (el)=>{
-            const findQuantity=await Products.findOne({
+        products.forEach(async (el) => {
+            const findQuantity = await Products.findOne({
+                sku: el.sku,
+                'assets.color': el.color,
+                'assets.stockQuantity.size': el.size
+            }, { 'assets.stockQuantity.quantity': 1, _id: 0 });
+
+            if (el.quantity > findQuantity) { throw { message: 'Sorry given Product Quantity is not available' } }
+            // if(el.quantity>=findQuantity) el.quantity=findQuantity;
+            else el.quantity = el.quantity;
+            const updateProduct = await Products.updateOne(
+                {
                     sku: el.sku,
                     'assets.color': el.color,
                     'assets.stockQuantity.size': el.size
-            }, {'assets.stockQuantity.quantity':1,_id:0});
+                },
 
-            if(el.quantity>findQuantity) {throw {message:'Sorry given Product Quantity is not available'} }
-            // if(el.quantity>=findQuantity) el.quantity=findQuantity;
-            else el.quantity=el.quantity;
-            const updateProduct = await Products.updateOne(
                 {
-                  sku: el.sku,
-                  'assets.color': el.color,
-                  'assets.stockQuantity.size': el.size
-                },
-                
-                {
-                  $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity , 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
                 },
                 {
-                  arrayFilters: [
-                    { "outer.color": el.color }, 
-                    { "inner.size": el.size } 
-                  ]
+                    arrayFilters: [
+                        { "outer.color": el.color },
+                        { "inner.size": el.size }
+                    ]
                 }
-              );
+            );
         })
     } catch (error) {
-        
+        logger.error(error);
     }
- 
 }
 module.exports = {
     fetchProducts,
