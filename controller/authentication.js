@@ -11,7 +11,6 @@ const logger = require('./../logger');
 async function login(req, res) {
     try {
         const input = req.body;
-        console.log(req.body, "login input");
         if (input.token) {
             const googleOathClient = new OAuth2Client();
             const googleToken = await googleOathClient.verifyIdToken({
@@ -28,8 +27,6 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
-
-        console.log(userFound, "user found");
         const firstName = userFound?.name.firstname
 
         // PURE GOOGLE LOGIN
@@ -94,8 +91,21 @@ async function signup(req, res) {
             }
         }
         const firstName = req.body.name.firstname;
-
+        
         const user = await usersModel.findOne({ email: req.body.email });
+
+        //google signup/login
+        if (req.body.token) {
+            if(!user){
+                const userCreated = usersModel(req.body);
+                await userCreated.save();      
+            }
+            const tokenData = { email: user.email, id: user._id, role: user.role }
+            const token = createToken(tokenData);
+            res.status(200).json({ token, firstName });
+            return;
+        }
+      
         if (user) {
             throw ({ message: 'User already exists! Try to login.' });
         }
@@ -121,7 +131,10 @@ async function signup(req, res) {
 
     } catch (error) {
         logger.error(error);
-        res.status(500).json(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 
 }
@@ -219,12 +232,10 @@ async function updatePassword(req, res) {
     }
     catch (error) {
         logger.error(error);
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
-
-        res.status(500).json(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 
 }
@@ -232,10 +243,7 @@ async function updatePassword(req, res) {
 async function changePassword(req, res) {
     try {
         const input = req.body;
-        console.log(input);
         const user = await usersModel.findById(req.tokenData.id)
-
-        console.log(user, "user");
 
         if (user.provider == 'GOOGLE'){
             throw ({message: "Cannot change password since you are a Google user!"})
@@ -262,10 +270,10 @@ async function changePassword(req, res) {
     }
     catch (error) {
         logger.error(error);
-        if (error.message) {
-            res.status(500).json(error);
-            return;
-        }
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 async function subscribeMail(req, res) {
@@ -295,13 +303,10 @@ async function subscribeMail(req, res) {
     }
     catch(error){
         logger.error(error);
-        if(error.message){
-            res.status(500).json(error);
-        }
-        else{
-            res.status(500).json({message:'Internal Server Error'});
-        }
-        return;
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 module.exports = {

@@ -31,16 +31,16 @@ async function showWishlists(req, res) {
     }
     catch (error) {
         logger.error(error);
-        return res.status(500).json({
-            message: "Error in showing wishlists!"
-        })
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
 async function addToWishlist(req, res) {
     try {
         const input = req.body;
-        console.log(input, "input");
         const user = req.tokenData;
 
         const wishlister = await wishlist.findOne({
@@ -53,13 +53,11 @@ async function addToWishlist(req, res) {
             // }
             'wishlists.wishlistName': input.wishlistName.trim().toLowerCase()
         });
-        console.log(wishlister, "all wishlists");
         if (wishlister && input.type) {
             throw ({ message: 'Wishlist of same name already exists!' })
         }
 
         if (!wishlister) {
-            console.log("brand new");
             const newWishlist = {
                 wishlistName: input.wishlistName,
                 products: []
@@ -82,10 +80,10 @@ async function addToWishlist(req, res) {
     }
     catch (error) {
         logger.error(error);
-        if (error.message) return res.status(500).json(error); ``
-        return res.status(500).json({
-            message: "Error while adding product to wishlist!"
-        })
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
@@ -107,9 +105,10 @@ async function deleteWishlist(req, res) {
     }
     catch (error) {
         logger.error(error);
-        return res.status(500).json({
-            message: "Couldn't delete wishlist"
-        })
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
@@ -155,6 +154,10 @@ async function showWishlistCount(req, res) {
     }
     catch (error) {
         logger.error(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 
 }
@@ -197,7 +200,10 @@ async function showWishlistedData(req, res) {
     }
     catch (error) {
         logger.error(error);
-        return res.status(500).json(products)
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
@@ -234,11 +240,12 @@ async function removeFromWishlist(req, res) {
             response
         })
     }
-
-
     catch (error) {
         logger.error(error);
-        res.status(500).json(error);
+        if (error.message) return res.status(500).json(error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
 }
 
