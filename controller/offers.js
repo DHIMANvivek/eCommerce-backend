@@ -83,6 +83,8 @@ async function createOffer(req, res) {
         }
       }
     }
+
+
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
