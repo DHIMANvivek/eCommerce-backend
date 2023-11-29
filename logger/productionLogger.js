@@ -11,7 +11,7 @@ const productionLogger = () => {
         format: combine(
             timestamp(),
             myFormat,
-            format.json(),
+            // format.json(),
           ),
         transports: [
           new transports.File({ filename: './logger/logs/error.log', level: 'error' }),

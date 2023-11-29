@@ -27,6 +27,8 @@ async function login(req, res) {
         const userFound = await usersModel.findOne({
             email: input.email
         })
+
+        console.log(userFound, "user found");
         const firstName = userFound?.name.firstname
 
         // PURE GOOGLE LOGIN
@@ -244,6 +246,8 @@ async function changePassword(req, res) {
     try {
         const input = req.body;
         const user = await usersModel.findById(req.tokenData.id)
+
+        console.log(user, "user");
 
         if (user.provider == 'GOOGLE'){
             throw ({message: "Cannot change password since you are a Google user!"})
