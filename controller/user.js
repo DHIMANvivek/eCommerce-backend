@@ -96,7 +96,6 @@ async function getPaginatedData(req, res) {
 
 async function addAddress(req, res) {
     try {
-        console.log('req body is ',req.body);
         const findUserAddress=await getActiveAddresses(req);
 if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
     throw({message:'You cannot add more than 3 addresses'});
@@ -131,7 +130,6 @@ async function deleteAddress(req, res) {
 
 async function updateAddress(req, res) {
     try {
-        console.log('req body is ',req.body);
         const address_id = req.body._id;
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,

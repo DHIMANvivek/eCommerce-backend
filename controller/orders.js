@@ -6,6 +6,7 @@ const moongoose = require('mongoose');
 const ProductController = require('../controller/products');
 const productsModel = require('./../models/products');
 const logger = require('./../logger');
+const moongoose = require('mongoose');
 
 async function getLatestOrderId(req, res) {
     try {
@@ -25,56 +26,23 @@ async function updateLatestOrderDetail(req, res) {
     try {
         const buyerId = req.tokenData.id;
         // const buyerId ='6539e71dced882bb66fbae55';
-        const { newPaymentStatus, transactionId, MOP } = req.body;
-        const result = await ordersModel.updateOne(
-            { orderID: req.body.orderID },
-            {
-                $set: {
-                    payment_status: newPaymentStatus,
-                    transactionId: transactionId,
-                    MOP: MOP,
-                }
-            }
-        );
+        // const { newPaymentStatus, transactionId, MOP } = req.body;
+        // const result = await ordersModel.updateOne(
+        //     { orderID: req.body.orderID },
+        //     {
+        //         $set: {
+        //             payment_status: newPaymentStatus,
+        //             transactionId: transactionId,
+        //             MOP: MOP,
+        //         }
+        //     }
+        // );
 
-        const response=await ordersModel.findOne({ orderID: req.body.orderID },{_id:0,coupon:1,products:1});
+        const response=await ordersModel.findOne({ orderID: req.body.orderID ,payment_status:'success'},{_id:0,coupon:1,products:1});
         if(response?.coupon){
             await updateCoupon(response.coupon,buyerId); 
         }
-        if(response?.products){
-            await Promise.all(response.products.map(async (el) => {
-                await Products.updateOne(
-                    {
-                        sku: el.sku,
-                        'assets.color': el.color,
-                        'assets.stockQuantity.size': el.size
-                    },
-                    {
-                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
-                    },
-                    {
-                        arrayFilters: [
-                            { "outer.color": el.color },
-                            { "inner.size": el.size }
-                        ]
-                    }
-                );
-            
-          let particularProduct=  await Products.findOne({sku:el.sku});
-          const allStockZero = particularProduct.assets.every(color => {
-            return color.stockQuantity.every(size => size.quantity === 0);
-          });
-
-
-          console.log('');
-          if(allStockZero){
-            await Products.updateOne({active:false});
-          }
-
-        }));
-           
-            
-        }
+   
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
                 await Products.updateOne(
@@ -95,15 +63,12 @@ async function updateLatestOrderDetail(req, res) {
                 );
 
                 let particularProduct = await Products.findOne({ sku: el.sku });
-                // console.log(particularProduct);
                 const allStockZero = particularProduct.assets.every(color => {
-                    // console.log('colkor si ',color,);
-                    // console.log(color.stockQuantity.every(size => size.quantity === 0), 'hehe');
                     return color.stockQuantity.every(size => size.quantity === 0);
                 });
 
                 if (allStockZero) {
-                    await Products.updateOne({ active: false });
+                    await Products.updateOne({sku:el.sku},{ $set:{active: false} });
                 }
 
             }));
@@ -230,13 +195,13 @@ async function getParicularUserOrders(req, res) {
     try {
         // const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'sucess'}).sort({ createdAt: -1 });
         let parameters =req.body;
-        const skip =  (parameters.currentPage - 1) * parameters.limit ;
+        const skip =  (parameters.currentPage - 1) * parameters.limit;
         const limit= parameters.limit;
         
         let aggregationPipe = [
             {
               $match: {
-                buyerId:new moongoose.Types.ObjectId( req.tokenData.id),
+                buyerId:new moongoose.Types.ObjectId(req.tokenData.id),
                 payment_status:'success'
               },
             },
@@ -264,7 +229,7 @@ async function getParicularUserOrders(req, res) {
               }
             }
           ];
-      
+
           const data=await ordersModel.aggregate(aggregationPipe);
         res.status(200).json(data);
     } catch (error) {

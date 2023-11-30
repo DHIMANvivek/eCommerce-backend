@@ -5,6 +5,7 @@ const orderController = require('../../../controller/orders');
 const adminVerify = require('../../../middlewares/adminVerify');
 
 
+
 router.post('/verifyOrder',jwtVerify,orderController.VerifyOrder)
 router.post('/verifyOrderWithoutCoupon',orderController.VerifyOrder);
 // router.use();
