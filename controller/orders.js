@@ -2,6 +2,7 @@ const ordersModel = require('./../models/order');
 const userModel = require('./../models/users');
 const { checkCoupon, updateCoupon, } = require('../controller/offers');
 const Products = require('../models/products')
+const moongoose = require('mongoose');
 const ProductController = require('../controller/products');
 const productsModel = require('./../models/products');
 const logger = require('./../logger');
@@ -235,7 +236,7 @@ async function getParicularUserOrders(req, res) {
         let aggregationPipe = [
             {
               $match: {
-                buyerId:req.tokenData.id,
+                buyerId:new moongoose.Types.ObjectId( req.tokenData.id),
                 payment_status:'success'
               },
             },

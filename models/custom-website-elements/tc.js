@@ -10,14 +10,11 @@ const tcSchema = new mongoose.Schema(
           content_type: {
             type: String,
             enum: ['list', 'paragraph'],
-            // validate: function validator() {
-            // }
           },
           content_description: [
-            {content:{type:String}}
-        ]
+            { content: { type: String } }
+          ]
         }
-
       ]
     }]
   }
