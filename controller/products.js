@@ -193,8 +193,6 @@ async function fetchProducts(req, res) {
 
         // fetching the data
         let products = await Products.aggregate(aggregationPipe);
-
-        matchedProducts.total = products.length;
         matchedProducts.items = await getProductPrice((products));
 
         if (priceSortValue) {
@@ -250,6 +248,8 @@ async function fetchProducts(req, res) {
         if (limit) {
             matchedProducts.items = matchedProducts.items.splice(skip, limit);
         }
+
+        matchedProducts.total = products.length;
 
         res.status(200).json(matchedProducts);
 
