@@ -131,6 +131,7 @@ async function deleteAddress(req, res) {
 
 async function updateAddress(req, res) {
     try {
+        console.log('req body is ',req.body);
         const address_id = req.body._id;
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,

@@ -799,6 +799,8 @@ async function updateDetails(req, res) {
   const role = req.tokenData.role;
   const data = req.body.data;
 
+  console.log(data, "data coming ")
+
   if (data && role == 'admin' && email && data.name && data.name.firstname !== undefined) {
     const firstname = data.name.firstname;
 

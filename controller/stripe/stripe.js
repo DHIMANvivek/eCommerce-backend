@@ -1,62 +1,56 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-require('dotenv').config();
+const stripe = require('stripe')('sk_test_51NvsyeSENcdZfgNiy559a6dtaofzqfn00MVNCrPe4kQWAZNZulhdDmJePJTZvSSzzu4xnkTjHIjmWPVdzTW1L6oc00oI29MAG4');
+const express = require('express');
+const app = express();
+const endpointSecret = 'whsec_3ab6989c4dd3fa67a11fb76b2cbb4a4e15687f60550b2d2fbe4b85ab3d0e0c94';
 
-let endpointSecret;
 
-endpointSecret= "whsec_3ab6989c4dd3fa67a11fb76b2cbb4a4e15687f60550b2d2fbe4b85ab3d0e0c94";
-
-const stripeWebhook = async (request, response) => {
+// This endpoint receives Stripe webhook events
+const stripeWebhook = (request, response) => {
+  console.log('Webhook received');
+  
   const sig = request.headers['stripe-signature'];
+  const payload = request.body;
 
-  let data;
+  if (!Buffer.isBuffer(payload) && typeof payload !== 'string') {
+    console.log('Invalid payload format');
+    response.status(400).send('Invalid payload format');
+    return;
+  }
+
   let eventType;
-  // Verify webhook signature and extract the event.
-  if(endpointSecret){
-    let event;
-  
-    try {
-      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-      console.log("webhook verified");
-    } catch (err) {
-      console.log("webhook not verified", `${err.message}`, request.body)
-      response.status(400).send(`Webhook Error: ${err.message}`);
-      return;
-    }
+  let eventData;
 
-    data = event.data.object;
+  try {
+    const event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+    const dataObject = event.data.object;
+
+    console.log('Webhook verified', dataObject);
+
     eventType = event.type;
-  }else {
-    data = request.body.data.object;
-    eventType = request.body.type;
+    eventData = event.data.object;
+  } catch (err) {
+    console.log('Webhook not verified', `${err.message}`, typeof payload);
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
   }
-  
 
-  // Handle the event
-  if(eventType === 'payment_intent.succeeded'){
-    console.log("payment intent succeeded");
-    stripe.retrievePaymentIntent(data.id, function(err, paymentIntent) {
-      if(err){
-        console.log("error in retrieving payment intent", err);
-      }else{
-        console.log("payment intent retrieved", paymentIntent);
+  // Handle the event based on its type
+  if (eventType === 'charge.succeeded') {
+    console.log('Payment intent succeeded');
+
+    // Retrieve the payment intent using its ID
+    stripe.paymentIntents.retrieve(eventData.id, (err, paymentIntent) => {
+      if (err) {
+        console.log('Error in retrieving payment intent', err);
+      } else {
+        console.log('Payment intent retrieved', paymentIntent);
+        // Perform further actions or processing with paymentIntent here
       }
-    })
+    });
   }
-  // switch (event.type) {
-  //   case 'payment_intent.succeeded':
-  //     const paymentIntentSucceeded = event.data.object;
-  //     console.log('PaymentIntent was successful!');
-  //     // Then define and call a function to handle the event payment_intent.succeeded
-  //     break;
-  //   // ... handle other event types
-  //   default:
-  //     console.log(`Unhandled event type ${event.type}`);
-  // }
 
-  // Return a 200 response to acknowledge receipt of the event
-  response.send().end();
-};
-
+  response.sendStatus(200);
+}
 module.exports = {
   stripeWebhook
 };

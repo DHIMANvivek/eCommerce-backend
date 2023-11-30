@@ -188,6 +188,7 @@ const getAllTickets = async (req, res) => {
 
 const updateTicket = async (req , res) => {
     try {
+      console.log('notification working and updated ',req.body)
         const { _id, status } = req.body;
         const result = await supportTicket.findByIdAndUpdate(
           _id,

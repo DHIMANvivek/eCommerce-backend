@@ -36,7 +36,9 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
 router.use('/tc', require('./v1/tc')) ;
-router.use('/payment', require('./v1/stripe/stripe'));
+// const bodyParser = require('body-parser');  
+// router.use(bodyParser.raw({ type: '*/*' }));
+// router.use('/payment', require('./v1/stripe/stripe'));
 
 // router.get('/checkUser', (req, res) => {
 
@@ -121,19 +123,12 @@ router.post('/create-payment-intent', async (req, res) => {
             },
         });
 
-        redisClient.set('payment_intent_client_secret', paymentIntent.client_secret, 'EX', 10, (err, reply) => {
-            if (err) {
-              console.error('Error storing client secret:', err);
-            }
-          });
-
         res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while creating the payment intent.' });
     }
-})
-
+});
 // getPaginated Data
 router.get('/getPaginatedData/:model', getPaginatedData);
 

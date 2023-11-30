@@ -24,6 +24,7 @@ async function updateLatestOrderDetail(req, res) {
     try {
         console.log('HELLLOOOOOOOO VIVEK');
         const buyerId = req.tokenData.id;
+        // const buyerId ='6539e71dced882bb66fbae55';
         const { newPaymentStatus, transactionId, MOP } = req.body;
         const result = await ordersModel.updateOne(
             { orderID: req.body.orderID },
@@ -35,9 +36,6 @@ async function updateLatestOrderDetail(req, res) {
                 }
             }
         );
-
-
-
 
         const response=await ordersModel.findOne({ orderID: req.body.orderID },{_id:0,coupon:1,products:1});
         if(response?.coupon){
