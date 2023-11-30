@@ -6,8 +6,6 @@ async function generateSKU(product){
         'info.category': product.info.category.toLowerCase(),
     }).sort({'createdAt': -1});
     
-    console.log(data.sku);
-
     let code;
 
     if(!data){

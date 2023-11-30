@@ -60,7 +60,6 @@ async function fetchReviews(productId, userId = '') {
         }
 
     } catch (error) {
-        console.log('here', error);
         logger.error(error);
         return {
             reviews: {},

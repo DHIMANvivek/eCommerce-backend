@@ -45,6 +45,7 @@ async function updateLatestOrderDetail(req, res) {
    
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
+                console.log('el is ',el);
                 await Products.updateOne(
                     {
                         sku: el.sku,
@@ -118,7 +119,7 @@ async function verifyOrderSummary(req, res) {
                 particularColor=particularColor[0].stockQuantity;
                 let particularColorSize=particularColor?.filter(el=>el.size==element.size);
                if( particularColorSize[0].quantity<=0){
-                   rej({ message: response.sku + 'is out of stock' });
+                   rej({ message: response.name + ' is out of stock' });
                }
                res(response.price * element.quantity);
             });

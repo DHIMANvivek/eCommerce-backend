@@ -36,39 +36,41 @@ async function updateDetails(req, res) {
 }
 
 
-async function getActiveAddresses(req,res){
+async function getActiveAddresses(req, res) {
 
-try {
-      const data=await Users.aggregate([
-        {$match:{_id:new mongoose.Types.ObjectId( req.tokenData.id)}},
-        {$unwind:'$info.address'},
-        {$match:{'info.address.status':true}},
-        {$project:{'info.address':1}},
-        {$group:{
-            _id:'$_id',
-            addresses:{$push:'$info.address'}
-        }}]);
+    try {
+        const data = await Users.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(req.tokenData.id) } },
+            { $unwind: '$info.address' },
+            { $match: { 'info.address.status': true } },
+            { $project: { 'info.address': 1 } },
+            {
+                $group: {
+                    _id: '$_id',
+                    addresses: { $push: '$info.address' }
+                }
+            }]);
 
 
 
-        return  new Promise((res)=>{
+        return new Promise((res) => {
             res(data);
         })
-  
 
-} catch (error) {
-    logger.error(error);
-    return  new Promise((res,rej)=>{
-        rej(0);
-    })
-    
-}
+
+    } catch (error) {
+        logger.error(error);
+        return new Promise((res, rej) => {
+            rej(0);
+        })
+
+    }
 }
 
 
 async function getAddress(req, res) {
     try {
-    const data=await getActiveAddresses(req);
+        const data = await getActiveAddresses(req);
         res.status(200).json(data[0]);
     }
     catch (error) {
@@ -78,21 +80,21 @@ async function getAddress(req, res) {
 }
 
 async function getPaginatedData(req, res) {
-    const modelName = req.params.model; 
+    const modelName = req.params.model;
     const page = parseInt(req.query.page, 1) || 1;
     const pageSize = parseInt(req.query.pageSize, 3) || 10;
 
     try {
-      const Model = require(`../models/custom-website-elements/${modelName}`); 
-      const data = await paginateResults(Model, page, pageSize);
+        const Model = require(`../models/custom-website-elements/${modelName}`);
+        const data = await paginateResults(Model, page, pageSize);
 
-      res.status(200).json(data);
+        res.status(200).json(data);
     } catch (error) {
         logger.error(error);
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-  }
+}
 
 async function addAddress(req, res) {
     try {
@@ -101,9 +103,9 @@ if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
     throw({message:'You cannot add more than 3 addresses'});
 }
 
-const result=await Users.findByIdAndUpdate({_id:req.tokenData.id},{$push:{'info.address':req.body}});
-const response=await getActiveAddresses(req,res);
-res.status(200).json(response[0].addresses);
+        const result = await Users.findByIdAndUpdate({ _id: req.tokenData.id }, { $push: { 'info.address': req.body } });
+        const response = await getActiveAddresses(req, res);
+        res.status(200).json(response[0].addresses);
     }
     catch (error) {
         logger.error(error);
@@ -150,12 +152,12 @@ async function updateAddress(req, res) {
 
 async function DefaultAddress(req, res) {
     try {
-let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
-FindAddress.info.address[req.body.index]=(FindAddress.info.address[0]);
-FindAddress.info.address[0]=(req.body.address);
-await FindAddress.save();
-const result=await getActiveAddresses(req);
-res.status(200).json(result[0].addresses);
+        let FindAddress = await Users.findOne({ _id: req.tokenData.id }, { 'info.address': 1 });
+        FindAddress.info.address[req.body.index] = (FindAddress.info.address[0]);
+        FindAddress.info.address[0] = (req.body.address);
+        await FindAddress.save();
+        const result = await getActiveAddresses(req);
+        res.status(200).json(result[0].addresses);
 
     } catch (error) {
         logger.error(error);
@@ -228,9 +230,9 @@ async function usedCoupon(req, res) {
 // }
 // }
 
-async function UserCoupon(req,res){
+async function UserCoupon(req, res) {
     try {
-        const findCoupon=await OffersModel.findById(req.body.couponId);
+        const findCoupon = await OffersModel.findById(req.body.couponId);
 
         // info.adddr
         findCoupon.userId.push(req.body.userId);
@@ -238,11 +240,11 @@ async function UserCoupon(req,res){
         res.status(200).json(findCoupon);
     } catch (error) {
         logger.error(error);
-        
+
     }
 }
 
-async function getFaq(req , res) {
+async function getFaq(req, res) {
     try {
         const page = req.query.page || 1;
         const limit = req.query.limit || 2;
@@ -273,7 +275,7 @@ async function sendData(req, res) {
         res.status(500).json({ error: 'An error occurred while inserting FAQ data.' });
     }
 }
-  
+
 module.exports = {
     getDetails,
     updateDetails,

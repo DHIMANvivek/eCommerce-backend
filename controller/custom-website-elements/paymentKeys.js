@@ -85,8 +85,6 @@ async function getAllPaymentKeys(req, res) {
             const { publicKey, privateKey, id, enable, rzpIdKey, rzpSecretKey } = req.body;
             const adminId = id;
     
-            console.log(req.body);
-    
             // Disable all keys
             if (publicKey && privateKey) {
                 await PaymentKeys.updateMany({}, { $set: { 'keys.$[].enable': false } });
