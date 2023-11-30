@@ -6,7 +6,6 @@ const moongoose = require('mongoose');
 const ProductController = require('../controller/products');
 const productsModel = require('./../models/products');
 const logger = require('./../logger');
-const moongoose = require('mongoose');
 
 async function getLatestOrderId(req, res) {
     try {
