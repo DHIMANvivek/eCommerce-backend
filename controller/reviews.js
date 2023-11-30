@@ -3,13 +3,24 @@ const logger = require('./../logger');
 
 async function fetchReviews(productId, userId = '') {
     try {
+
         let reviews = JSON.parse(JSON.stringify((await Reviews.findOne({ productID: productId })
         .populate({
             path: 'reviews.userId',
             select: 'name'
-        })).reviews));
-        
-        console.log('s', reviews);
+        }))));
+
+        if(!reviews){
+            return  {
+                reviews: [],
+                userReview: '',
+                avgRating: 0,
+                totalReviews: 0,
+            };
+        }else{
+            reviews = reviews.reviews;
+        }
+
         reviews = reviews.map(review => {
             if (review.userId === null) {
                 review.userId = {
@@ -49,7 +60,6 @@ async function fetchReviews(productId, userId = '') {
         }
 
     } catch (error) {
-        console.log('here', error);
         logger.error(error);
         return {
             reviews: {},

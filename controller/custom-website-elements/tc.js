@@ -143,12 +143,14 @@ let body = {
 }
 async function setDocument(req, res) {
     try {
-        await tc.updateOne({}, { $set: { data: req.body.TandC } }, { upsert: true })
+        console.log(req.body);
+        await tc.updateOne({}, { $set: { data: req.body.tcFormArray } }, { upsert: true })
         return res.status(200).json({
             message: "Document updated successfully!"
         })
     }
     catch (error){
+        console.log(error);
         logger.error(error);
         res.status(500).json(error);
     }

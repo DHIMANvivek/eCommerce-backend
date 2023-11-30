@@ -367,7 +367,6 @@ async function sendInvoiceTemplate(paymentData) {
 }
 
 async function sendDiscountTemplate(discountData) {
-  console.log(discountData, "template");
   
   let html = `
     <!DOCTYPE html>

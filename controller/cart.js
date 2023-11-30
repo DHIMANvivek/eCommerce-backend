@@ -32,6 +32,11 @@ async function fetchCart(req, res) {
             let item = JSON.parse(JSON.stringify(copy));
             let product = await productsController.fetchProductDetails(req, res, item.sku);
 
+            // (product.assets).findIndex((asset)=>{
+
+            // })
+            // console.log(item, product.assets);
+
             const fields = ['name', 'assets', 'info', 'price'];
 
             for (let field of fields) {
@@ -55,6 +60,13 @@ async function fetchCart(req, res) {
                 return asset.color === item.color;
             }).stockQuantity[0].size;
 
+
+            // product.assets.find((asset) => {
+            //     return asset.color === item.color;
+            // }).stockQuantity.find((sizeQ)=>{
+            //     return sizeQ.size === item.size;
+            // })
+
             // amounting
             // shipping will be calculated after getting it from tracking page dynamically later
             cart.amounts.subTotal += item.price * item.quantity;
@@ -64,8 +76,6 @@ async function fetchCart(req, res) {
             return item;
         }));
 
-        // cart.amounts.savings -= cart.amounts.subTotal;
-        // cart.amounts.savings = (Math.round((cart.amounts.savings) * 100)) / 100;
         cart.amounts.subTotal = (Math.round((cart.amounts.subTotal) * 100) / 100);
         cart.amounts.total = cart.amounts.subTotal + cart.amounts.shipping;
 

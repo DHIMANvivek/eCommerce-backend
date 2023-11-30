@@ -24,7 +24,7 @@ function createQuery(req) {
       query['ExtraInfo.brands'] = null
   }
 
-  if (req.body?.ExtraInfo.brands && req.body?.ExtraInfo?.categories) {
+  if (req.body?.ExtraInfo?.brands && req.body?.ExtraInfo?.categories) {
     query['ExtraInfo.brands'] = {$in:req.body.ExtraInfo.brands};
     query['ExtraInfo.categories'] = {$in:req.body.ExtraInfo.categories};
   }
@@ -84,12 +84,10 @@ async function createOffer(req, res) {
       }
     }
 
-
     const newOffer = OfferModel(req.body);
     await newOffer.save();
     res.status(200).json(newOffer);
   } catch (error) {
-    console.log('error comnig is ',error);
     res.status(500).json(error);
   }
 }
@@ -139,7 +137,6 @@ async function getOffers(req, res) {
     
 
     const data=await OfferModel.aggregate(aggregationPipe);
-    console.log('data come up is ',data);
     res.status(200).json(data);
 
   } catch (error) {
@@ -246,7 +243,6 @@ async function updateOfferStatus(req, res) {
 
       for (let result of results) {
         result = JSON.parse(JSON.stringify(result));
-        console.log('result coming is ', result);
         if (result && result._id != req.body._id) {
           throw { message: 'This is conflict point please try to create another date points ' };
         }
@@ -256,6 +252,10 @@ async function updateOfferStatus(req, res) {
 
     if (!status) {
       req.body.status = false;
+    }
+
+    if(req.body.couponType=='custom'){
+      req.body.userUsed=[];
     }
     const updateOfferStatus = await OfferModel.updateOne({ _id: req.body._id }, {
       $set: { 'status.active': status }
@@ -283,23 +283,32 @@ async function getCoupons(req, res) {
 
     if (req.headers.authorization) {
       data = verifyToken(req.headers.authorization.split(' ')[1])
-      query.userUsed = { $nin: [data.id] }
       let checkNewUser = await ordersModel.findOne({ buyerId: data.id });
 
       if (checkNewUser) {
         query.couponType = { $nin: ['new'] };
       }
-      query.userUsed = { $nin: [data.id] }
+
       user = await Users.findOne({ _id: data.id }, { email: 1, _id: 0 });
     };
 
-
     const getAllCoupons = await OfferModel.aggregate([
-      {$match: query},
-      {$match:  {$or:[
-        { couponType: 'custom', 'UserEmails.email': {$in:[user?.email]} }
-        ,{couponType:{$in:['global','new']}}]}}
-  ])
+      {
+        $match: query,
+      },
+      {
+        $match: {
+          $or: [
+            { couponType: 'custom', 'UserEmails.email': { $in: [user?.email] } },
+            {
+              couponType: { $in: ['global', 'new'] },
+              userUsed: { $not: { $in: [data.id] } },
+            },
+          ],
+        },
+      },
+    ]);
+    
 
   res.status(200).json(getAllCoupons);
 
@@ -340,7 +349,7 @@ async function checkCoupon(couponId, userId) {
 
 async function updateCoupon(couponId, userId) {
   try {
-    const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) } });
+    const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) },$inc:{couponUsersLimit:-1} });
     return new Promise((res, rej) => {
       res(response);
     })

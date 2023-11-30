@@ -1,5 +1,10 @@
 const express = require('express');
 const router = express.Router();
+// router.use('/', require('./v1/stripe/stripe'));
+
+const app = express();
+
+app.use(express.json());
 const AdminVerify = require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt');
 const mailer = require('../../helpers/nodemailer');
@@ -36,7 +41,8 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
 router.use('/tc', require('./v1/tc')) ;
-router.use('/payment', require('./v1/stripe/stripe'));
+const paymentKeysController = require('../../controller/custom-website-elements/paymentKeys');
+
 
 // router.get('/checkUser', (req, res) => {
 
@@ -96,8 +102,8 @@ router.get('/checkUser',(req,res)=>{
 // payment intent
 router.post('/create-payment-intent', async (req, res) => {
 
-    const response = await fetch('https://tradevogue-backend.onrender.com/paymentKeys/get');
-
+    const response = await fetch('http://localhost:1000/paymentKeys/get');
+    
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -121,19 +127,12 @@ router.post('/create-payment-intent', async (req, res) => {
             },
         });
 
-        redisClient.set('payment_intent_client_secret', paymentIntent.client_secret, 'EX', 10, (err, reply) => {
-            if (err) {
-              console.error('Error storing client secret:', err);
-            }
-          });
-
         res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while creating the payment intent.' });
     }
-})
-
+});
 // getPaginated Data
 router.get('/getPaginatedData/:model', getPaginatedData);
 
