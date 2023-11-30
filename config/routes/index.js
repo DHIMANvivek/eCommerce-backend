@@ -1,5 +1,10 @@
 const express = require('express');
 const router = express.Router();
+// router.use('/', require('./v1/stripe/stripe'));
+
+const app = express();
+
+app.use(express.json());
 const AdminVerify = require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt');
 const mailer = require('../../helpers/nodemailer');
@@ -36,9 +41,8 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
 router.use('/tc', require('./v1/tc')) ;
-// const bodyParser = require('body-parser');  
-// router.use(bodyParser.raw({ type: '*/*' }));
-// router.use('/payment', require('./v1/stripe/stripe'));
+const paymentKeysController = require('../../controller/custom-website-elements/paymentKeys');
+
 
 // router.get('/checkUser', (req, res) => {
 
@@ -99,7 +103,7 @@ router.get('/checkUser',(req,res)=>{
 router.post('/create-payment-intent', async (req, res) => {
 
     const response = await fetch('http://localhost:1000/paymentKeys/get');
-
+    
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }

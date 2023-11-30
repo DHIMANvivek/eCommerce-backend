@@ -22,7 +22,6 @@ async function getLatestOrderId(req, res) {
 
 async function updateLatestOrderDetail(req, res) {
     try {
-        console.log('HELLLOOOOOOOO VIVEK');
         const buyerId = req.tokenData.id;
         // const buyerId ='6539e71dced882bb66fbae55';
         const { newPaymentStatus, transactionId, MOP } = req.body;

@@ -3,6 +3,11 @@ const bodyParser = require("body-parser");
 const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
+
+// const router = express.Router();
+// const stripeController = require('./controller/stripe/stripe');
+// router.post('/webhook', stripeController.stripeWebhook);
+
 const ordersModel = require('./models/order');
 const cors = require('cors');
 app.use(cors({ origin: 'http://localhost:4200' }));
