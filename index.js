@@ -10,7 +10,7 @@ const app = express();
 
 const ordersModel = require('./models/order');
 const cors = require('cors');
-app.use(cors({ origin: 'http://localhost:4200' }));
+// app.use(cors({ origin: 'http://localhost:4200' }));
 const stripe = require('stripe')('sk_test_51NvsyeSENcdZfgNiy559a6dtaofzqfn00MVNCrPe4kQWAZNZulhdDmJePJTZvSSzzu4xnkTjHIjmWPVdzTW1L6oc00oI29MAG4');
 const endpointSecret = 'whsec_3ab6989c4dd3fa67a11fb76b2cbb4a4e15687f60550b2d2fbe4b85ab3d0e0c94';
 app.post('/webhook', express.raw({ type: 'application/json' }), async(request, response) => {
