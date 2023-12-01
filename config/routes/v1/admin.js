@@ -11,7 +11,7 @@ router.get('/fetchPopularProducts', adminController.fetchPopularProducts);
 // Product 
 router.post('/addProduct',adminController.addProduct);
 router.post('/updateProduct',adminController.updateProduct);
-router.post('/updatehighlightProduct',adminController.updateHighlightProduct);
+router.post('/updateProductStatus',adminController.updateProductStatus);
 
 router.get('/fetchProductDetails', adminController.fetchProductDetail);
 router.post('/fetchProducts', adminController.fetchProductInventory);

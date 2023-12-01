@@ -10,7 +10,7 @@ const SKU_generater = require('../helpers/sku');
 const productController = require('../controller/products');
 const logger = require('./../logger');
 
-async function getOverallInfo(req, res, controller=false) {
+async function getOverallInfo(req, res, controller = false) {
   try {
     let result = {};
     // const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
@@ -20,7 +20,7 @@ async function getOverallInfo(req, res, controller=false) {
     //   'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     // }).count();
 
-    const customerCountCurr = (await orders.distinct('buyerId', {payment_status: 'success'})).length;
+    const customerCountCurr = (await orders.distinct('buyerId', { payment_status: 'success' })).length;
 
     const customerCountPrev = (await orders.distinct('buyerId', {
       payment_status: 'success',
@@ -41,8 +41,8 @@ async function getOverallInfo(req, res, controller=false) {
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
-    let currentOrders=orderCountTotal-orderCountPrev;
-    let orderChange = orderCountPrev ? ((currentOrders-orderCountPrev) / orderCountPrev) * 100 : 0;
+    let currentOrders = orderCountTotal - orderCountPrev;
+    let orderChange = orderCountPrev ? ((currentOrders - orderCountPrev) / orderCountPrev) * 100 : 0;
 
     result['orders'] = {
       'count': orderCountTotal,
@@ -291,7 +291,7 @@ async function fetchPopularProducts(req, res) {
           payment_status: "success",
           'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
 
-         //products only for particular month (current)
+          //products only for particular month (current)
           $expr: {
             $eq: [
               { $month: "$orderDate" },
@@ -318,19 +318,19 @@ async function fetchPopularProducts(req, res) {
         $group: {
           _id: "$products.info._id",
           revenue: {
-            $sum: { 
-              $subtract: [ "$products.amount", "$discount" ],
+            $sum: {
+              $subtract: ["$products.amount", "$discount"],
             },
           },
           profit: {
             $sum: {
               $subtract: [
                 {
-                  $subtract: [ "$products.amount", "$discount" ],
+                  $subtract: ["$products.amount", "$discount"],
                 },
                 {
                   $multiply: [
-                    "$products.quantity", 
+                    "$products.quantity",
                     "$products.info.costPrice",
                   ],
                 },
@@ -416,7 +416,7 @@ async function fetchCategorySalesData(req, res) {
 async function fetchReviewStats(req, res) {
   let sellerData = req.tokenData;
   let controller = req.controller ? true : false;
-  
+
   try {
     let aggregationPipe = [
 
@@ -511,7 +511,7 @@ async function addProduct(req, res) {
         productObject.data[key] = productObject.data.basicinfo[key];
       });
       productObject.data.sellerID = sellerID;
-      productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
+      productObject.data.info.orderQuantity.sort(function (a, b) { return a - b });
       productObject.data.sku = await SKU_generater.generateSKU(productObject.data);
 
       response = await products.create(productObject.data);
@@ -525,13 +525,12 @@ async function addProduct(req, res) {
   }
 }
 
-async function updateHighlightProduct(req, res) {
+async function updateProductStatus(req, res) {
+
   const sellerID = req.tokenData.id;
   const field_status = req.body.status;
   const productID = req.body._id;
   const field = req.body.field;
-
-  console.log(req.body);
 
   try {
     const response = await products.updateOne(
@@ -540,14 +539,17 @@ async function updateHighlightProduct(req, res) {
         'sellerID': sellerID
       },
       {
-        $set: { [`status.${field}`] : field_status }
+        $set: { [`status.${field}`]: field_status }
       });
 
-    const highlightCount = await products.find({ [`status.${field}`]: true }).count();
-
     if (!response) throw "Unable to Update";
-    return res.status(200).json({ 'highlightCount': highlightCount });
 
+    if (field == 'highlight') {
+      const highlightCount = await products.find({ [`status.${field}`]: true }).count();
+      return res.status(200).json({ 'highlightCount': highlightCount });
+    } else {
+      return res.status(200).json();
+    }
   } catch (err) {
     logger.error(err);
     return res.status(401).send();
@@ -566,7 +568,7 @@ async function updateProduct(req, res) {
     });
     delete productObject.data['basicinfo'];
     delete productObject.data['_id'];
-    productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
+    productObject.data.info.orderQuantity.sort(function (a, b) { return a - b });
 
     const response = await products.findOneAndUpdate({
       '_id': _id,
@@ -931,7 +933,7 @@ async function addFaq(req, res) {
     await category.save();
 
     return res.status(200).json({ success: true, message: 'Children added to the category' });
-  } 
+  }
   catch (error) {
     logger.error(error);
     return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
@@ -1054,7 +1056,7 @@ module.exports = {
 
   addProduct,
   updateProduct,
-  updateHighlightProduct,
+  updateProductStatus,
   deleteProductInventory,
   fetchProductInventory,
   fetchProductDetail,
