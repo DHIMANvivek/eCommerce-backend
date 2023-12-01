@@ -16,5 +16,8 @@ router.post('/deleteTitle', adminVerify , ticketController.deleteTicketTitle);
 router.post('/updateTicket', adminVerify , ticketController.updateTicket);
 router.post('/deleteTicket', adminVerify , ticketController.deleteTicket);
 
+// combined
+// router.get('/combinedticketSearch', adminVerify , ticketController.combinedticketSearch);
+
 
 module.exports = router;

@@ -51,6 +51,7 @@ async function getFaq(req, res) {
 
 /* update Faq without Aggregation */
 async function updateFaq(req, res) {
+  console.log(req.body, "req.body")
   try {
     const { _id: itemId, title: updatedTitle, content: updatedContent } = req.body;
 
@@ -94,40 +95,129 @@ async function addFaq(req, res) {
   }
 } */
 
-
 /* Add Faq  with Aggregation */
+// async function addFaq(req, res) {
+
+//   try {
+//     const { title, children } = req.body;
+
+//     const result = await faqData.aggregate([
+//       { $match: { title: title } },
+//       {
+//         $project: {
+//           childrens: {
+//             $concatArrays: ["$childrens", children]
+//           }
+//         }
+//       }
+//     ]);
+
+//     console.log(result, "faq result");
+
+//     if (!result.length) {
+//       return res.status(404).json({ success: false, message: 'Category not found' });
+//     }
+
+//     const updateResult = await faqData.updateOne({ title: title }, { $set: { childrens: result[0].childrens } });
+
+//     if (updateResult) {
+//       return res.status(200).json({ success: true, message: 'Children added to the category' });
+//     } else {
+//       return res.status(500).json({ success: false, message: 'Failed to add children to the category' });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
+//   }
+// }
+
+// async function addFaq(req, res) {
+//   try {
+//     const categories = req.body.categories; // Array of categories to be updated
+
+//     const categoryPromises = categories.map(async (category) => {
+//       const { selectedOption, query, content } = category;
+
+//       const result = await faqData.findOneAndUpdate(
+//         { title: selectedOption },
+//         {
+//           $push: {
+//             childrens: {
+//               title: query,
+//               content: content,
+//               expanded: false,
+//             },
+//           },
+//         },
+//         { new: true }
+//       );
+
+//       return result;
+//     });
+
+//     const updatedCategories = await Promise.all(categoryPromises);
+
+//     const allUpdatesSuccessful = updatedCategories.every((category) => !!category);
+
+//     if (allUpdatesSuccessful) {
+//       return res.status(200).json({ success: true, message: 'Children added to the categories' });
+//     } else {
+//       return res.status(500).json({ success: false, message: 'Failed to add children to some categories' });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ success: false, message: 'An error occurred while adding children to the categories' });
+//   }
+// }
+
+
 async function addFaq(req, res) {
-
   try {
-    const { title, children } = req.body;
+    const categories = req.body.categories;
+    const categoryPromises = categories.map(async (category) => {
+      const { title, children } = category;
 
-    const result = await faqData.aggregate([
-      { $match: { title: title } },
-      {
-        $project: {
-          childrens: {
-            $concatArrays: ["$childrens", children]
-          }
-        }
+      const existingCategory = await faqData.findOne({ title });
+
+      if (existingCategory) {
+        const result = await faqData.findOneAndUpdate(
+          { title },
+          {
+            $push: {
+              childrens: { $each: children },
+            },
+          },
+          { new: true }
+        );
+
+        return result;
+      } else {
+        const newCategory = new faqData({
+          title,
+          childrens: children,
+        });
+
+        const result = await newCategory.save();
+        return result;
       }
-    ]);
+    });
 
-    if (!result.length) {
-      return res.status(404).json({ success: false, message: 'Category not found' });
-    }
+    const updatedCategories = await Promise.all(categoryPromises);
 
-    const updateResult = await faqData.updateOne({ title: title }, { $set: { childrens: result[0].childrens } });
+    const allUpdatesSuccessful = updatedCategories.every((category) => !!category);
 
-    if (updateResult.nModified > 0) {
-      return res.status(200).json({ success: true, message: 'Children added to the category' });
+    if (allUpdatesSuccessful) {
+      return res.status(200).json({ success: true, message: 'Categories and children added/updated successfully' });
     } else {
-      return res.status(500).json({ success: false, message: 'Failed to add children to the category' });
+      return res.status(500).json({ success: false, message: 'Failed to add/update some categories or children' });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
+    return res.status(500).json({ success: false, message: 'An error occurred while adding/updating categories and children' });
   }
 }
+
+
 
 /* Delete Query Without Aggregation */
 async function deleteFaq(req, res) {
