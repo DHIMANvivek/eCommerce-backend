@@ -478,9 +478,9 @@ async function addProduct(req, res) {
 
       data.forEach((product) => {
 
-
         // Purpose -> extracting any unique category or brands  
         // not inside the seller inventory
+
         if (!seller_info['categories'].includes(product.info.category.toLowerCase())) {
           seller_info['categories'].push(product.info.category);
         }
@@ -499,10 +499,8 @@ async function addProduct(req, res) {
       for (const product of data) {
         // Add the sellerID for each product
         product['sellerID'] = sellerID;
-
         // Generate SKU for the product
         product['sku'] = await SKU_generater.generateSKU(product);
-
         response = await products.create(product);
       }
 
@@ -529,18 +527,23 @@ async function addProduct(req, res) {
 
 async function updateHighlightProduct(req, res) {
   const sellerID = req.tokenData.id;
-  const highlight = req.body;
+  const field_status = req.body.status;
+  const productID = req.body._id;
+  const field = req.body.field;
+
+  console.log(req.body);
+
   try {
     const response = await products.updateOne(
       {
-        '_id': new ObjectId(highlight._id),
+        '_id': new ObjectId(productID),
         'sellerID': sellerID
       },
       {
-        $set: { 'highlight': highlight.status }
+        $set: { [`status.${field}`] : field_status }
       });
 
-    const highlightCount = await products.find({ 'highlight': true }).count();
+    const highlightCount = await products.find({ [`status.${field}`]: true }).count();
 
     if (!response) throw "Unable to Update";
     return res.status(200).json({ 'highlightCount': highlightCount });
@@ -586,11 +589,11 @@ async function deleteProductInventory(req, res) {
     let response;
 
     if (Array.isArray(reqData.data)) {
-      response = await products.updateMany({ 'sellerID': sellerID, _id: { $in: reqData.data } }, { $set: { 'active': false } });
+      response = await products.updateMany({ 'sellerID': sellerID, _id: { $in: reqData.data } }, { $set: { 'status.delete': true } });
       return res.status(200).json({ message: 'Products Deleted' })
     }
 
-    response = await products.updateOne({ 'sellerID': sellerID, _id: reqData.data }, { $set: { 'active': false } });
+    response = await products.updateOne({ 'sellerID': sellerID, _id: reqData.data }, { $set: { 'status.delete': true } });
 
     if (!response) throw "Unable to Delete";
 
@@ -606,6 +609,7 @@ async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
   const parameters = req.body;
   try {
+
     aggregationPipe = [
       {
         $match: {
@@ -697,7 +701,7 @@ async function fetchProductInventory(req, res) {
       }
     });
 
-    aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } });
+    aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'status.delete': false } });
 
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       {

@@ -44,7 +44,6 @@ async function updateLatestOrderDetail(req, res) {
    
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
-                console.log('el is ',el);
                 await Products.updateOne(
                     {
                         sku: el.sku,
@@ -68,7 +67,7 @@ async function updateLatestOrderDetail(req, res) {
                 });
 
                 if (allStockZero) {
-                    await Products.updateOne({sku:el.sku},{ $set:{active: false} });
+                    await Products.updateOne({sku:el.sku},{ $set:{"status.active": false} });
                 }
 
             }));
@@ -275,9 +274,7 @@ async function getSellerOrdersInventory(req, res, controller = false) {
                 $facet: {
                     orders: [
                         {
-                            $unwind: {
-                                path: "$orderDetails.products",
-                            },
+                            $unwind: "$orderDetails.products"
                         },
                         {
                             $group: {
@@ -321,11 +318,11 @@ async function getSellerOrdersInventory(req, res, controller = false) {
         Object.keys(parameters.filter).forEach((key) => {
             if (parameters.filter[key]) {
                 if (key == 'search') {
-                    aggregationPipe.splice(1, 0, {
+                    aggregationPipe.splice(aggregationPipe.length - 1, 0, {
                         $match: {
                             $or: [
-                                { 'buyerInfo.customer': { $regex: parameters.filter['search'], $options: 'i' } },
-                                { 'orderID': { $regex: parameters.filter['search'], $options: 'i' } },
+                                { 'customer': { $regex: parameters.filter['search'], $options: 'i' } },
+                                { 'orderDetails.orderID': { $regex: parameters.filter['search'], $options: 'i' } },
                             ]
                         }
                     })

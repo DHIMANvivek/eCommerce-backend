@@ -21,7 +21,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {
-                active: 0,
+                status: 0,
                 updatedAt: 0
             }
         )));
@@ -91,7 +91,8 @@ async function fetchProducts(req, res) {
         aggregationPipe = [
             {
                 $match: {
-                    "active": true
+                    "status.active": true,
+                    "status.delete": false
                 }
             },
             {
