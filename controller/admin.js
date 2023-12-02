@@ -10,6 +10,27 @@ const SKU_generater = require('../helpers/sku');
 const productController = require('../controller/products');
 const logger = require('./../logger');
 
+async function fetchAdminNotifications(req, res){
+
+  try{
+    const sellerID = req.tokenData.id;
+
+
+    const result = await products.find({
+      sellerID: sellerID,
+      $or: [
+        {'status.active': false},
+        {'asset.stockQuantity.quantity': { $lte: { $arrayElemAt: ['$info.orderQuantity', 0] } } }
+      ]
+    }, { assets: 1, info: 1, sku:1, name:1, price:1, status:1, _id: 0 });
+
+    return res.status(200).json(result);
+
+  }catch(err){
+
+  }
+}
+
 async function getOverallInfo(req, res, controller = false) {
   try {
     let result = {};
@@ -610,6 +631,7 @@ async function deleteProductInventory(req, res) {
 async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
   const parameters = req.body;
+
   try {
 
     aggregationPipe = [
@@ -688,14 +710,20 @@ async function fetchProductInventory(req, res) {
 
     let sortFilter = false;
     Object.keys(parameters.filter).forEach((key) => {
-      if (parameters.filter[key]) {
+      if(key == 'active') {
+        aggregationPipe.unshift({ $match: {'status.active': parameters.filter['active']} });
+      }
+      else if (parameters.filter[key]) {
+
         if (key == 'categories') {
           aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i' } } });
         }
+
         if (key == 'rating') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'avgRating': parameters.filter[key] } });
           sortFilter = true;
         }
+
         else if (key == 'stockQuantity') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'inventory': parameters.filter[key] } });
           sortFilter = true;
@@ -731,6 +759,7 @@ async function fetchProductInventory(req, res) {
       { $skip: (parameters.page - 1) * parameters.limit },
       { $limit: parameters.limit }
     );
+    
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
     res.status(200).json(response[0]);
@@ -804,8 +833,6 @@ async function updateDetails(req, res) {
   const email = emails.email
   const role = req.tokenData.role;
   const data = req.body.data;
-
-  console.log(data, "data coming ")
 
   if (data && role == 'admin' && email && data.name && data.name.firstname !== undefined) {
     const firstname = data.name.firstname;
@@ -1047,6 +1074,10 @@ async function getPaginatedData(req, res) {
 }
 
 module.exports = {
+
+  //Admin notification
+  fetchAdminNotifications,
+
   // Stats Data
   getOverallInfo,
   fetchCategorySalesData,
