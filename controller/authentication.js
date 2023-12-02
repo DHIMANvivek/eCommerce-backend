@@ -252,15 +252,8 @@ async function changePassword(req, res) {
         const input = req.body;
         const user = await usersModel.findById(req.tokenData.id)
 
-<<<<<<< Updated upstream
         if (user.provider == 'GOOGLE'){
             throw ({message: "Cannot change password since you are a Google user!"})
-=======
-        console.log(user, "user");
-
-        if (user.provider == 'GOOGLE') {
-            throw ({ message: "Cannot change password since you are a Google user!" })
->>>>>>> Stashed changes
         }
 
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)

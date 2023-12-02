@@ -594,3 +594,10 @@ error: 2023-12-01T03:44:19.119Z Kindly Signup!
 error: 2023-12-01T11:01:15.058Z Operation `wishlists.findOne()` buffering timed out after 10000ms
 error: 2023-12-01T11:01:15.103Z Operation `carts.findOne()` buffering timed out after 10000ms
 error: 2023-12-01T11:01:15.287Z Operation `sellerdetails.findOne()` buffering timed out after 10000ms
+error: 2023-12-01T15:40:48.975Z You are already a user
+error: 2023-12-02T03:53:54.676Z productList.map is not a function
+error: 2023-12-02T03:55:06.407Z productList.map is not a function
+error: 2023-12-02T04:04:34.129Z productList.map is not a function
+error: 2023-12-02T04:05:39.168Z productList.map is not a function
+error: 2023-12-02T05:05:01.267Z Cannot read properties of undefined (reading 'map')
+error: 2023-12-02T05:08:56.516Z Cannot read properties of undefined (reading 'map')

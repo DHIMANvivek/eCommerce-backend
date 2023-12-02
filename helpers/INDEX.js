@@ -267,18 +267,18 @@ async function TicketStatusTemplate(mailData) {
 
 async function sendInvoiceTemplate(paymentData) {
   let productList = JSON.parse(paymentData.description);
-
-  let productRows = productList.map(product => {
-    let productDetails = product.id.map((productId, index) => {
-      return `
-        <a href="http://localhost:4200/product/${productId}" style="text-decoration: none; color: #007bff;">${product.name[index]}: ${productId}</a>
-      `;
-    }).join('<br>');
-
+  console.log(productList, "productList");
+  
+  let productRows = productList.items.map(product => {
+    let productDetails = `
+      <a href="http://localhost:4200/product/${product.id}" style="text-decoration: none; color: #007bff;">${product.name}: ${product.id}</a>
+    `;
+  
     return `
       <tr>
         <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
-        <td style="padding: 8px; border: 1px solid #dddddd;"> ${paymentData.amount / 100} ${paymentData.currency}</td>
+        <td style="padding: 8px; border: 1px solid #dddddd;"> ${product.price} ${paymentData.currency}</td>
+        <td style="padding: 8px; border: 1px solid #dddddd;">${product.quantity} qty</td>
       </tr>
     `;
   }).join('');
@@ -344,14 +344,15 @@ async function sendInvoiceTemplate(paymentData) {
           <thead>
             <tr>
               <th>Product Details</th>
-              <th>Total Amount</th>
+              <th>Item Price</th>
+              <th>Quantity</th>
             </tr>
           </thead>
           <tbody>
             ${productRows}
           </tbody>
         </table>
-        <p><strong>Total Amount:</strong> ${paymentData.amount / 100} ${paymentData.currency}</p>
+        <p><strong>Total Amount:</strong> ${productList.subTtotal} ${paymentData.currency}</p>
         <p><strong>Payment ID:</strong> ${paymentData.id}</p>
         <p><strong>Receipt Email:</strong> ${paymentData.receipt_email}</p>
         <p>Our team is here to assist you. If you have any further questions or need additional help, please don't hesitate to reach out to us.</p>

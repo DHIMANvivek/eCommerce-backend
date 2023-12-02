@@ -1,17 +1,13 @@
 const express = require('express');
 const router = express.Router();
-// router.use('/', require('./v1/stripe/stripe'));
+router.use('/', require('./v1/stripe/stripe'));
 
 const app = express();
 
 app.use(express.json());
 const AdminVerify = require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt');
-const mailer = require('../../helpers/nodemailer');
-const { SubscribeTemplate } = require('../../helpers/INDEX');
-const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const jwtVerify = require('../../middlewares/jwtVerify')
-const { sendInvoiceTemplate } = require('../../helpers/INDEX');
 const paginateResults = require('../../helpers/pagination');
 const redisClient = require('../../config/redisClient');
 router.use('/user', require('./v1/user'));
@@ -41,41 +37,6 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
 router.use('/tc', require('./v1/tc')) ;
-const paymentKeysController = require('../../controller/custom-website-elements/paymentKeys');
-
-
-// router.get('/checkUser', (req, res) => {
-
-//     const token = req.headers.authorization;
-//     try {
-//         if (token) {
-//             const data = verifyToken(token.split(' ')[1]);
-//             if (data.role != 'admin') {
-//                 throw ({ message: 'You are not an admin.' })
-//             }
-//             return res.json("sucess");
-//         }
-//         throw { message: 'Please login/signup first.' };
-//     } catch (error) {
-//         return res.status(404).json(error);
-//     }
-// })
-
-// router.get('/checkUser',(req,res)=>{
-//     const token = req.headers.authorization;
-//     try {
-//         if (token) {
-//             const data = verifyToken(token.split(' ')[1]);
-//             if (data.role != 'admin') {
-//                 throw ({ message: 'You are not an admin.' })
-//             }
-//             return res.json("sucess");
-//         }
-//         throw { message: 'Please login/signup first.' };
-//     } catch (error) {
-//         return res.status(404).json(error);
-//     }
-// })
 
 router.get('/checkUser',(req,res)=>{
     const token = req.headers.authorization;
@@ -86,54 +47,6 @@ router.get('/checkUser',(req,res)=>{
 
 })
 
-//send subscribe mail 
-// router.post('/sendMail', async (req, res) => {
-//     const mailData = {
-//         email: req.body.email,
-//         subject: "Thank You for Subscribing - Enjoy 25% Off!"
-//     }
-//     const mailSent = await mailer(mailData, SubscribeTemplate);
-
-//     res.status(200).json({
-//         message: "done"
-//     })
-// })
-
-// payment intent
-router.post('/create-payment-intent', async (req, res) => {
-
-    const response = await fetch('http://localhost:1000/paymentKeys/get');
-    
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-
-    const data = await response.json();
-    const privateKey = data[0].keys[0].privateKey;
-
-    const stripe = require('stripe')(privateKey);
-
-    try {
-        const { items } = req.body;
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: 1000,
-            currency: "inr",
-            description: JSON.stringify(items),
-            metadata: {
-                items: JSON.stringify(items),
-            },
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
-
-        res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while creating the payment intent.' });
-    }
-});
-// getPaginated Data
 router.get('/getPaginatedData/:model', getPaginatedData);
 
 async function getPaginatedData(req, res) {
@@ -151,42 +64,6 @@ async function getPaginatedData(req, res) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
-
-// ticket status
-router.post('/ticketStatus', async (req, res) => {
-try {
-    const mailData = {
-        email: req.body.email,
-        subject: "Ticket Status",
-        status: req.body.status,
-        message: req.body.message
-    }
-    const emailTemplate = TicketStatusTemplate(mailData);
-    const mailSent = await mailer(mailData, emailTemplate);
-
-    res.status(200).json({
-        message: "done"
-    })
-} catch (error) {
-
-}
-})
-
-// email invoice 
-
-router.post('/invoiceSend', async (req, res) => {
-    const mailData = {
-        email: req.body.receipt_email,
-        subject: "Invoice",
-        invoice: req.body
-    }
-    const emailTemplate = sendInvoiceTemplate(mailData.invoice);
-    await mailer(mailData, emailTemplate);
-
-    res.status(200).json({
-        message: "done"
-    })
-})
 
 router.use(function (req, res) {
     return res.status(404).json({
