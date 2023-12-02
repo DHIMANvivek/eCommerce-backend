@@ -37,7 +37,7 @@ async function fetchCart(req, res) {
             // })
             // console.log(item, product.assets);
 
-            const fields = ['name', 'assets', 'info', 'price'];
+            const fields = ['name', 'assets', 'info', 'price','oldPrice'];
 
             for (let field of fields) {
                 if (field === 'info') {

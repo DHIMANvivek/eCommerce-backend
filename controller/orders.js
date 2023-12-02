@@ -106,11 +106,17 @@ async function verifyOrderSummary(req, res) {
         }
 
 
-        let result = await Promise.all(req.body.details.map(async (element) => {
+     await Promise.all(req.body.details.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
+            FinalResponse.total+=element.price*element.quantity;
             if (response?.discount) {
-                FinalResponse.savings += response.discount;
+                FinalResponse.savings += response.discount*element.quantity;
             }
+            if(element?.oldPrice){
+                FinalResponse.subTotal+=element?.oldPrice*element.quantity;
+            }
+        
+
             return new Promise((res, rej) => {
                 let colorArray = response.assets?.filter(el => el.color == element.color);
                 let particularColor=colorArray?.filter(el=>el.color==element.color);
@@ -119,43 +125,46 @@ async function verifyOrderSummary(req, res) {
                if( particularColorSize[0].quantity<=0){
                    rej({ message: response.name + ' is out of stock' });
                }
-               res(response.price * element.quantity);
+
+               if(response?.oldPrice){
+                res({price:response.price * element.quantity,oldPrice:response?.oldPrice*element.quantity});
+               }
+               else{
+                   res({price:response.price * element.quantity});
+               }
             });
+            FinalResponse.total -=FinalResponse.savings;
         }));
 
-        let totalAmount = result?.reduce((accumlater, currentValue) => {
-            return accumlater + currentValue;
-        })
 
-        FinalResponse.subTotal = totalAmount;
-        FinalResponse.total=FinalResponse.subTotal-FinalResponse.savings;
-        if (req.body.CouponApplied && req?.tokenData?.id) {
-            let coupon = await checkCoupon(req.body.CouponApplied._id, req.tokenData.id);
+        // console.log('req body is ------------> ',req.body);
+        console.log('final response before coupon is ',FinalResponse);
+        if (req.body.coupon && req?.tokenData?.id) {
+            let coupon = await checkCoupon(req.body.coupon._id, req.tokenData.id);
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
-            if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > totalAmount) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
+            if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > FinalResponse.total) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
             let discount = 0;
             if (coupon.discountType == 'percentage') {
-                let discountCalculated = (totalAmount / 100) * coupon.discountAmount;
+                let discountCalculated = (FinalResponse.total / 100) * coupon.discountAmount;
                 discount = discountCalculated <= coupon.maximumDiscount ? discountCalculated : coupon.maximumDiscount;
-                discount = discount >= req.body.amounts.total ? 0 : discount
+                discount = discount >= FinalResponse.total ? 0 : discount
             }
             else {
                 discount = coupon.discountAmount
                 discount = discount >= req.body.amounts.total ? 0 : discount
             }
 
-            FinalResponse.savings += discount;
-            FinalResponse.total -= discount;
+            FinalResponse.discount=discount;
+            // FinalResponse.total -= discount;
         }
+        
 
-
-
-        if (!FinalResponse.total) FinalResponse.total = FinalResponse.subTotal;
         return new Promise((res, rej) => {
             res(FinalResponse);
         });
 
     } catch (error) {
+        console.log('error come up is ',error);
         logger.error(error);
         res.status(500).json(error);
     }
@@ -165,9 +174,16 @@ async function createOrder(req, res) {
 
         const verifyOrder = await verifyOrderSummary(req, res);
         req.body.buyerId = req.tokenData.id;
-        if (req.body.coupon) {
-            let response = await checkCoupon(req.body.coupon._id, req.tokenData.id);
-            if (!response) { throw ({ message: 'You already use this coupon' }) }
+
+        // if(verifyOrder?.discount){
+        //     req.body.couponDiscount=verifyOrder.discount;
+        // }   
+
+        req.body.OrderSummary=verifyOrder;
+        req.body.Price=verifyOrder.subTotal;
+        if(verifyOrder?.discount){
+            req.body.OrderSummary.couponDiscount=verifyOrder.discount;
+            req.body.OrderSummary.total-=verifyOrder.discount;
         }
 
         // order ID creation

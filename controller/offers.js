@@ -244,7 +244,7 @@ async function updateOfferStatus(req, res) {
       for (let result of results) {
         result = JSON.parse(JSON.stringify(result));
         if (result && result._id != req.body._id) {
-          throw { message: 'This is conflict point please try to create another date points ' };
+          throw { message: `Your Current discount is conflicting with ${result.Title}` };
         }
       }
 
@@ -262,6 +262,7 @@ async function updateOfferStatus(req, res) {
     })
     res.status(200).json({ message: 'offer status updated sucess' })
   } catch (error) {
+    console.log('eroror come yp is ',error);
     logger.error(error);
     res.status(500).json(error)
   }
@@ -269,7 +270,6 @@ async function updateOfferStatus(req, res) {
 
 async function getCoupons(req, res) {
   try {
-
     let query = {
       OfferType: 'coupon',
       "status.active": true,
@@ -280,7 +280,7 @@ async function getCoupons(req, res) {
     };
 
     let user;
-
+    let data;
     if (req.headers.authorization) {
       data = verifyToken(req.headers.authorization.split(' ')[1])
       let checkNewUser = await ordersModel.findOne({ buyerId: data.id });
@@ -313,6 +313,7 @@ async function getCoupons(req, res) {
   res.status(200).json(getAllCoupons);
 
 } catch (error) {
+  console.log('error come up is ',error);
   logger.error(error);
   res.status(500).json(error);
 }

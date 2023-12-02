@@ -75,9 +75,9 @@ const orderSchema = mongoose.Schema(
             type: String,
         },
 
-        orderAmount: {
-            type: Number,
-        },
+        // orderAmount: {
+        //     type: Number,
+        // },
         orderDate: {
             type: Date,
             required: true,
@@ -104,25 +104,26 @@ const orderSchema = mongoose.Schema(
             type: String
         },
 
+        OrderSummary:{
+            savings:{type:Number},
+            shipping:{type:Number},
+            total:{type:Number}  ,
+            Price:{type:Number},  // before any discount
+            couponDiscount:{type:Number}
+        },
 
         coupon: {
             //   type:String
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Offers',
         },
-        discount: {
-            type: Number,
-            default: 0,
-            required: function () {
-                return this.coupon;
-            }
-        },
-
-        orderValueAfterDiscount: {
-            type: Number,
-            default: this.orderAmount
-        },
-
+        // discount: {
+        //     type: Number,
+        //     default: 0,
+        //     required: function () {
+        //         return this.coupon;
+        //     }
+        // },
 
     },
     {
@@ -132,22 +133,22 @@ const orderSchema = mongoose.Schema(
 
 
 
-orderSchema.pre('save', function (next) {
+// orderSchema.pre('save', function (next) {
 
-    this.orderAmount = this.products.reduce((totalAmount, product) => {
-        return totalAmount + product.amount;
-    }, 0);
+//     // this.orderAmount = this.products.reduce((totalAmount, product) => {
+//     //     return totalAmount + product.amount;
+//     // }, 0);
 
-    if (!this.coupon) {
-        this.orderValueAfterDiscount = this.orderAmount;
-    }
+//     // if (!this.coupon) {
+//     //     this.orderValueAfterDiscount = this.orderAmount;
+//     // }
 
-    if (this.coupon) {
-        this.orderValueAfterDiscount = this.orderAmount - this.discount;
-    }
+//     // if (this.coupon) {
+//     //     this.orderValueAfterDiscount = this.orderAmount - this.discount;
+//     // }
 
-    next();
-});
+//     next();
+// });
 
 
 

@@ -402,7 +402,7 @@ async function getProductPrice(products) {
     try {
 
         if (!Array.isArray(products)) {
-            discount = await discountQuery(products);
+            // discount = await discountQuery(products);
             products = await discountQuery(products);
         }
         else {
