@@ -32,16 +32,25 @@ async function login(req, res) {
 
         // PURE GOOGLE LOGIN
         if (input.token) {
-            if(!userFound){
-                const userCreated = usersModel(req.body);
-                await userCreated.save();      
+
+            // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
+            if (userFound.provider == 'direct' && input.token) {
+                throw ({ message: 'Try to login manually.' });
             }
+
+            if (!userFound) {
+                const userCreated = usersModel(req.body);
+                await userCreated.save();
+            }
+
+
+
             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
             res.status(200).json({ token, firstName });
             return;
         }
-        
+
         if (!userFound) {
             throw ({ message: 'Kindly Signup!' })
         }
@@ -50,10 +59,7 @@ async function login(req, res) {
             throw ({ message: 'Try login with Google, you already have account registered with it.' });
         }
 
-        // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
-        if (userFound.provider == 'direct' && input.token) {
-            throw ({ message: 'Try to login manually.' });
-        }
+
 
         // PURE MANUAL LOGIN
         const compare = await bcryptjs.compare(input.password, userFound.password);
@@ -92,21 +98,21 @@ async function signup(req, res) {
             }
         }
         const firstName = req.body.name.firstname;
-        
+
         const user = await usersModel.findOne({ email: req.body.email });
 
         //google signup/login
         if (req.body.token) {
-            if(!user){
+            if (!user) {
                 const userCreated = usersModel(req.body);
-                await userCreated.save();      
+                await userCreated.save();
             }
             const tokenData = { email: user.email, id: user._id, role: user.role }
             const token = createToken(tokenData);
             res.status(200).json({ token, firstName });
             return;
         }
-      
+
         if (user) {
             throw ({ message: 'User already exists! Try to login.' });
         }
@@ -150,7 +156,7 @@ async function forgotPassword(req, res) {
                 'provider': 1,
             });
 
-       
+
         if (!user) {
             throw { message: "This email doesn't exist." }
         }
@@ -246,15 +252,22 @@ async function changePassword(req, res) {
         const input = req.body;
         const user = await usersModel.findById(req.tokenData.id)
 
+<<<<<<< Updated upstream
         if (user.provider == 'GOOGLE'){
             throw ({message: "Cannot change password since you are a Google user!"})
+=======
+        console.log(user, "user");
+
+        if (user.provider == 'GOOGLE') {
+            throw ({ message: "Cannot change password since you are a Google user!" })
+>>>>>>> Stashed changes
         }
-      
+
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
 
         if (compareOldPassword) {
-            if (input.oldPassword === input.newPassword){
-                throw ({message: "Cannot set same password as before!"})
+            if (input.oldPassword === input.newPassword) {
+                throw ({ message: "Cannot set same password as before!" })
             }
             const updatePassword = await usersModel.findByIdAndUpdate({
                 _id: user.id
@@ -265,8 +278,8 @@ async function changePassword(req, res) {
                 message: "Password Reset Successful!"
             })
         }
-        else{
-            throw({message:'Your Password is incorrect'})
+        else {
+            throw ({ message: 'Your Password is incorrect' })
         }
     }
     catch (error) {
@@ -281,28 +294,28 @@ async function subscribeMail(req, res) {
     try {
         const user = await usersModel.findOne({ email: req.body.email });
         if (user) {
-            throw({message:'You are already a user'});
+            throw ({ message: 'You are already a user' });
         }
         else {
-            const findLead=await leadModel.findOne(req.body);
-            if(findLead){
-                throw({message:'You are already in our Mailing List :)'})
+            const findLead = await leadModel.findOne(req.body);
+            if (findLead) {
+                throw ({ message: 'You are already in our Mailing List :)' })
             }
             const leadCreated = leadModel(req.body);
             await leadCreated.save();
             const mailData = {
-            email: req.body.email,
-            subject: "Thank You for Subscribing to TradeVogue"
+                email: req.body.email,
+                subject: "Thank You for Subscribing to TradeVogue"
 
+            }
+            const mailSent = await mailer(mailData, SubscribeTemplate());
+            res.status(200).json({
+                message: "You will be notified about latest deal and offers."
+            })
         }
-        const mailSent = await mailer(mailData, SubscribeTemplate());
-        res.status(200).json({
-            message: "You will be notified about latest deal and offers."
-        })
-        }
-  
+
     }
-    catch(error){
+    catch (error) {
         logger.error(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
