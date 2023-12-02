@@ -5,17 +5,21 @@ require('dotenv').config();
 const app = express();
 const ordersModel = require('./models/order');
 const cors = require('cors');
-const stripe = require('stripe')('sk_test_51NvsyeSENcdZfgNiy559a6dtaofzqfn00MVNCrPe4kQWAZNZulhdDmJePJTZvSSzzu4xnkTjHIjmWPVdzTW1L6oc00oI29MAG4');
-const endpointSecret = 'whsec_3ab6989c4dd3fa67a11fb76b2cbb4a4e15687f60550b2d2fbe4b85ab3d0e0c94';
+require('dotenv').config();
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
+const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripe = require('stripe')(stripeSecret);
+const Secret = endPointSecret;
+
 app.post('/webhook', express.raw({ type: 'application/json' }), async(request, response) => {
   let event;
   const signature = request.headers['stripe-signature'];
   try {
-    if (endpointSecret) {
+    if (Secret) {
       event = stripe.webhooks.constructEvent(
         request.body,
         signature,
-        endpointSecret
+        Secret
       );
     } else {
       event = JSON.parse(request.body);
@@ -48,6 +52,26 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async(request, r
                 },
               }
             );
+            const webhookData = {
+              paymentIntentId: paymentIntent.id,
+              orderId,
+              paymentStatus: 'success',
+              transactionId: payment,
+              MOP: 'card',
+            };
+
+            const fs = require('fs');
+
+            let existingData = [];
+            try {
+              const fileData = fs.readFileSync('stripeLogs.json', 'utf-8');
+              existingData = JSON.parse(fileData)
+            } catch (err) {
+              console.error('Error reading or parsing the file:', err);
+            }
+
+            existingData.push(webhookData);
+            fs.writeFileSync('stripeLogs.json', JSON.stringify(existingData, null, 2));
           }
         }catch(err){
         console.log(err, "error is");
