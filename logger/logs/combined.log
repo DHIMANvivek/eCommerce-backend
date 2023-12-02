@@ -670,3 +670,31 @@ error: 2023-12-02T08:33:30.339Z Cannot read properties of undefined (reading 'to
 error: 2023-12-02T08:33:30.503Z Cannot set headers after they are sent to the client
 error: 2023-12-02T08:33:44.442Z Cannot read properties of undefined (reading 'total')
 error: 2023-12-02T08:33:44.602Z Cannot set headers after they are sent to the client
+error: 2023-12-02T04:39:12.027Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T07:42:17.245Z This product is Out Of Stock
+error: 2023-12-02T07:42:41.025Z This product is Out Of Stock
+error: 2023-12-02T07:43:42.751Z This product is Out Of Stock
+error: 2023-12-02T07:44:07.400Z This product is Out Of Stock
+error: 2023-12-02T07:44:18.194Z This product is Out Of Stock
+error: 2023-12-02T07:44:26.800Z This product is Out Of Stock
+error: 2023-12-02T07:44:42.963Z This product is Out Of Stock
+error: 2023-12-02T07:44:49.561Z This product is Out Of Stock
+error: 2023-12-02T07:46:51.715Z This product is Out Of Stock
+error: 2023-12-02T07:47:25.494Z This product is Out Of Stock
+error: 2023-12-02T07:47:27.932Z This product is Out Of Stock
+error: 2023-12-02T07:48:50.649Z This product is Out Of Stock
+error: 2023-12-02T07:48:51.669Z This product is Out Of Stock
+error: 2023-12-02T07:48:54.364Z This product is Out Of Stock
+error: 2023-12-02T08:20:22.690Z E11000 duplicate key error collection: test.home-layouts index: name_1 dup key: { name: "layout 3" }
+error: 2023-12-02T08:20:59.485Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "akshay saini" }
+error: 2023-12-02T08:35:28.405Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 3" }
+error: 2023-12-02T08:43:40.408Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 2" }
+error: 2023-12-02T08:44:46.924Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:48:48.884Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:51:26.715Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:56:13.462Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:56:41.280Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 2" }
+error: 2023-12-02T08:57:22.654Z E11000 duplicate key error collection: test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T09:12:58.196Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T09:13:17.868Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T09:26:33.097Z Heavyweight Shirt is out of stock

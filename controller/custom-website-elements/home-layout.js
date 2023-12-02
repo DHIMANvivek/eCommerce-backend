@@ -55,13 +55,18 @@ async function updateOrCreate(req, res) {
         }
 
         res.status(200).json({
-            message: 'Successfully update/created layout'
+            message: 'Successfully updated/created layout'
         });
     }
     catch (error) {
         logger.error(error);
+        let message = 'Unable to update/create Layout right now';
+        console.log(error, 'er');
+        if(error.code === 11000){
+            message = 'Layout with same Name Already Exists'
+        }
         res.status(500).json({
-            message: 'Unable to update/create Layout right now'
+            message
         });
     }
 }

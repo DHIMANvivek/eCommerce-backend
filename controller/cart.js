@@ -32,12 +32,7 @@ async function fetchCart(req, res) {
             let item = JSON.parse(JSON.stringify(copy));
             let product = await productsController.fetchProductDetails(req, res, item.sku);
 
-            // (product.assets).findIndex((asset)=>{
-
-            // })
-            // console.log(item, product.assets);
-
-            const fields = ['name', 'assets', 'info', 'price','oldPrice'];
+            const fields = ['name', 'assets', 'info', 'price', 'oldPrice'];
 
             for (let field of fields) {
                 if (field === 'info') {

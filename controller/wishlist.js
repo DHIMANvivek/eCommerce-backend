@@ -191,7 +191,7 @@ async function showWishlistedData(req, res) {
                     'productDetails.price': 1,
                     'productDetails.info': 1,
                     'productDetails._id': 1,
-                    'productDetails.active': 1,
+                    'productDetails.status.active': 1,
                 }
             }
         ])

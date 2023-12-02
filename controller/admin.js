@@ -10,23 +10,23 @@ const SKU_generater = require('../helpers/sku');
 const productController = require('../controller/products');
 const logger = require('./../logger');
 
-async function fetchAdminNotifications(req, res){
+async function fetchAdminNotifications(req, res) {
 
-  try{
+  try {
     const sellerID = req.tokenData.id;
 
 
     const result = await products.find({
       sellerID: sellerID,
       $or: [
-        {'status.active': false},
-        {'asset.stockQuantity.quantity': { $lte: { $arrayElemAt: ['$info.orderQuantity', 0] } } }
+        { 'status.active': false },
+        { 'asset.stockQuantity.quantity': { $lte: { $arrayElemAt: ['$info.orderQuantity', 0] } } }
       ]
-    }, { assets: 1, info: 1, sku:1, name:1, price:1, status:1, _id: 0 });
+    }, { assets: 1, info: 1, sku: 1, name: 1, price: 1, status: 1, _id: 0 });
 
     return res.status(200).json(result);
 
-  }catch(err){
+  } catch (err) {
 
   }
 }
@@ -549,11 +549,29 @@ async function addProduct(req, res) {
 async function updateProductStatus(req, res) {
 
   const sellerID = req.tokenData.id;
-  const field_status = req.body.status;
   const productID = req.body._id;
   const field = req.body.field;
+  const field_status = req.body.status;
 
   try {
+
+    
+    if(field_status){
+      const productDetails = await products.findById(productID);
+      let canActivateOrHighlight = productDetails.assets.some(asset => {
+        return asset.stockQuantity.some((item) => {
+          if (item.quantity > 0) {
+            return true;
+          }
+          return false;
+        });
+      });
+
+      if(!canActivateOrHighlight){
+        throw ({ message: 'This product is Out Of Stock' });
+      }
+    }
+
     const response = await products.updateOne(
       {
         '_id': new ObjectId(productID),
@@ -573,7 +591,7 @@ async function updateProductStatus(req, res) {
     }
   } catch (err) {
     logger.error(err);
-    return res.status(401).send();
+    res.status(401).json(err);
   }
 }
 
@@ -710,8 +728,8 @@ async function fetchProductInventory(req, res) {
 
     let sortFilter = false;
     Object.keys(parameters.filter).forEach((key) => {
-      if(key == 'active') {
-        aggregationPipe.unshift({ $match: {'status.active': parameters.filter['active']} });
+      if (key == 'active') {
+        aggregationPipe.unshift({ $match: { 'status.active': parameters.filter['active'] } });
       }
       else if (parameters.filter[key]) {
 
@@ -759,7 +777,7 @@ async function fetchProductInventory(req, res) {
       { $skip: (parameters.page - 1) * parameters.limit },
       { $limit: parameters.limit }
     );
-    
+
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
     res.status(200).json(response[0]);
