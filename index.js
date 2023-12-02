@@ -11,6 +11,7 @@ const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const stripe = require('stripe')(stripeSecret);
 const Secret = endPointSecret;
 
+
 app.post('/webhook', express.raw({ type: 'application/json' }), async(request, response) => {
   let event;
   const signature = request.headers['stripe-signature'];
@@ -37,6 +38,29 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async(request, r
 
         try{
           if(jsonData.data.object.status === "succeeded"){
+
+            // const webhookData = {
+            //   paymentIntentId: `${paymentIntent.id}`,
+            //   orderId,
+            //   paymentStatus: 'success',
+            //   transactionId: payment,
+            //   MOP: 'card',
+            // };
+
+            // const fs = require('fs');
+
+            // let existingData = [];
+            // try {
+            //   const fileData = fs.readFileSync('stripeLogs.json', 'utf-8');
+            //   existingData = JSON.parse(fileData)
+            // } catch (err) {
+            //   console.error('Error reading or parsing the file:', err);
+            // }
+
+            // existingData.push(webhookData);
+            // fs.writeFileSync('stripeLogs.json', JSON.stringify(existingData, null, 2));
+
+
             const descriptionObject = JSON.parse(description);
             const orderId = descriptionObject.orderId;
             console.log("data to db from here",  payment);
@@ -52,26 +76,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async(request, r
                 },
               }
             );
-            const webhookData = {
-              paymentIntentId: paymentIntent.id,
-              orderId,
-              paymentStatus: 'success',
-              transactionId: payment,
-              MOP: 'card',
-            };
-
-            const fs = require('fs');
-
-            let existingData = [];
-            try {
-              const fileData = fs.readFileSync('stripeLogs.json', 'utf-8');
-              existingData = JSON.parse(fileData)
-            } catch (err) {
-              console.error('Error reading or parsing the file:', err);
-            }
-
-            existingData.push(webhookData);
-            fs.writeFileSync('stripeLogs.json', JSON.stringify(existingData, null, 2));
           }
         }catch(err){
         console.log(err, "error is");
@@ -79,6 +83,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async(request, r
         break;
       case 'payment_method.attached':
         const paymentMethod = event.data.object;
+
         break;
       default:
         console.log(`Unhandled event type ${event.type}.`);
