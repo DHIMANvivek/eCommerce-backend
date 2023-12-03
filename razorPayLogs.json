@@ -1158,5 +1158,110 @@
             }
         },
         "created_at": 1701580887
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.authorized",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_N7lSqBMysm7j7Y",
+                    "entity": "payment",
+                    "amount": 6400000,
+                    "currency": "INR",
+                    "status": "authorized",
+                    "order_id": "order_N7lSX9JHLfaJdb",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "upi",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": false,
+                    "description": "ORDER-ae55-2",
+                    "card_id": null,
+                    "bank": null,
+                    "wallet": null,
+                    "vpa": "googlydhiman.4236@okhdfcbank",
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916283415102",
+                    "notes": {
+                        "description": "ORDER-ae55-2"
+                    },
+                    "fee": null,
+                    "tax": null,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "rrn": "955403640321",
+                        "upi_transaction_id": "D1F262CF2CD89A11FF4EE619B40FF61C"
+                    },
+                    "created_at": 1701582925,
+                    "upi": {
+                        "vpa": "googlydhiman.4236@okhdfcbank"
+                    }
+                }
+            }
+        },
+        "created_at": 1701582925
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.captured",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_N7lSqBMysm7j7Y",
+                    "entity": "payment",
+                    "amount": 6400000,
+                    "currency": "INR",
+                    "status": "captured",
+                    "order_id": "order_N7lSX9JHLfaJdb",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "upi",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": true,
+                    "description": "ORDER-ae55-2",
+                    "card_id": null,
+                    "bank": null,
+                    "wallet": null,
+                    "vpa": "googlydhiman.4236@okhdfcbank",
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916283415102",
+                    "notes": {
+                        "description": "ORDER-ae55-2"
+                    },
+                    "fee": 151040,
+                    "tax": 23040,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "rrn": "955403640321",
+                        "upi_transaction_id": "D1F262CF2CD89A11FF4EE619B40FF61C"
+                    },
+                    "created_at": 1701582925,
+                    "upi": {
+                        "vpa": "googlydhiman.4236@okhdfcbank"
+                    },
+                    "base_amount": 6400000
+                }
+            }
+        },
+        "created_at": 1701582926
     }
 ]

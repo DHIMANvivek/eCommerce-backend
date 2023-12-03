@@ -594,3 +594,115 @@ error: 2023-12-01T03:44:19.119Z Kindly Signup!
 error: 2023-12-01T11:01:15.058Z Operation `wishlists.findOne()` buffering timed out after 10000ms
 error: 2023-12-01T11:01:15.103Z Operation `carts.findOne()` buffering timed out after 10000ms
 error: 2023-12-01T11:01:15.287Z Operation `sellerdetails.findOne()` buffering timed out after 10000ms
+error: 2023-12-01T15:40:48.975Z You are already a user
+error: 2023-12-02T03:53:54.676Z productList.map is not a function
+error: 2023-12-02T03:55:06.407Z productList.map is not a function
+error: 2023-12-02T04:04:34.129Z productList.map is not a function
+error: 2023-12-02T04:05:39.168Z productList.map is not a function
+error: 2023-12-02T05:05:01.267Z Cannot read properties of undefined (reading 'map')
+error: 2023-12-02T05:08:56.516Z Cannot read properties of undefined (reading 'map')
+error: 2023-12-02T04:45:33.347Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T04:45:35.850Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T04:45:36.535Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T04:45:36.782Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T04:46:59.445Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T05:11:29.442Z This is conflict point please try to create another date points 
+error: 2023-12-02T05:11:31.263Z This is conflict point please try to create another date points 
+error: 2023-12-02T05:11:36.124Z This is conflict point please try to create another date points 
+error: 2023-12-02T05:11:46.603Z This is conflict point please try to create another date points 
+error: 2023-12-02T05:12:03.445Z This is conflict point please try to create another date points 
+error: 2023-12-02T05:13:14.987Z Cannot read properties of undefined (reading 'Title')
+error: 2023-12-02T05:13:38.747Z Cannot read properties of undefined (reading 'Title')
+error: 2023-12-02T05:13:50.914Z Cannot read properties of undefined (reading 'Title')
+error: 2023-12-02T05:14:17.959Z This is conflict point please try to create another date points diwali discount
+error: 2023-12-02T05:15:39.906Z Your Current discount is conflicting with diwali discount
+error: 2023-12-02T05:20:20.903Z Your Current discount is conflicting with diwali third
+error: 2023-12-02T05:22:47.790Z Your Current discount is conflicting with diwali third
+error: 2023-12-02T05:24:12.462Z Your Current discount is conflicting with diwali third
+error: 2023-12-02T05:24:20.171Z Your Current discount is conflicting with diwali third
+error: 2023-12-02T05:24:30.634Z Your Current discount is conflicting with diwali 3
+error: 2023-12-02T05:24:33.372Z Your Current discount is conflicting with diwali 3
+error: 2023-12-02T05:24:34.148Z Your Current discount is conflicting with diwali 3
+error: 2023-12-02T05:24:34.531Z Your Current discount is conflicting with diwali 3
+error: 2023-12-02T05:25:27.126Z Your Current discount is conflicting with diwali 3
+error: 2023-12-02T06:06:46.946Z Sorry This Coupon is not available for you
+error: 2023-12-02T06:06:56.441Z Sorry This Coupon is not available for you
+error: 2023-12-02T06:07:42.441Z Sorry This Coupon is not available for you
+error: 2023-12-02T06:09:00.415Z Sorry This Coupon is not available for you
+error: 2023-12-02T07:19:19.228Z A-line Kurti is out of stock
+error: 2023-12-02T07:19:26.299Z A-line Kurti is out of stock
+error: 2023-12-02T07:19:31.255Z A-line Kurti is out of stock
+error: 2023-12-02T07:19:39.630Z A-line Kurti is out of stock
+error: 2023-12-02T07:20:20.458Z A-line Kurti is out of stock
+error: 2023-12-02T07:20:26.636Z A-line Kurti is out of stock
+error: 2023-12-02T07:20:36.042Z A-line Kurti is out of stock
+error: 2023-12-02T07:21:32.468Z A-line Kurti is out of stock
+error: 2023-12-02T07:21:38.214Z A-line Kurti is out of stock
+error: 2023-12-02T07:22:12.905Z A-line Kurti is out of stock
+error: 2023-12-02T07:22:20.063Z A-line Kurti is out of stock
+error: 2023-12-02T07:23:34.527Z A-line Kurti is out of stock
+error: 2023-12-02T07:23:38.838Z A-line Kurti is out of stock
+error: 2023-12-02T07:24:45.300Z A-line Kurti is out of stock
+error: 2023-12-02T07:24:55.473Z A-line Kurti is out of stock
+error: 2023-12-02T07:25:00.040Z A-line Kurti is out of stock
+error: 2023-12-02T07:25:07.965Z A-line Kurti is out of stock
+error: 2023-12-02T07:25:48.102Z A-line Kurti is out of stock
+error: 2023-12-02T07:25:56.601Z A-line Kurti is out of stock
+error: 2023-12-02T07:26:00.742Z A-line Kurti is out of stock
+error: 2023-12-02T07:26:16.504Z A-line Kurti is out of stock
+error: 2023-12-02T07:26:21.210Z A-line Kurti is out of stock
+error: 2023-12-02T07:26:56.227Z A-line Kurti is out of stock
+error: 2023-12-02T07:27:42.884Z A-line Kurti is out of stock
+error: 2023-12-02T07:30:57.025Z A-line Kurti is out of stock
+error: 2023-12-02T07:37:58.012Z undefined is not iterable (cannot read property Symbol(Symbol.iterator))
+error: 2023-12-02T07:38:54.404Z totalAmount is not defined
+error: 2023-12-02T07:38:59.932Z totalAmount is not defined
+error: 2023-12-02T07:39:36.735Z totalAmount is not defined
+error: 2023-12-02T08:26:19.825Z Cannot read properties of undefined (reading '_id')
+error: 2023-12-02T08:26:19.977Z Cannot set headers after they are sent to the client
+error: 2023-12-02T08:26:49.206Z Cannot read properties of undefined (reading '_id')
+error: 2023-12-02T08:26:49.371Z Cannot set headers after they are sent to the client
+error: 2023-12-02T08:31:04.369Z Cannot read properties of undefined (reading '_id')
+error: 2023-12-02T08:31:28.993Z Cannot read properties of undefined (reading '_id')
+error: 2023-12-02T08:32:16.277Z Cannot read properties of undefined (reading 'total')
+error: 2023-12-02T08:32:16.431Z Cannot set headers after they are sent to the client
+error: 2023-12-02T08:33:30.339Z Cannot read properties of undefined (reading 'total')
+error: 2023-12-02T08:33:30.503Z Cannot set headers after they are sent to the client
+error: 2023-12-02T08:33:44.442Z Cannot read properties of undefined (reading 'total')
+error: 2023-12-02T08:33:44.602Z Cannot set headers after they are sent to the client
+error: 2023-12-02T04:39:12.027Z GRAPHIC PRINT FULL SLEEVE HOODED SWEATSHIRT is out of stock
+error: 2023-12-02T07:42:17.245Z This product is Out Of Stock
+error: 2023-12-02T07:42:41.025Z This product is Out Of Stock
+error: 2023-12-02T07:43:42.751Z This product is Out Of Stock
+error: 2023-12-02T07:44:07.400Z This product is Out Of Stock
+error: 2023-12-02T07:44:18.194Z This product is Out Of Stock
+error: 2023-12-02T07:44:26.800Z This product is Out Of Stock
+error: 2023-12-02T07:44:42.963Z This product is Out Of Stock
+error: 2023-12-02T07:44:49.561Z This product is Out Of Stock
+error: 2023-12-02T07:46:51.715Z This product is Out Of Stock
+error: 2023-12-02T07:47:25.494Z This product is Out Of Stock
+error: 2023-12-02T07:47:27.932Z This product is Out Of Stock
+error: 2023-12-02T07:48:50.649Z This product is Out Of Stock
+error: 2023-12-02T07:48:51.669Z This product is Out Of Stock
+error: 2023-12-02T07:48:54.364Z This product is Out Of Stock
+error: 2023-12-02T08:20:22.690Z E11000 duplicate key error collection: test.home-layouts index: name_1 dup key: { name: "layout 3" }
+error: 2023-12-02T08:20:59.485Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "akshay saini" }
+error: 2023-12-02T08:35:28.405Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 3" }
+error: 2023-12-02T08:43:40.408Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 2" }
+error: 2023-12-02T08:44:46.924Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:48:48.884Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:51:26.715Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:56:13.462Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T08:56:41.280Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 2" }
+error: 2023-12-02T08:57:22.654Z E11000 duplicate key error collection: test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T09:12:58.196Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T09:13:17.868Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
+error: 2023-12-02T09:26:33.097Z Heavyweight Shirt is out of stock
+error: 2023-12-02T20:42:12.549Z 404
+error: 2023-12-02T20:42:13.568Z 404
+error: 2023-12-03T03:41:28.690Z Cannot read properties of undefined (reading 'id')
+error: 2023-12-03T05:38:11.989Z 404
+error: 2023-12-03T05:42:33.256Z 404
+error: 2023-12-03T05:42:37.494Z 404
+error: 2023-12-03T05:42:38.642Z 404
+error: 2023-12-03T05:42:39.667Z 404
