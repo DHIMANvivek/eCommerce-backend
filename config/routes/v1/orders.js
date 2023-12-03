@@ -13,6 +13,7 @@ router.post('/create',jwtVerify,orderController.createOrder);
 router.post('/update',jwtVerify,orderController.updateLatestOrderDetail)
 router.post('/getparticularUserOrders',jwtVerify,orderController.getParicularUserOrders);
 router.post('/cancelOrder', jwtVerify,orderController.cancelOrderedProduct );
+router.get('/getIndividualOrders',jwtVerify,orderController.getIndividualOrders);
 
 router.post('/sellerOrders', adminVerify, orderController.getSellerOrdersInventory);
 router.get('/sellerOrderDetail', adminVerify, orderController.getSellerOrderDetails);

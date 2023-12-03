@@ -5,7 +5,7 @@ router.use('/', require('./v1/stripe/stripe'));
 const app = express();
 
 const socket = require('socket.io');
-const server =  app.listen(3000, () => console.log('chat server listening on port 3000!'));
+const server = app.listen(3000, () => console.log('chat server listening on port 3000!'));
 let x = false;
 
 const io = socket(server);
@@ -15,12 +15,12 @@ io.sockets.on('connection', (socket) => {
     sendData(socket);
 })
 
-function sendData(socket){
-  socket.emit('message' , "hello world");
+function sendData(socket) {
+    socket.emit('message', "hello world");
 }
 
-io.of('/chat').on('connection', function(socket){
-  require('../../controller/chat/chat').chatSocket(socket);
+io.of('/chat').on('connection', function (socket) {
+    require('../../controller/chat/chat').chatSocket(socket);
 });
 
 app.use(express.json());
@@ -45,7 +45,7 @@ router.use('/sales', require('./v1/custom-website-elements/sales'));
 router.use('/tc', require('./v1/tc'));
 
 router.use('/deals', require('./v1/custom-website-elements/deals'));
-router.use('/about',require('./v1/custom-website-elements/about'));
+router.use('/about', require('./v1/custom-website-elements/about'));
 router.use('/razorpay', require('./v1/razorpay/payment'));
 
 router.use('/deals', require('./v1/custom-website-elements/deals'));
@@ -55,12 +55,13 @@ router.use('/ticket', require('./v1/support-ticket/ticket'));
 
 // notification
 router.use('/notification', require('./v1/notifications/notification'));
-router.use('/tc', require('./v1/tc')) ;
+router.use('/tc', require('./v1/tc'));
+router.use('/chat', require('./v1/chat/chat'));
 
-router.get('/checkUser',(req,res)=>{
+router.get('/checkUser', (req, res) => {
     const token = req.headers.authorization;
-    if(token){
-    return res.status(200).json(verifyToken(token.split(' ')[1]).role);
+    if (token) {
+        return res.status(200).json(verifyToken(token.split(' ')[1]).role);
     }
     return res.status(500).json(null);
 

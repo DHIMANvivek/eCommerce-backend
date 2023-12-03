@@ -206,6 +206,19 @@ async function createOrder(req, res) {
     }
 }
 
+async function getIndividualOrders(req, res) {
+    try {
+        const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id, payment_status: 'success' }).sort({ createdAt: -1 });
+        if (!getAllOrders || getAllOrders.length === 0) {
+            return res.status(404).json({ message: 'No orders found' });
+        }
+        res.status(200).json(getAllOrders);
+    } catch (error) {
+        console.error('Error fetching individual orders:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 async function getParicularUserOrders(req, res) {
     try {
         // const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'sucess'}).sort({ createdAt: -1 });
@@ -483,5 +496,6 @@ module.exports = {
     updateLatestOrderDetail,
     getOverallOrderData,
     cancelOrderedProduct,
-    getLatestOrderId
+    getLatestOrderId,
+    getIndividualOrders
 }

@@ -682,3 +682,83 @@ error: 2023-12-03T10:29:06.288Z Cannot read properties of undefined (reading 'to
 error: 2023-12-03T10:31:10.925Z Cannot read properties of undefined (reading 'authorization')
 error: 2023-12-03T10:31:23.939Z Cannot read properties of undefined (reading 'authorization')
 error: 2023-12-03T10:32:28.078Z Cannot read properties of undefined (reading 'authorization')
+error: 2023-12-03T12:06:17.211Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T19:14:33.809Z Please login/signup.
+error: 2023-12-03T19:14:33.809Z Please login/signup.
+error: 2023-12-03T21:24:28.414Z Please login/signup.
+error: 2023-12-03T21:24:28.414Z Please login/signup.
+error: 2023-12-03T21:24:40.300Z Please login/signup.
+error: 2023-12-03T21:24:40.300Z Please login/signup.
+error: 2023-12-03T21:25:10.685Z Please login/signup.
+error: 2023-12-03T21:25:10.685Z Please login/signup.
+error: 2023-12-03T21:29:04.720Z 404
+error: 2023-12-03T21:38:33.385Z Please login/signup.
+error: 2023-12-03T21:38:33.385Z Please login/signup.
+error: 2023-12-03T21:39:56.975Z Please login/signup.
+error: 2023-12-03T21:39:56.975Z Please login/signup.
+error: 2023-12-03T21:40:39.524Z Please login/signup.
+error: 2023-12-03T21:40:39.524Z Please login/signup.
+error: 2023-12-03T21:41:13.714Z Please login/signup.
+error: 2023-12-03T21:41:13.714Z Please login/signup.
+error: 2023-12-03T21:43:10.005Z Please login/signup.
+error: 2023-12-03T21:43:10.005Z Please login/signup.
+error: 2023-12-03T21:44:04.231Z Please login/signup.
+error: 2023-12-03T21:44:04.231Z Please login/signup.
+error: 2023-12-03T21:44:11.978Z Please login/signup.
+error: 2023-12-03T21:44:11.978Z Please login/signup.
+error: 2023-12-03T21:44:24.724Z Please login/signup.
+error: 2023-12-03T21:44:24.724Z Please login/signup.
+error: 2023-12-03T21:45:03.896Z Please login/signup.
+error: 2023-12-03T21:45:03.896Z Please login/signup.
+error: 2023-12-03T21:45:22.236Z Please login/signup.
+error: 2023-12-03T21:45:22.236Z Please login/signup.
+error: 2023-12-03T21:45:29.809Z Please login/signup.
+error: 2023-12-03T21:45:29.809Z Please login/signup.
+error: 2023-12-03T21:45:37.066Z Please login/signup.
+error: 2023-12-03T21:45:37.066Z Please login/signup.
+error: 2023-12-03T21:46:37.724Z Please login/signup.
+error: 2023-12-03T21:46:37.724Z Please login/signup.
+error: 2023-12-03T21:46:42.065Z Please login/signup.
+error: 2023-12-03T21:46:42.065Z Please login/signup.
+error: 2023-12-03T21:47:50.464Z Please login/signup.
+error: 2023-12-03T21:47:50.464Z Please login/signup.
+error: 2023-12-03T21:49:34.221Z Please login/signup.
+error: 2023-12-03T21:49:34.221Z Please login/signup.
+error: 2023-12-03T21:50:01.534Z Please login/signup.
+error: 2023-12-03T21:50:01.534Z Please login/signup.
+error: 2023-12-03T21:51:08.910Z Please login/signup.
+error: 2023-12-03T21:51:08.910Z Please login/signup.
+error: 2023-12-03T21:52:29.719Z Please login/signup.
+error: 2023-12-03T21:52:29.719Z Please login/signup.
+error: 2023-12-03T21:52:34.499Z Please login/signup.
+error: 2023-12-03T21:52:34.499Z Please login/signup.
+error: 2023-12-03T21:53:25.800Z Please login/signup.
+error: 2023-12-03T21:53:25.800Z Please login/signup.
+error: 2023-12-03T21:53:33.964Z Please login/signup.
+error: 2023-12-03T21:53:33.964Z Please login/signup.
+error: 2023-12-03T21:56:02.491Z Try to login manually.
+error: 2023-12-03T21:59:55.420Z 404
+error: 2023-12-03T21:59:56.475Z 404
+error: 2023-12-03T21:59:57.214Z 404
+error: 2023-12-03T22:45:23.263Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:45:25.685Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:45:33.298Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:45:39.671Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:45:47.629Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:46:23.729Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:46:45.161Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:47:09.108Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:47:24.051Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:52:56.012Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:52:59.447Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:53:58.264Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:57:39.620Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:57:52.486Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T22:59:21.044Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T23:01:13.029Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T23:03:02.594Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T23:03:02.972Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T23:03:17.979Z Cannot read properties of undefined (reading 'slice')
+error: 2023-12-03T23:22:18.584Z 404
+error: 2023-12-03T23:22:20.193Z 404
+error: 2023-12-03T23:22:21.134Z 404
