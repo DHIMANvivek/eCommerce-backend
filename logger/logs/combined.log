@@ -698,3 +698,6 @@ error: 2023-12-02T08:57:22.654Z E11000 duplicate key error collection: test.home
 error: 2023-12-02T09:12:58.196Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
 error: 2023-12-02T09:13:17.868Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "layout 4" }
 error: 2023-12-02T09:26:33.097Z Heavyweight Shirt is out of stock
+error: 2023-12-02T20:42:12.549Z 404
+error: 2023-12-02T20:42:13.568Z 404
+error: 2023-12-03T03:41:28.690Z Cannot read properties of undefined (reading 'id')

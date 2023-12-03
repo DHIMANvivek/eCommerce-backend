@@ -277,7 +277,10 @@ async function sendInvoiceTemplate(paymentData) {
     return `
       <tr>
         <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
-        <td style="padding: 8px; border: 1px solid #dddddd;"> ${product.price} ${paymentData.currency}</td>
+        <td style="padding: 8px; border: 1px solid #dddddd;"> ${product.price.toLocaleString('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+        })}</td>
         <td style="padding: 8px; border: 1px solid #dddddd;">${product.quantity} qty</td>
       </tr>
     `;
@@ -352,7 +355,14 @@ async function sendInvoiceTemplate(paymentData) {
             ${productRows}
           </tbody>
         </table>
-        <p><strong>Total Amount:</strong> ${productList.subTtotal} ${paymentData.currency}</p>
+        <p><strong>Total Amount:</strong> ${productList.subTtotal.toLocaleString('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+        })} </p>
+        <p><strong>Payment Status:</strong> ${paymentData.status}</p>
+        <p><strong>Payment Method:</strong> ${paymentData.payment_method}</p>
+        <p><strong>Payment Date:</strong> ${new Date(paymentData.created * 1000).toLocaleString()}</p>
+      
         <p><strong>Payment ID:</strong> ${paymentData.id}</p>
         <p><strong>Receipt Email:</strong> ${paymentData.receipt_email}</p>
         <p>Our team is here to assist you. If you have any further questions or need additional help, please don't hesitate to reach out to us.</p>

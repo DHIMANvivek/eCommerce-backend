@@ -2,10 +2,9 @@ const Razorpay = require('razorpay');
 const PaymentKeys = require('./../../models/custom-website-elements/paymentKeys');
 const app = require('express')()
 const cors = require('cors')
-const bodyParser = require('body-parser')
-// const ordersModel = require('../../models/order');
-const crypto = require('crypto')
-const fs = require('fs')
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
+const fs = require('fs');
 const ordersModel = require('../../models/order');
 
 
@@ -27,7 +26,7 @@ const createUpiPayment = async (req, res) => {
                     key_secret: enabledRazorKey.rzpSecretKey
                 });
 
-                const amount = req.body.amount * 100;
+                const amount = req.body.amount;
 
                 const options = {
                     amount: amount,
