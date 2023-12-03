@@ -9,12 +9,11 @@ const app = express();
 
 const chatSocket = async (req, res) => {
   // Ensure you have the 'io' instance available
-  const io = req.app.get('io');
-
+//   const io = req.app.get('io');
   // Emit the message to all connected sockets
-  io.emit('message', 'Hello world');
+//   io.emit('message', 'Hello world');
+console.log("inised");
 
-  res.status(200).json({ message: 'Message sent to all sockets' });
 };
 
 app.use(express.raw({ type: 'application/json' }));

@@ -19,11 +19,9 @@ function sendData(socket){
   socket.emit('message' , "hello world");
 }
 
-
-// io.of('/chat').on('connection', function(socket){
-//   require('./controller/chat/chat').chatSocket(socket);
-// });
-
+io.of('/chat').on('connection', function(socket){
+  require('../../controller/chat/chat').chatSocket(socket);
+});
 
 app.use(express.json());
 const AdminVerify = require('../../middlewares/adminVerify');
