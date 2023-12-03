@@ -10,7 +10,27 @@ const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const stripe = require('stripe')(stripeSecret);
 const Secret = endPointSecret;
+const { exec } = require('child_process');
 
+const startWebhookListener = () => {
+  const command = 'stripe listen --forward-to localhost:1000/webhook';
+
+  const child = exec(command);
+
+  child.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  child.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  child.on('close', (code) => {
+    console.log(`child process exited with code ${code}`);
+  });
+};
+
+startWebhookListener();
 
 app.post('/webhook', express.raw({ type: 'application/json' }), async (request, response) => {
   let event;
