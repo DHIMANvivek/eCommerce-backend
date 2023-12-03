@@ -672,3 +672,13 @@ error: 2023-12-03T05:42:33.256Z 404
 error: 2023-12-03T05:42:37.494Z 404
 error: 2023-12-03T05:42:38.642Z 404
 error: 2023-12-03T05:42:39.667Z 404
+error: 2023-12-03T08:33:07.158Z 404
+error: 2023-12-03T08:33:07.806Z 404
+error: 2023-12-03T08:40:38.725Z 404
+error: 2023-12-03T08:50:06.644Z Operation `wishlists.findOne()` buffering timed out after 10000ms
+error: 2023-12-03T08:50:06.656Z Operation `carts.findOne()` buffering timed out after 10000ms
+error: 2023-12-03T09:52:56.700Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T10:29:06.288Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T10:31:10.925Z Cannot read properties of undefined (reading 'authorization')
+error: 2023-12-03T10:31:23.939Z Cannot read properties of undefined (reading 'authorization')
+error: 2023-12-03T10:32:28.078Z Cannot read properties of undefined (reading 'authorization')

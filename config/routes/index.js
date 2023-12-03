@@ -4,6 +4,27 @@ router.use('/', require('./v1/stripe/stripe'));
 
 const app = express();
 
+const socket = require('socket.io');
+const server =  app.listen(3000, () => console.log('chat server listening on port 3000!'));
+let x = false;
+
+const io = socket(server);
+app.set('io', io);
+io.sockets.on('connection', (socket) => {
+    console.log(`new connection id: ${socket.id}`);
+    sendData(socket);
+})
+
+function sendData(socket){
+  socket.emit('message' , "hello world");
+}
+
+
+// io.of('/chat').on('connection', function(socket){
+//   require('./controller/chat/chat').chatSocket(socket);
+// });
+
+
 app.use(express.json());
 const AdminVerify = require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt');
