@@ -18,7 +18,10 @@ const wishlistSchema = mongoose.Schema({
                     ref: 'products',
                 },
             ]
-        },
+        },{
+            timestamps: true,
+            autoIndex: true,
+        }
     ],
     active : {
         type : Boolean,

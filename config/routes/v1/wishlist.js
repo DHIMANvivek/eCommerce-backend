@@ -7,9 +7,11 @@ router.get('/showWishlist',  wishlistController.showWishlists)
 router.post('/addToWishlist', wishlistController.addToWishlist)
 router.post('/deleteWishlist', wishlistController.deleteWishlist)
 router.get('/showWishlistCount', wishlistController.showWishlistCount)
-router.post('/showWishlistProducts', wishlistController.showWishlistedData)
+router.get('/showWishlistProducts', wishlistController.showWishlistedData)
 router.post('/deleteFromWishlist', wishlistController.removeFromWishlist)
-// router.get('/insert', wishlistController.createDefault)
+
+
+router.get('/insert', wishlistController.createDefault)
 
 
 module.exports = router;

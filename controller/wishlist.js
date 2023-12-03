@@ -8,7 +8,7 @@ async function showWishlists(req, res) {
         const user = req.tokenData;
         const wishlister = await wishlist.findOne({
             userId: user.id
-        })
+        });
         if (wishlister) {
             const wishlists = wishlister.wishlists
             const count = (await wishlist.aggregate([
@@ -19,9 +19,15 @@ async function showWishlists(req, res) {
                     $unwind: '$wishlists'
                 },
                 {
-                    $unwind: '$wishlists.products'
+                    $unwind: {
+                        path: "$wishlists.products",
+                        // includeArrayIndex: 'string',
+                        // preserveNullAndEmptyArrays: true
+                      }
                 }
             ])).length;
+
+            // console.log(count);
             return res.status(200).json(
                 {
                     wishlists, count
@@ -42,26 +48,51 @@ async function addToWishlist(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
+        // console.log(input, "type?");
+
 
         const wishlister = await wishlist.findOne({
             userId: user.id,
-            // $exp: {
-            //     $eq: [
-            //         '$wishlists.wishlistName'.toLowerCase(),
-            //         input.wishlistName.toLowerCase()
-            //     ]
-            // }
             'wishlists.wishlistName': input.wishlistName.trim().toLowerCase()
         });
         if (wishlister && input.type) {
             throw ({ message: 'Wishlist of same name already exists!' })
         }
+        if (!wishlister && input.type == 'update') {
+            const update = await wishlist.updateOne({
+                userId: user.id,
+                'wishlists._id': input.id
+            }, {
+                $set: {
+                    'wishlists.$.wishlistName': input.wishlistName
+                }
+            }
+            );
+            // console.log(update, "update hehe");
 
-        if (!wishlister) {
+            return res.status(200).json({
+                message: "Updated Wishlist Name!"
+            })
+        }
+
+        if (!wishlister && input.type == 'new') {
             const newWishlist = {
                 wishlistName: input.wishlistName,
                 products: []
             }
+
+            const count = JSON.parse(JSON.stringify(await wishlist.findOne({
+                userId: user.id,
+            },
+                {
+                    _id: 0,
+                    'count': { $size: '$wishlists' }
+                })));
+
+            if (count.count >= 10) {
+                throw { message: "Cannot have more than 10 wishlists!" };
+            }
+
             const response = await wishlist.updateOne({ userId: user.id }, { $push: { 'wishlists': newWishlist } });
         }
 
@@ -80,6 +111,7 @@ async function addToWishlist(req, res) {
     }
     catch (error) {
         logger.error(error);
+        console.log(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
             message: 'Internal Server Error'
@@ -90,6 +122,8 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
+        console.log(input, "del wish");
+
         const user = req.tokenData;
 
         const wishlister = await wishlist.findOne({
@@ -122,35 +156,6 @@ async function showWishlistCount(req, res) {
         })
 
         res.status(200).json(result);
-
-        // const input = req.body;
-
-        // // const wishlister = await wishlist.findOne({
-        // //     userId : user.id
-        // // })
-        // // const wishlistsArray = wishlister.wishlists
-        // // let count = 0;
-
-        // // wishlistsArray.forEach(wishlist => {
-        // //     let length = wishlist.products.length
-        // //     count += length;
-        // // });
-
-        // const count = (await wishlist.aggregate([
-        //     {
-        //         $match: { 'userId': new mongoose.Types.ObjectId(user.id) }
-        //     },
-        //     {
-        //         $unwind: '$wishlists'
-        //     },
-        //     {
-        //         $unwind: '$wishlists.products'
-        //     }
-        // ])).length;
-
-        // return res.status(200).json(
-        //     count
-        // )
     }
     catch (error) {
         logger.error(error);
@@ -164,42 +169,65 @@ async function showWishlistCount(req, res) {
 
 async function showWishlistedData(req, res) {
     try {
-        const input = req.body;
         const user = req.tokenData;
+        // console.log(user);
 
         let products = await wishlist.aggregate([
-            { $match: { userId: new mongoose.Types.ObjectId(user.id) } },
-            { $unwind: '$wishlists' },
-            { $match: { 'wishlists.wishlistName': input.wishlistName } },
-            { $unwind: '$wishlists.products' },
             {
-                $lookup: {
-                    from: 'products',
-                    localField: 'wishlists.products',
-                    foreignField: '_id',
-                    as: 'productDetails'
-                }
+                $match: {
+                    userId: new mongoose.Types.ObjectId(user.id),
+                },
             },
             {
-                $unwind: '$productDetails'
+                $unwind: "$wishlists",
+            },
+            {
+                $unwind: {
+                    path: "$wishlists.products",
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "wishlists.products",
+                    foreignField: "_id",
+                    as: "productDetails",
+                },
+            },
+            {
+                $unwind: "$productDetails",
+            },
+            {
+                $group:
+                {
+                    _id: "$wishlists.wishlistName",
+                    productinfo: {
+                        $push: "$productDetails",
+                    },
+                },
             },
             {
                 $project: {
-                    'productDetails.sku': 1,
-                    'productDetails.name': 1,
-                    'productDetails.assets': 1,
-                    'productDetails.price': 1,
-                    'productDetails.info': 1,
-                    'productDetails._id': 1,
-                    'productDetails.status.active': 1,
-                }
-            }
-        ])
+                    "productinfo.sku": 1,
+                    "productinfo.name": 1,
+                    "productinfo.assets": 1,
+                    "productinfo.price": 1,
+                    "productinfo.info": 1,
+                    "productinfo._id": 1,
+                    "productinfo.status": 1,
+                    wishlists: 1,
+                },
+            },
+        ]);
 
+        // console.log(products);
         return res.status(200).json(products)
     }
     catch (error) {
         logger.error(error);
+        console.log(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
             message: 'Internal Server Error'
@@ -250,26 +278,27 @@ async function removeFromWishlist(req, res) {
 }
 
 
+
 // used in case of emergency 
 
-// async function createDefault(req, res) {
-//     try {
-//         const getAllusers = await UserModel.find({}, { _id: 1 });
-//         console.log('get all user si ', getAllusers);
-//         getAllusers.forEach(async (el) => {
-//             const defaultWishlist = {
-//                 wishlistName: 'my wishlist',
-//                 products: []
-//             }
-//             await wishlist.create({
-//                 userId: el._id,
-//                 wishlists: [defaultWishlist]
-//             });
-//         })
-//     } catch (error) {
-//         console.log('error is ', error);
-//     }
-// }
+async function createDefault(req, res) {
+    try {
+        const getAllusers = await UserModel.find({}, { _id: 1 });
+        // console.log('get all user si ', getAllusers);
+        getAllusers.forEach(async (el) => {
+            const defaultWishlist = {
+                wishlistName: 'my wishlist',
+                products: []
+            }
+            await wishlist.create({
+                userId: el._id,
+                wishlists: [defaultWishlist]
+            });
+        })
+    } catch (error) {
+        console.log('error is ', error);
+    }
+}
 
 module.exports = {
     showWishlists,
@@ -278,5 +307,5 @@ module.exports = {
     deleteWishlist,
     showWishlistCount,
     showWishlistedData,
-    // createDefault
+    createDefault
 }
