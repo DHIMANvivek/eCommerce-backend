@@ -21,13 +21,10 @@ async function showWishlists(req, res) {
                 {
                     $unwind: {
                         path: "$wishlists.products",
-                        // includeArrayIndex: 'string',
-                        // preserveNullAndEmptyArrays: true
                     }
                 }
             ])).length;
 
-            // console.log(count);
             return res.status(200).json(
                 {
                     wishlists, count
@@ -48,15 +45,13 @@ async function addToWishlist(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
-        // console.log(input, "type?");
-
 
         const wishlister = await wishlist.findOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName.trim().toLowerCase()
         });
 
-        if (wishlister && input.type) {
+        if (wishlister && input.type == 'new') {
             throw ({ message: 'Wishlist of same name already exists!' })
         }
 
@@ -70,8 +65,6 @@ async function addToWishlist(req, res) {
                 }
             }
             );
-            // console.log(update, "update hehe");
-
             return res.status(200).json({
                 message: "Updated Wishlist Name!"
             })
@@ -115,7 +108,7 @@ async function addToWishlist(req, res) {
         });
 
         return res.status(200).json({
-            message: "Added to " + input.wishlistName + '!'
+            message: "Added to " + (input.wishlistName).charAt(0).toUpperCase() + (input.wishlistName).slice(1) + '!'
         })
     }
     catch (error) {
@@ -131,7 +124,6 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
-        console.log(input, "del wish");
 
         const user = req.tokenData;
 
@@ -295,7 +287,7 @@ async function removeFromWishlist(req, res) {
         const data = await showWishlistedData(req, res);
 
         return res.status(200).json({
-            message: "Product removed from wishlist!",
+            message: "Product removed!",
             response, data
         })
     }
