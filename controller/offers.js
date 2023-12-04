@@ -280,16 +280,17 @@ async function getCoupons(req, res) {
     };
 
     let user;
-    let data;
+    let tokenData;
+
     if (req.headers.authorization) {
-      data = verifyToken(req.headers.authorization.split(' ')[1])
-      let checkNewUser = await ordersModel.findOne({ buyerId: data.id });
+      tokenData = verifyToken(req.headers.authorization.split(' ')[1])
+      let checkNewUser = await ordersModel.findOne({ buyerId: tokenData.id });
 
       if (checkNewUser) {
         query.couponType = { $nin: ['new'] };
       }
 
-      user = await Users.findOne({ _id: data.id }, { email: 1, _id: 0 });
+      user = await Users.findOne({ _id: tokenData.id }, { email: 1, _id: 0 });
     };
 
     const getAllCoupons = await OfferModel.aggregate([
@@ -302,7 +303,7 @@ async function getCoupons(req, res) {
             { couponType: 'custom', 'UserEmails.email': { $in: [user?.email] } },
             {
               couponType: { $in: ['global', 'new'] },
-              userUsed: { $not: { $in: [data.id] } },
+              userUsed: { $not: { $in: [(tokenData.id)] } },
             },
           ],
         },
@@ -313,7 +314,6 @@ async function getCoupons(req, res) {
   res.status(200).json(getAllCoupons);
 
 } catch (error) {
-  console.log('error come up is ',error);
   logger.error(error);
   res.status(500).json(error);
 }
@@ -322,6 +322,7 @@ async function getCoupons(req, res) {
 async function checkCoupon(couponId, userId) {
   try {
 
+    console.log('couponid is ',couponId," user id ",userId);
     const response = await OfferModel.findOne({
       $and: [
         { OfferType: 'coupon' },

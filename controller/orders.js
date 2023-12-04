@@ -37,6 +37,8 @@ async function updateLatestOrderDetail(req, res) {
         //     }
         // );
 
+
+
         const response=await ordersModel.findOne({ orderID: req.body.orderID ,payment_status:'success'},{_id:0,coupon:1,products:1});
         if(response?.coupon){
             await updateCoupon(response.coupon,buyerId); 
@@ -101,12 +103,9 @@ async function verifyOrderSummary(req, res) {
         FinalResponse.shipping = 0;
         FinalResponse.total = 0;
         FinalResponse.subTotal = 0;
-        if (!req.body?.details) {
-            req.body.details = req.body.products;
-        }
+        allProducts=JSON.parse(JSON.stringify(req.body.products));
 
-
-     await Promise.all(req.body.details.map(async (element) => {
+     await Promise.all(allProducts.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
             FinalResponse.total+=element.price*element.quantity;
             if (response?.discount) {
@@ -133,14 +132,11 @@ async function verifyOrderSummary(req, res) {
                    res({price:response.price * element.quantity});
                }
             });
-            FinalResponse.total -=FinalResponse.savings;
         }));
 
 
-        // console.log('req body is ------------> ',req.body);
-        console.log('final response before coupon is ',FinalResponse);
-        if (req.body.coupon && req?.tokenData?.id) {
-            let coupon = await checkCoupon(req.body.coupon._id, req.tokenData.id);
+        if (req.body.couponId && req?.tokenData?.id) {
+            let coupon = await checkCoupon(req.body.couponId, req.tokenData.id);
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > FinalResponse.total) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
             let discount = 0;
@@ -155,7 +151,6 @@ async function verifyOrderSummary(req, res) {
             }
 
             FinalResponse.discount=discount;
-            // FinalResponse.total -= discount;
         }
         
 
@@ -164,26 +159,19 @@ async function verifyOrderSummary(req, res) {
         });
 
     } catch (error) {
-        console.log('error come up is ',error);
         logger.error(error);
         res.status(500).json(error);
     }
 }
 async function createOrder(req, res) {
     try {
-
         const verifyOrder = await verifyOrderSummary(req, res);
         req.body.buyerId = req.tokenData.id;
-
-        // if(verifyOrder?.discount){
-        //     req.body.couponDiscount=verifyOrder.discount;
-        // }   
-
-        req.body.OrderSummary=verifyOrder;
-        req.body.Price=verifyOrder.subTotal;
+        delete req.body.details;
+        req.body.OrderSummary={};
+        req.body.OrderSummary.subTotal=verifyOrder.total;
         if(verifyOrder?.discount){
             req.body.OrderSummary.couponDiscount=verifyOrder.discount;
-            req.body.OrderSummary.total-=verifyOrder.discount;
         }
 
         // order ID creation
@@ -222,7 +210,9 @@ async function getIndividualOrders(req, res) {
 async function getParicularUserOrders(req, res) {
     try {
         // const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'sucess'}).sort({ createdAt: -1 });
+        
         let parameters =req.body;
+        let active = parameters?.active !== undefined ? parameters?.active : true;
         const skip =  (parameters.currentPage - 1) * parameters.limit;
         const limit= parameters.limit;
         
@@ -230,7 +220,8 @@ async function getParicularUserOrders(req, res) {
             {
               $match: {
                 buyerId:new moongoose.Types.ObjectId(req.tokenData.id),
-                payment_status:'success'
+                payment_status:'success',
+                active:active
               },
             },
             {
@@ -473,10 +464,33 @@ async function getOverallOrderData(req, res, controller = false) {
 
 
 async function cancelOrderedProduct(req, res) {
-    const { id, sku } = req.body;
     try {
-        const orderUpdate = await ordersModel.updateOne({ _id: id, 'products.sku': sku }, { $set: { 'products.$.shipmentStatus': 'cancelled' } })
+        const orderUpdate = await ordersModel.findByIdAndUpdate(
+            req.body.id,
+            { $set: { 'products.$[elem].shipmentStatus': 'cancelled' } },
+            { arrayFilters: [{ 'elem.sku': req.body.sku }], new: true }
+          );
+          
+            let active=orderUpdate.products.every((el)=>el.shipmentStatus=='cancelled');
+            if(active){
+                await ordersModel.updateOne({_id:req.body.id},{$set:{active:false}});
+            }
         return res.status(200).json({ message: 'Product cancelled successfully' });
+    } catch (error) {
+        logger.error(error);
+        return res.status(500).json({ message: 'Error cancelling the product' });
+    }
+}
+
+async function cancelOrder(req,res){
+    try {
+        console.log('body is ',req.body);
+        const orderUpdate = await ordersModel.findByIdAndUpdate(
+            req.body.orderId,
+            { $set: { active:false } },
+          );
+          
+        return res.status(200).json({ message: 'Order cancelled successfully' });
     } catch (error) {
         logger.error(error);
         return res.status(500).json({ message: 'Error cancelling the product' });
@@ -489,7 +503,7 @@ module.exports = {
     verifyOrderSummary,
     VerifyOrder,
     getParicularUserOrders,
-
+    cancelOrder,
 
     getSellerOrdersInventory,
     getSellerOrderDetails,

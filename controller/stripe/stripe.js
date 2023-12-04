@@ -9,7 +9,6 @@ const express = require('express');
 const app = express();
 
 const createPaymentIntent = async (req , res ) => {
-  console.log("intent coming is ", req.body)
   const response = await fetch('http://localhost:1000/paymentKeys/get');
     
     if (!response.ok) {
@@ -42,7 +41,7 @@ const createPaymentIntent = async (req , res ) => {
 }
 
 const invoiceSend = async (req, res) => {
-  console.log("invoice data", req.body);
+
   // return;
   const mailData = {
       email: req.body.receipt_email,

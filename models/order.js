@@ -75,9 +75,6 @@ const orderSchema = mongoose.Schema(
             type: String,
         },
 
-        // orderAmount: {
-        //     type: Number,
-        // },
         orderDate: {
             type: Date,
             required: true,
@@ -105,11 +102,10 @@ const orderSchema = mongoose.Schema(
         },
 
         OrderSummary:{
-            savings:{type:Number},
-            shipping:{type:Number},
-            total:{type:Number}  ,
-            Price:{type:Number},  // before any discount
-            couponDiscount:{type:Number}
+            subTotal:{type:Number},
+            shipping:{type:Number,default:0},
+            Total:{type:Number}  ,
+            couponDiscount:{type:Number,default:0}
         },
 
         coupon: {
@@ -117,14 +113,6 @@ const orderSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Offers',
         },
-        // discount: {
-        //     type: Number,
-        //     default: 0,
-        //     required: function () {
-        //         return this.coupon;
-        //     }
-        // },
-
     },
     {
         timestamps: true,
@@ -133,22 +121,20 @@ const orderSchema = mongoose.Schema(
 
 
 
-// orderSchema.pre('save', function (next) {
 
-//     // this.orderAmount = this.products.reduce((totalAmount, product) => {
-//     //     return totalAmount + product.amount;
-//     // }, 0);
+orderSchema.pre('save', function (next) {
+    this.OrderSummary.subTotal = this.products.reduce((totalAmount, product) => {
+        return totalAmount + product.amount;
+    }, 0);
 
-//     // if (!this.coupon) {
-//     //     this.orderValueAfterDiscount = this.orderAmount;
-//     // }
-
-//     // if (this.coupon) {
-//     //     this.orderValueAfterDiscount = this.orderAmount - this.discount;
-//     // }
-
-//     next();
-// });
+    if(this.OrderSummary.couponDiscount){
+        this.OrderSummary.Total=this.OrderSummary.subTotal-this.OrderSummary.couponDiscount+this.OrderSummary.shipping;
+    }
+    else{
+        this.OrderSummary.Total=this.OrderSummary.subTotal+this.OrderSummary.shipping;
+    }
+    next();
+});
 
 
 
