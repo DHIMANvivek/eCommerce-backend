@@ -5,6 +5,7 @@ const socketIO = require('socket.io');
 const httpServer = require('http').createServer(app);
 const jwtVerify = require('../../middlewares/jwtVerify');
 const ChatModel = require('../../models/chat/chat');
+const { writeFile } =  require("fs");
 
 const io = socketIO(httpServer);
 
@@ -24,7 +25,6 @@ const allOnlineUsers = async (req, res) => {
 const chatSocket = async (socket) => {
     console.log('A user connected to /chat namespace.');
     socket.emit('message', "how may i help you?");
-    if(socket.handshake.headers.cookie) {
     const cookieString = JSON.stringify(socket.handshake.headers.cookie);
     const cookiePairs = cookieString.split(';');
     const userTokenPair = cookiePairs.find(pair => pair.includes('userToken'));
@@ -94,8 +94,6 @@ const chatSocket = async (socket) => {
                 });
             });
     });
-}
-
     socket.on('replyMessage', async (message) => {
         console.log('Received new replu replu message:', message);
         socket.broadcast.emit('replymessage', message);
@@ -109,6 +107,13 @@ const chatSocket = async (socket) => {
             socket.emit('loadExistChat', chats);
         }
     });
+
+    socket.on("upload", (file, callback) => {
+        console.log(file); 
+        writeFile("/tmp/upload", file, (err) => {
+          callback({ message: err ? "failure" : "success" });
+        });
+      });
 
     // chatting implementation
     socket.on('newChat', async (message) => {

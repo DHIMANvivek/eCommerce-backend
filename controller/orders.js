@@ -137,6 +137,7 @@ async function verifyOrderSummary(req, res) {
 
         if (req.body.couponId && req?.tokenData?.id) {
             let coupon = await checkCoupon(req.body.couponId, req.tokenData.id);
+            console.log("coupon is ",coupon)
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > FinalResponse.total) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
             let discount = 0;
@@ -172,7 +173,9 @@ async function createOrder(req, res) {
         req.body.OrderSummary.subTotal=verifyOrder.total;
         if(verifyOrder?.discount){
             req.body.OrderSummary.couponDiscount=verifyOrder.discount;
+            req.body.OrderSummary.total-=req.body.OrderSummary.couponDiscount;
         }
+
 
         // order ID creation
         const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
@@ -249,6 +252,7 @@ async function getParicularUserOrders(req, res) {
           ];
 
           const data=await ordersModel.aggregate(aggregationPipe);
+        //   console.log('data come ups is ',data);
         res.status(200).json(data);
     } catch (error) {
         logger.error(error);

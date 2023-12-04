@@ -233,12 +233,3 @@ error: 2023-12-04T06:36:51.104Z Error: read ECONNRESET
 error: 2023-12-04T06:37:21.861Z Error: read ECONNRESET
 error: 2023-12-04T06:38:04.700Z Error: read ECONNRESET
 error: 2023-12-04T07:10:23.616Z AxiosError: Request failed with status code 400
-error: 2023-12-01T11:01:15.058Z Operation `wishlists.findOne()` buffering timed out after 10000ms
-error: 2023-12-01T11:01:15.103Z Operation `carts.findOne()` buffering timed out after 10000ms
-error: 2023-12-01T11:01:15.287Z Operation `sellerdetails.findOne()` buffering timed out after 10000ms
-error: 2023-12-04T05:29:35.725Z Floral Embroidered Kurti is out of stock
-error: 2023-12-04T05:29:42.934Z Floral Embroidered Kurti is out of stock
-error: 2023-12-04T05:29:51.552Z Floral Embroidered Kurti is out of stock
-error: 2023-12-04T05:30:04.958Z Floral Embroidered Kurti is out of stock
-error: 2023-12-04T05:30:54.453Z Floral Embroidered Kurti is out of stock
-error: 2023-12-04T05:30:59.996Z Floral Embroidered Kurti is out of stock

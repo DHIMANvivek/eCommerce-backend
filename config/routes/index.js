@@ -28,7 +28,6 @@ const AdminVerify = require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt');
 const jwtVerify = require('../../middlewares/jwtVerify')
 const paginateResults = require('../../helpers/pagination');
-const redisClient = require('../../config/redisClient');
 router.use('/user', require('./v1/user'));
 router.use('/admin', AdminVerify, require('./v1/admin'));
 router.use('/products', require('./v1/products'));
