@@ -245,12 +245,11 @@ async function fetchProducts(req, res) {
         if (colors) {
             matchedProducts.items = colorDistance(matchedProducts.items);
         }
-
+        matchedProducts.total = matchedProducts['items'].length;
         if (limit) {
             matchedProducts.items = matchedProducts.items.splice(skip, limit);
         }
 
-        matchedProducts.total = products.length;
 
         res.status(200).json(matchedProducts);
 
@@ -323,6 +322,7 @@ async function fetchProducts(req, res) {
 
     } catch (error) {
         logger.error(error);
+        console.log(error)
         res.status(500).json({
             message: 'Unable to fetch Products'
         });
@@ -402,7 +402,7 @@ async function getProductPrice(products) {
     try {
 
         if (!Array.isArray(products)) {
-            // discount = await discountQuery(products);
+            discount = await discountQuery(products);
             products = await discountQuery(products);
         }
         else {

@@ -23,7 +23,7 @@ async function showWishlists(req, res) {
                         path: "$wishlists.products",
                         // includeArrayIndex: 'string',
                         // preserveNullAndEmptyArrays: true
-                      }
+                    }
                 }
             ])).length;
 
@@ -55,16 +55,18 @@ async function addToWishlist(req, res) {
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName.trim().toLowerCase()
         });
+
         if (wishlister && input.type) {
             throw ({ message: 'Wishlist of same name already exists!' })
         }
+
         if (!wishlister && input.type == 'update') {
             const update = await wishlist.updateOne({
                 userId: user.id,
                 'wishlists._id': input.id
             }, {
                 $set: {
-                    'wishlists.$.wishlistName': input.wishlistName
+                    'wishlists.$.wishlistName': input.wishlistName,
                 }
             }
             );
@@ -92,8 +94,15 @@ async function addToWishlist(req, res) {
             if (count.count >= 10) {
                 throw { message: "Cannot have more than 10 wishlists!" };
             }
-
-            const response = await wishlist.updateOne({ userId: user.id }, { $push: { 'wishlists': newWishlist } });
+            const response = await wishlist.updateOne(
+                { userId: user.id },
+                {
+                    $push: {
+                        'wishlists': newWishlist,
+                        'createdAt': Date.now()
+                    }
+                }
+            );
         }
 
         const add = await wishlist.updateOne({
@@ -167,62 +176,79 @@ async function showWishlistCount(req, res) {
 
 }
 
-async function showWishlistedData(req, res) {
+async function showWishlistedData(req, res, next, controller=false) {
     try {
+        const controller = req.controller ? true:false; 
         const user = req.tokenData;
-        // console.log(user);
 
         let products = await wishlist.aggregate([
             {
                 $match: {
                     userId: new mongoose.Types.ObjectId(user.id),
+                }
+            },
+            {
+              $unwind: {
+                path: "$wishlists",
+                includeArrayIndex: "string",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $unwind: {
+                path: "$wishlists.products",
+                includeArrayIndex: "string",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: "products",
+                localField: "wishlists.products",
+                foreignField: "_id",
+                as: "productDetails",
+              },
+            },
+            {
+              $unwind: {
+                path: "$productDetails",
+                includeArrayIndex: "string",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $group: {
+                _id: "$wishlists.wishlistName",
+                time: {
+                  $first: "$wishlists.createdAt",
                 },
-            },
-            {
-                $unwind: "$wishlists",
-            },
-            {
-                $unwind: {
-                    path: "$wishlists.products",
-                    includeArrayIndex: 'string',
-                    preserveNullAndEmptyArrays: true
-                  }
-            },
-            {
-                $lookup: {
-                    from: "products",
-                    localField: "wishlists.products",
-                    foreignField: "_id",
-                    as: "productDetails",
+                productinfo: {
+                  $push: "$productDetails",
                 },
+              },
             },
             {
-                $unwind: "$productDetails",
+              $sort: {
+                time: 1,
+              },
             },
             {
-                $group:
-                {
-                    _id: "$wishlists.wishlistName",
-                    productinfo: {
-                        $push: "$productDetails",
-                    },
-                },
+              $project: {
+                "productinfo.sku": 1,
+                "productinfo.name": 1,
+                "productinfo.assets": 1,
+                "productinfo.price": 1,
+                "productinfo.info": 1,
+                "productinfo._id": 1,
+                "productinfo.status": 1,
+                wishlists: 1,
+              },
             },
-            {
-                $project: {
-                    "productinfo.sku": 1,
-                    "productinfo.name": 1,
-                    "productinfo.assets": 1,
-                    "productinfo.price": 1,
-                    "productinfo.info": 1,
-                    "productinfo._id": 1,
-                    "productinfo.status": 1,
-                    wishlists: 1,
-                },
-            },
-        ]);
+          ]);
 
-        // console.log(products);
+        if(controller){
+            return products;
+        }
         return res.status(200).json(products)
     }
     catch (error) {
@@ -239,6 +265,7 @@ async function removeFromWishlist(req, res) {
     try {
         const input = req.body;
         const user = req.tokenData;
+
         if (!input.wishlistName) {
             const find = await wishlist.findOne({
                 userId: user.id,
@@ -262,10 +289,14 @@ async function removeFromWishlist(req, res) {
                     "wishlists.$.products": input.productId
                 }
             }
-        )
+        );
+
+        req.controller = true; 
+        const data = await showWishlistedData(req, res);
+
         return res.status(200).json({
             message: "Product removed from wishlist!",
-            response
+            response, data
         })
     }
     catch (error) {
@@ -276,8 +307,6 @@ async function removeFromWishlist(req, res) {
         });
     }
 }
-
-
 
 // used in case of emergency 
 

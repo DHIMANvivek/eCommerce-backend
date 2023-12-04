@@ -796,3 +796,42 @@ error: 2023-12-03T23:03:17.979Z Cannot read properties of undefined (reading 'sl
 error: 2023-12-03T23:22:18.584Z 404
 error: 2023-12-03T23:22:20.193Z 404
 error: 2023-12-03T23:22:21.134Z 404
+error: 2023-12-02T05:25:02.447Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:25:02.639Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:25:06.508Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:25:11.950Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:25:21.982Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:27:00.794Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:28:00.720Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-02T05:28:22.680Z Cannot read properties of undefined (reading 'length')
+error: 2023-12-03T11:45:47.048Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T11:46:24.740Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:03:13.847Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:03:26.002Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:05:45.445Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:06:54.566Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:07:47.899Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:08:31.735Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T12:09:14.189Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-03T16:45:14.883Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T16:45:26.390Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T16:47:32.689Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T16:55:00.640Z Incorrect Password!
+error: 2023-12-03T17:02:12.174Z Wishlist of same name already exists!
+error: 2023-12-03T17:02:32.432Z Wishlist of same name already exists!
+error: 2023-12-03T17:02:47.470Z Wishlist of same name already exists!
+error: 2023-12-03T17:17:59.301Z Wishlist of same name already exists!
+error: 2023-12-03T17:18:05.400Z Wishlist of same name already exists!
+error: 2023-12-03T18:06:01.051Z Date.now(...).toISOString is not a function
+error: 2023-12-03T18:11:15.547Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T18:28:07.291Z Wishlist of same name already exists!
+error: 2023-12-03T18:37:20.897Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T18:37:31.340Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T18:38:38.026Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T18:41:27.463Z Cannot read properties of null (reading 'wishlists')
+error: 2023-12-03T18:51:30.015Z Cannot set headers after they are sent to the client
+error: 2023-12-03T18:53:11.014Z next is not defined
+error: 2023-12-03T18:53:19.294Z next is not defined
+error: 2023-12-03T18:54:31.944Z next is not defined
+error: 2023-12-03T18:55:11.302Z next is not defined
+error: 2023-12-04T03:29:19.248Z Incorrect Password!

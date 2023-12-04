@@ -240,7 +240,6 @@ async function getParicularUserOrders(req, res) {
                 },
               },
             },
-          
             {
               $project: {
                 count:1,
@@ -380,13 +379,11 @@ async function getSellerOrdersInventory(req, res, controller = false) {
 async function getSellerOrderDetails(req, res) {
     const sellerID = req.tokenData.id;
     const OrderID = req.query.orderID;
-
     try {
         const response = await ordersModel.findOne(
             { _id: OrderID },
             {
                 active: 0,
-                _id: 0,
                 createdAt: 0,
                 updatedAt: 0
             }

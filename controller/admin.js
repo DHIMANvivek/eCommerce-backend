@@ -55,7 +55,8 @@ async function getOverallInfo(req, res, controller = false) {
       'change': Math.floor(customerChange)
     };
 
-    const orderCountTotal = await orders.find({ payment_status: 'success', }).count();
+
+    const orderCountTotal = await orders.find({ payment_status: 'success' }).count();
 
     const orderCountPrev = await orders.find({
       payment_status: 'success',
@@ -134,11 +135,11 @@ async function getOverallInfo(req, res, controller = false) {
               $group: {
                 _id: null,
                 overallDiscount: {
-                  $sum: "$discount",
+                  $sum: "$OrderSummary.couponDiscount",
                 },
                 totalsales: {
                   $sum: "$products.amount",
-                },
+                }
               },
             },
             {
@@ -165,11 +166,11 @@ async function getOverallInfo(req, res, controller = false) {
               $group: {
                 _id: null,
                 overallDiscount: {
-                  $sum: "$discount",
+                  $sum: "$OrderSummary.couponDiscount",
                 },
                 totalsales: {
                   $sum: "$products.amount",
-                },
+                }
               },
             },
             {
@@ -214,55 +215,104 @@ async function fetchProductSalesData(req, res) {
           $unwind: "$products",
         },
         {
-          $lookup: {
-            from: "products",
-            localField: "products.sku",
-            foreignField: "sku",
-            as: "products.info",
+          $match: {
+            payment_status: "success",
+            "products.shipmentStatus": {
+              $nin: ["cancelled", "declined"],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            totalAmount: {
+              $sum: "$products.price",
+            },
+            products: {
+              $push: "$$ROOT",
+            },
           },
         },
         {
           $unwind: {
-            path: "$products.info",
+            path: "$products",
             preserveNullAndEmptyArrays: true,
           },
         },
         {
-          $match: {
-            payment_status: "success",
-            'products.shipmentStatus': { $nin: ['cancelled', 'declined'] }
+          $project: {
+            _id: 1,
+            totalAmount: 1,
+            shareDiscount: {
+              $round: {
+                $multiply: [
+                  {
+                    $divide: [
+                      "$products.products.price",
+                      "$totalAmount",
+                    ],
+                  },
+                  "$products.OrderSummary.couponDiscount",
+                ],
+              },
+            },
+            products: 1,
+          },
+        },
+        {
+          $lookup: {
+            from: "products",
+            localField: "products.products.sku",
+            foreignField: "sku",
+            as: "productsDetail",
+          },
+        },
+        {
+          $unwind: {
+            path: "$productsDetail",
+            preserveNullAndEmptyArrays: true,
           },
         }
       ];
 
       let groupbyQuery = {
-
         $group: {
           _id: {
-            year: { $year: "$orderDate" },
-            month: { $month: "$orderDate" },
+            year: {
+              $year: "$products.orderDate",
+            },
+            month: {
+              $month: "$products.orderDate",
+            },
           },
-          overallDiscount: { $sum: "$discount" },
           totalsales: {
-            $sum: "$products.amount"
+            $sum: {
+              $subtract: [
+                "$products.products.amount",
+                "$shareDiscount",
+              ],
+            },
           },
           totalExpenses: {
             $sum: {
               $multiply: [
-                "$products.info.costPrice",
-                "$products.quantity",
+                "$productsDetail.costPrice",
+                "$products.products.quantity",
               ],
-            }
-          }
+            },
+          },
         },
       };
 
       if (type == 'yearly') {
         delete groupbyQuery.$group._id.date;
-        aggregationPipe.push(
-        )
+        // aggregationPipe.unshift({
+        //   $match: {
+        //     $
+        //   }
+        // })
       } else {
-        groupbyQuery.$group._id.date = { $dayOfMonth: "$orderDate" };
+        groupbyQuery.$group._id.date = { $dayOfMonth: "$products.orderDate" };
       }
 
       aggregationPipe.push(
@@ -270,24 +320,25 @@ async function fetchProductSalesData(req, res) {
         {
           $project: {
             _id: 1,
-            totalSales: {
-              $subtract: ['$totalsales', '$overallDiscount'],
-            },
+            totalsales: 1,
             totalExpenses: 1,
             totalProfit: {
               $subtract: [
-                { $subtract: ['$totalsales', '$overallDiscount'] },
-                '$totalExpenses'
-              ]
-            }
-          }
+                "$totalsales",
+                "$totalExpenses",
+              ],
+            },
+          },
         },
         {
-          $sort: { _id: 1 }
-        }
+          $sort: {
+            _id: 1,
+          },
+        },
       );
 
       const salesStats = await orders.aggregate(aggregationPipe);
+
       if (!salesStats) throw 401;
       if (controller) return salesStats;
 
@@ -305,71 +356,140 @@ async function fetchPopularProducts(req, res) {
 
     const popularProductStats = await orders.aggregate([
       {
-        $unwind: "$products",
+        $match:
+        {
+          payment_status: "success",
+        },
+      },
+      {
+        $unwind:
+        {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group:
+        {
+          _id: "$_id",
+          totalAmount: {
+            $sum: "$products.price",
+          },
+          products: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $unwind:
+        {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          totalAmount: 1,
+          shareDiscount: {
+            $round: {
+              $multiply: [
+                {
+                  $divide: [
+                    "$products.products.price",
+                    "$totalAmount",
+                  ],
+                },
+                "$products.OrderSummary.couponDiscount",
+              ],
+            },
+          },
+          products: 1,
+        },
       },
       {
         $match: {
-          payment_status: "success",
-          'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
-
-          //products only for particular month (current)
+          "products.payment_status": "success",
+          "products.products.shipmentStatus": {
+            $nin: ["cancelled", "declined"],
+          },
           $expr: {
             $eq: [
-              { $month: "$orderDate" },
-              { $month: new Date() },
-            ]
-          }
+              {
+                $month: "$products.orderDate",
+              },
+              {
+                $month: new Date(),
+              },
+            ],
+          },
         },
       },
       {
         $lookup: {
           from: "products",
-          localField: "products.sku",
+          localField: "products.products.sku",
           foreignField: "sku",
-          as: "products.info",
+          as: "productDetail",
         },
       },
       {
         $unwind: {
-          path: "$products.info",
+          path: "$productDetail",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
-          _id: "$products.info._id",
+          _id: "$productDetail._id",
           revenue: {
             $sum: {
-              $subtract: ["$products.amount", "$discount"],
+              $subtract: [
+                "$products.products.amount",
+                "$shareDiscount",
+              ],
             },
           },
           profit: {
             $sum: {
               $subtract: [
                 {
-                  $subtract: ["$products.amount", "$discount"],
+                  $subtract: [
+                    "$products.products.amount",
+                    "$shareDiscount",
+                  ],
                 },
                 {
                   $multiply: [
-                    "$products.quantity",
-                    "$products.info.costPrice",
+                    "$products.products.quantity",
+                    "$productDetail.costPrice",
                   ],
                 },
               ],
             },
           },
-          name: { $first: "$products.name" },
+          name: {
+            $first: "$products.products.name",
+          },
           category: {
-            $first: "$products.info.info.category",
+            $first: "$productDetail.info.category",
           },
           brand: {
-            $first: "$products.info.info.brand",
+            $first: "$productDetail.info.brand",
           },
-          photo: { $first: "$products.image" },
+          photo: {
+            $first: "$products.products.image",
+          },
         },
       },
-      { $sort: { revenue: -1 } },
-      { $limit: 3 },
+      {
+        $sort: {
+          revenue: -1,
+        },
+      },
+      {
+        $limit: 3,
+      },
     ]);
 
     if (!popularProductStats) throw '401';
@@ -392,27 +512,72 @@ async function fetchCategorySalesData(req, res) {
         },
       },
       {
-        $unwind: "$products",
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.sku",
-          foreignField: "sku",
-          as: "products.info",
-        },
-      },
-      {
         $unwind: {
-          path: "$products.info",
+          path: "$products",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
-          _id: "$products.info.info.category",
+          _id: "$_id",
+          totalAmount: {
+            $sum: "$products.price",
+          },
+          products: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          totalAmount: 1,
+          shareDiscount: {
+            $round: {
+              $multiply: [
+                { $divide: ["$products.products.price", "$totalAmount"] },
+                "$products.OrderSummary.couponDiscount",
+              ],
+            },
+          },
+          products: 1,
+        },
+      },
+      {
+        $match: {
+          "products.payment_status": "success",
+          "products.products.shipmentStatus": {
+            $nin: ["cancelled", "declined"],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.products.sku",
+          foreignField: "sku",
+          as: "productDetail",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productDetail",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$productDetail.info.category",
           sales: {
-            $sum: "$products.amount",
+            $sum: {
+              $subtract: ["$products.products.amount", "$shareDiscount"],
+            },
           },
         },
       },
@@ -422,8 +587,8 @@ async function fetchCategorySalesData(req, res) {
         },
       },
       {
-        $limit: 3
-      }
+        $limit: 3,
+      },
     ]);
     if (!categoryStats) throw '401'; // throw error if aggregationPipe Fails
     if (controller) return categoryStats; // return calculated data if it arrives from controller
@@ -555,8 +720,8 @@ async function updateProductStatus(req, res) {
 
   try {
 
-    
-    if(field_status){
+
+    if (field_status) {
       const productDetails = await products.findById(productID);
       let canActivateOrHighlight = productDetails.assets.some(asset => {
         return asset.stockQuantity.some((item) => {
@@ -567,7 +732,7 @@ async function updateProductStatus(req, res) {
         });
       });
 
-      if(!canActivateOrHighlight){
+      if (!canActivateOrHighlight) {
         throw ({ message: 'This product is Out Of Stock' });
       }
     }
@@ -727,8 +892,10 @@ async function fetchProductInventory(req, res) {
     ];
 
     let sortFilter = false;
+
     Object.keys(parameters.filter).forEach((key) => {
-      if (key == 'active') {
+
+      if (key == 'active' && !parameters.productID) {
         aggregationPipe.unshift({ $match: { 'status.active': parameters.filter['active'] } });
       }
       else if (parameters.filter[key]) {
@@ -773,11 +940,16 @@ async function fetchProductInventory(req, res) {
       );
     }
 
+    if (parameters.productID) {
+      aggregationPipe.unshift({
+        $match: { _id: new ObjectId(parameters.productID) }
+      })
+    }
+
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       { $skip: (parameters.page - 1) * parameters.limit },
       { $limit: parameters.limit }
     );
-
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
     res.status(200).json(response[0]);
