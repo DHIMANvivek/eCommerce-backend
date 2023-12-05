@@ -722,6 +722,7 @@ async function updateProductStatus(req, res) {
 
 
     if (field_status) {
+
       const productDetails = await products.findById(productID);
       let canActivateOrHighlight = productDetails.assets.some(asset => {
         return asset.stockQuantity.some((item) => {
@@ -760,6 +761,23 @@ async function updateProductStatus(req, res) {
   }
 }
 
+async function stockQuantityStatus(productID){
+  try{
+    const productDetails = await products.findById(productID);
+    let totalQty = 0;
+
+    productDetails.assets.forEach(asset => {
+      asset.stockQuantity.forEach((item) => {
+          totalQty += item.quantity;
+      });
+    });
+
+    return totalQty
+  }catch(err){
+
+  }
+}
+
 async function updateProduct(req, res) {
   const sellerID = req.tokenData.id;
   const productObject = req.body;
@@ -774,16 +792,32 @@ async function updateProduct(req, res) {
     delete productObject.data['_id'];
     productObject.data.info.orderQuantity.sort(function (a, b) { return a - b });
 
+    let qty = await stockQuantityStatus(_id) ;
+
     const response = await products.findOneAndUpdate({
       '_id': _id,
       'sellerID': sellerID
     }, { $set: productObject.data });
+
+    // let query = {$set: {"status.delete": false, "status.active": true}};
+    // if(qty == 0){
+    //   query.$set["status.delete"] = true;
+    //   query.$set["status.active"] = false;
+    // }
+    // await products.findOneAndUpdate({
+    //   '_id': _id,
+    //   'sellerID': sellerID
+    // }, query);
+
+    // console.log(qty, productObject.data);
 
     // SKU_generater.generateSKU(productObject.data);
 
     return res.status(200).json("uploaded");
   } catch (err) {
     logger.error(err);
+    console.log(err);
+    res.status(500).json("Unable to Update");
   }
 }
 
@@ -952,6 +986,7 @@ async function fetchProductInventory(req, res) {
     );
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
+    console.log(parameters, response);
     res.status(200).json(response[0]);
 
   } catch (err) {
