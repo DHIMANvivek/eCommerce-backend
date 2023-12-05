@@ -6,7 +6,7 @@ router.get('/showWishlist',  wishlistController.showWishlists)
 // router.post('/addWishlist', wishlistController.addWishlist)
 router.post('/addToWishlist', wishlistController.addToWishlist)
 router.post('/deleteWishlist', wishlistController.deleteWishlist)
-router.get('/showWishlistCount', wishlistController.showWishlistCount)
+// router.get('/showWishlistCount', wishlistController.showWishlistCount)
 router.get('/showWishlistProducts', wishlistController.showWishlistedData)
 router.post('/deleteFromWishlist', wishlistController.removeFromWishlist)
 

@@ -1,6 +1,6 @@
-const wishlist = require('../models/wishlist')
-const mongoose = require('mongoose')
+const wishlist = require('../models/wishlist');
 const logger = require('./../logger');
+const mongoose = require('mongoose')
 const UserModel = require('../models/users')
 
 async function showWishlists(req, res) {
@@ -98,6 +98,15 @@ async function addToWishlist(req, res) {
             );
         }
 
+        const itemAlreadyExists = await wishlist.findOne({ userId: user.id, 'wishlists.wishlistName': input.wishlistName, 'wishlists.products': { $in: [input.productId] } });
+
+        if (itemAlreadyExists) {
+            res.status(200).json({
+                message: "Item already exists in " + input.wishlistName + '!'
+            });
+            return;
+        }
+
         const add = await wishlist.updateOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName
@@ -147,30 +156,9 @@ async function deleteWishlist(req, res) {
     }
 }
 
-async function showWishlistCount(req, res) {
+async function showWishlistedData(req, res, next, controller = false) {
     try {
-        const user = req.tokenData;
-        const result = await wishlist.findOne({ userId: new mongoose.Types.ObjectId('6541ea9c937b999d318165d7') })
-            .populate('wishlists.products', { 'sku': 1, _id: 0 });
-        let ans = result.wishlists.some((el) => {
-            return el.products.some(e => { e.sku == 'sku-kurti003' })
-        })
-
-        res.status(200).json(result);
-    }
-    catch (error) {
-        logger.error(error);
-        if (error.message) return res.status(500).json(error);
-        res.status(500).json({
-            message: 'Internal Server Error'
-        });
-    }
-
-}
-
-async function showWishlistedData(req, res, next, controller=false) {
-    try {
-        const controller = req.controller ? true:false; 
+        const controller = req.controller ? true : false;
         const user = req.tokenData;
 
         let products = await wishlist.aggregate([
@@ -180,65 +168,65 @@ async function showWishlistedData(req, res, next, controller=false) {
                 }
             },
             {
-              $unwind: {
-                path: "$wishlists",
-                includeArrayIndex: "string",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $unwind: {
-                path: "$wishlists.products",
-                includeArrayIndex: "string",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $lookup: {
-                from: "products",
-                localField: "wishlists.products",
-                foreignField: "_id",
-                as: "productDetails",
-              },
-            },
-            {
-              $unwind: {
-                path: "$productDetails",
-                includeArrayIndex: "string",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$wishlists.wishlistName",
-                time: {
-                  $first: "$wishlists.createdAt",
+                $unwind: {
+                    path: "$wishlists",
+                    includeArrayIndex: "string",
+                    preserveNullAndEmptyArrays: true,
                 },
-                productinfo: {
-                  $push: "$productDetails",
+            },
+            {
+                $unwind: {
+                    path: "$wishlists.products",
+                    includeArrayIndex: "string",
+                    preserveNullAndEmptyArrays: true,
                 },
-              },
             },
             {
-              $sort: {
-                time: 1,
-              },
+                $lookup: {
+                    from: "products",
+                    localField: "wishlists.products",
+                    foreignField: "_id",
+                    as: "productDetails",
+                },
             },
             {
-              $project: {
-                "productinfo.sku": 1,
-                "productinfo.name": 1,
-                "productinfo.assets": 1,
-                "productinfo.price": 1,
-                "productinfo.info": 1,
-                "productinfo._id": 1,
-                "productinfo.status": 1,
-                wishlists: 1,
-              },
+                $unwind: {
+                    path: "$productDetails",
+                    includeArrayIndex: "string",
+                    preserveNullAndEmptyArrays: true,
+                },
             },
-          ]);
+            {
+                $group: {
+                    _id: "$wishlists.wishlistName",
+                    time: {
+                        $first: "$wishlists.createdAt",
+                    },
+                    productinfo: {
+                        $push: "$productDetails",
+                    },
+                },
+            },
+            {
+                $sort: {
+                    time: 1,
+                },
+            },
+            {
+                $project: {
+                    "productinfo.sku": 1,
+                    "productinfo.name": 1,
+                    "productinfo.assets": 1,
+                    "productinfo.price": 1,
+                    "productinfo.info": 1,
+                    "productinfo._id": 1,
+                    "productinfo.status": 1,
+                    wishlists: 1,
+                },
+            },
+        ]);
 
-        if(controller){
+        if (controller) {
             return products;
         }
         return res.status(200).json(products)
@@ -283,7 +271,7 @@ async function removeFromWishlist(req, res) {
             }
         );
 
-        req.controller = true; 
+        req.controller = true;
         const data = await showWishlistedData(req, res);
 
         return res.status(200).json({
@@ -300,8 +288,8 @@ async function removeFromWishlist(req, res) {
     }
 }
 
-// used in case of emergency 
 
+// used in case of emergency 
 async function createDefault(req, res) {
     try {
         const getAllusers = await UserModel.find({}, { _id: 1 });
@@ -326,7 +314,6 @@ module.exports = {
     addToWishlist,
     removeFromWishlist,
     deleteWishlist,
-    showWishlistCount,
     showWishlistedData,
     createDefault
 }

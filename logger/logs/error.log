@@ -233,3 +233,17 @@ error: 2023-12-04T06:36:51.104Z Error: read ECONNRESET
 error: 2023-12-04T06:37:21.861Z Error: read ECONNRESET
 error: 2023-12-04T06:38:04.700Z Error: read ECONNRESET
 error: 2023-12-04T07:10:23.616Z AxiosError: Request failed with status code 400
+error: 2023-12-04T09:49:39.299Z mongoose is not defined
+error: 2023-12-04T09:50:04.194Z mongoose is not defined
+error: 2023-12-04T09:50:04.320Z mongoose is not defined
+error: 2023-12-04T09:50:28.363Z mongoose is not defined
+error: 2023-12-04T09:51:33.528Z mongoose is not defined
+error: 2023-12-04T09:55:22.315Z mongoose is not defined
+error: 2023-12-04T09:55:52.695Z mongoose is not defined
+error: 2023-12-04T09:57:54.029Z mongoose is not defined
+error: 2023-12-04T10:03:11.920Z mongoose is not defined
+error: 2023-12-04T10:03:38.821Z mongoose is not defined
+error: 2023-12-04T10:03:38.876Z mongoose is not defined
+error: 2023-12-04T10:26:55.455Z log is not defined
+error: 2023-12-04T10:26:55.601Z log is not defined
+error: 2023-12-04T10:37:00.341Z Cannot set headers after they are sent to the client
