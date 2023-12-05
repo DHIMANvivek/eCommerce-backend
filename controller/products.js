@@ -21,7 +21,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         let product = JSON.parse(JSON.stringify(await Products.findOne(
             query,
             {
-                active: 0,
+                status: 0,
                 updatedAt: 0
             }
         )));
@@ -91,7 +91,8 @@ async function fetchProducts(req, res) {
         aggregationPipe = [
             {
                 $match: {
-                    "active": true
+                    "status.active": true,
+                    "status.delete": false
                 }
             },
             {
@@ -244,12 +245,11 @@ async function fetchProducts(req, res) {
         if (colors) {
             matchedProducts.items = colorDistance(matchedProducts.items);
         }
-
+        matchedProducts.total = matchedProducts['items'].length;
         if (limit) {
             matchedProducts.items = matchedProducts.items.splice(skip, limit);
         }
 
-        matchedProducts.total = products.length;
 
         res.status(200).json(matchedProducts);
 
@@ -322,6 +322,7 @@ async function fetchProducts(req, res) {
 
     } catch (error) {
         logger.error(error);
+        console.log(error)
         res.status(500).json({
             message: 'Unable to fetch Products'
         });

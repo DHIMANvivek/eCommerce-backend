@@ -2,6 +2,7 @@ const PaymentKeys = require('./../../models/custom-website-elements/paymentKeys'
 const redisClient = require('./../../config/redisClient');
 const logger = require('./../../logger');
 
+
 async function getPaymentKeys(req, res) {
   try {
     const paymentKeys = await PaymentKeys.aggregate([
@@ -152,22 +153,58 @@ async function addPaymentKeys(req, res) {
   }
 }
 
+
 async function deletePaymentKeys(req, res) {
   const { id } = req.body;
-
+  console.log(id, "coming id is ");
+  
   try {
-    const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
+    const data = await PaymentKeys.findOneAndUpdate(
+      { $or: [
+          { 'keys._id': id },
+          { 'razorKey._id': id }
+        ]
+      },
+      { 
+        $pull: {
+          keys: { _id: id },
+          razorKey: { _id: id }
+        }
+      },
+      { new: true }
+    );
 
     if (data) {
       res.status(200).json({ message: 'Payment Key deleted Successfully' });
     } else {
-      res.status(404).json({ message: 'No matching document found for the given query.' });
+      return;
     }
   } catch (error) {
     logger.error(error);
     res.status(500).json(error);
   }
 }
+
+
+
+// async function deletePaymentKeys(req, res) {
+//   const { id } = req.body;
+//   console.log(id, "coming id is ");
+  
+
+//   try {
+//     const data = await PaymentKeys.findOneAndDelete({ 'keys._id': id });
+
+//     if (data) {
+//       res.status(200).json({ message: 'Payment Key deleted Successfully' });
+//     } else {
+//       res.status(404).json({ message: 'No matching document found for the given query.' });
+//     }
+//   } catch (error) {
+//     logger.error(error);
+//     res.status(500).json(error);
+//   }
+// }
 
 async function getRedisData(req, res) {
   try {

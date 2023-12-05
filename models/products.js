@@ -104,14 +104,36 @@ const productSchema = mongoose.Schema({
     default: 0,
     min: 0,
   },
-  active: {
-    type: Boolean,
-    default: true
-  },
-  highlight: {
-    type: Boolean,
-    default: false
+  status:{
+
+    active: {
+      type: Boolean,
+      default: true
+    },
+
+    highlight: {
+      type: Boolean,
+      default: false
+    },
+
+    delete: {
+      type: Boolean,
+      default: false
+    }
   }
+
+  // active: {
+  //   type: Boolean,
+  //   default: true
+  // },
+  // highlight: {
+  //   type: Boolean,
+  //   default: false
+  // },
+  // deleteStatus: {
+  //   type: Boolean,
+  //   default: false
+  // }
 },
   {
     timestamps: true,

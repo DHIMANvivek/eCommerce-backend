@@ -244,7 +244,7 @@ async function updateOfferStatus(req, res) {
       for (let result of results) {
         result = JSON.parse(JSON.stringify(result));
         if (result && result._id != req.body._id) {
-          throw { message: 'This is conflict point please try to create another date points ' };
+          throw { message: `Your Current discount is conflicting with ${result.Title}` };
         }
       }
 
@@ -262,6 +262,7 @@ async function updateOfferStatus(req, res) {
     })
     res.status(200).json({ message: 'offer status updated sucess' })
   } catch (error) {
+    console.log('eroror come yp is ',error);
     logger.error(error);
     res.status(500).json(error)
   }
@@ -269,7 +270,6 @@ async function updateOfferStatus(req, res) {
 
 async function getCoupons(req, res) {
   try {
-
     let query = {
       OfferType: 'coupon',
       "status.active": true,
@@ -280,16 +280,17 @@ async function getCoupons(req, res) {
     };
 
     let user;
+    let tokenData;
 
     if (req.headers.authorization) {
-      data = verifyToken(req.headers.authorization.split(' ')[1])
-      let checkNewUser = await ordersModel.findOne({ buyerId: data.id });
+      tokenData = verifyToken(req.headers.authorization.split(' ')[1])
+      let checkNewUser = await ordersModel.findOne({ buyerId: tokenData.id });
 
       if (checkNewUser) {
         query.couponType = { $nin: ['new'] };
       }
 
-      user = await Users.findOne({ _id: data.id }, { email: 1, _id: 0 });
+      user = await Users.findOne({ _id: tokenData.id }, { email: 1, _id: 0 });
     };
 
     const getAllCoupons = await OfferModel.aggregate([
@@ -302,7 +303,7 @@ async function getCoupons(req, res) {
             { couponType: 'custom', 'UserEmails.email': { $in: [user?.email] } },
             {
               couponType: { $in: ['global', 'new'] },
-              userUsed: { $not: { $in: [data.id] } },
+              userUsed: { $not: { $in: [(tokenData.id)] } },
             },
           ],
         },
@@ -321,6 +322,7 @@ async function getCoupons(req, res) {
 async function checkCoupon(couponId, userId) {
   try {
 
+    console.log('couponid is ',couponId," user id ",userId);
     const response = await OfferModel.findOne({
       $and: [
         { OfferType: 'coupon' },

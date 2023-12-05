@@ -32,7 +32,11 @@ let userSchema = new mongoose.Schema({
         required: function validate() {
             if (this.provider == 'direct') return true;
 
-        }
+        },
+    },
+    is_online: {    
+        type: Boolean,
+        default: false
     },
 
     info: {

@@ -9,6 +9,8 @@ router.get('/get', AdminVerify, notificationController.getNotification);
 router.post('/set', AdminVerify, notificationController.setNotification);
 router.post('/update', AdminVerify, notificationController.updateNotifications);
 router.post('/toggle', AdminVerify , notificationController.toggleNotification);
+router.post('/send', AdminVerify, notificationController.sendNotification);
+router.post('/delete', AdminVerify, notificationController.deleteNotification);
 
 // user
 router.get('/coming', notificationController.comingNotification);

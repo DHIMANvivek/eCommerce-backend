@@ -2,6 +2,11 @@ const express = require('express')
 const router = express.Router();
 const adminController = require('../../../controller/admin');
 const jwtVerify = require('../../../middlewares/jwtVerify')
+
+//Notification
+router.get('/fetchSellerNotfications', adminController.fetchAdminNotifications);
+
+// Statistics
 router.get('/getOverallInfo', adminController.getOverallInfo);
 router.get('/fetchSalesData', adminController.fetchProductSalesData);
 router.get('/fetchCategoryData', adminController.fetchCategorySalesData);
@@ -11,7 +16,7 @@ router.get('/fetchPopularProducts', adminController.fetchPopularProducts);
 // Product 
 router.post('/addProduct',adminController.addProduct);
 router.post('/updateProduct',adminController.updateProduct);
-router.post('/updatehighlightProduct',adminController.updateHighlightProduct);
+router.post('/updateProductStatus',adminController.updateProductStatus);
 
 router.get('/fetchProductDetails', adminController.fetchProductDetail);
 router.post('/fetchProducts', adminController.fetchProductInventory);

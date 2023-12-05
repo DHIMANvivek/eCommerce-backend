@@ -10,7 +10,28 @@ const SKU_generater = require('../helpers/sku');
 const productController = require('../controller/products');
 const logger = require('./../logger');
 
-async function getOverallInfo(req, res, controller=false) {
+async function fetchAdminNotifications(req, res) {
+
+  try {
+    const sellerID = req.tokenData.id;
+
+
+    const result = await products.find({
+      sellerID: sellerID,
+      $or: [
+        { 'status.active': false },
+        { 'asset.stockQuantity.quantity': { $lte: { $arrayElemAt: ['$info.orderQuantity', 0] } } }
+      ]
+    }, { assets: 1, info: 1, sku: 1, name: 1, price: 1, status: 1, _id: 0 });
+
+    return res.status(200).json(result);
+
+  } catch (err) {
+
+  }
+}
+
+async function getOverallInfo(req, res, controller = false) {
   try {
     let result = {};
     // const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
@@ -20,7 +41,7 @@ async function getOverallInfo(req, res, controller=false) {
     //   'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     // }).count();
 
-    const customerCountCurr = (await orders.distinct('buyerId', {payment_status: 'success'})).length;
+    const customerCountCurr = (await orders.distinct('buyerId', { payment_status: 'success' })).length;
 
     const customerCountPrev = (await orders.distinct('buyerId', {
       payment_status: 'success',
@@ -34,15 +55,16 @@ async function getOverallInfo(req, res, controller=false) {
       'change': Math.floor(customerChange)
     };
 
-    const orderCountTotal = await orders.find({ payment_status: 'success', }).count();
+
+    const orderCountTotal = await orders.find({ payment_status: 'success' }).count();
 
     const orderCountPrev = await orders.find({
       payment_status: 'success',
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
-    let currentOrders=orderCountTotal-orderCountPrev;
-    let orderChange = orderCountPrev ? ((currentOrders-orderCountPrev) / orderCountPrev) * 100 : 0;
+    let currentOrders = orderCountTotal - orderCountPrev;
+    let orderChange = orderCountPrev ? ((currentOrders - orderCountPrev) / orderCountPrev) * 100 : 0;
 
     result['orders'] = {
       'count': orderCountTotal,
@@ -113,11 +135,11 @@ async function getOverallInfo(req, res, controller=false) {
               $group: {
                 _id: null,
                 overallDiscount: {
-                  $sum: "$discount",
+                  $sum: "$OrderSummary.couponDiscount",
                 },
                 totalsales: {
                   $sum: "$products.amount",
-                },
+                }
               },
             },
             {
@@ -144,11 +166,11 @@ async function getOverallInfo(req, res, controller=false) {
               $group: {
                 _id: null,
                 overallDiscount: {
-                  $sum: "$discount",
+                  $sum: "$OrderSummary.couponDiscount",
                 },
                 totalsales: {
                   $sum: "$products.amount",
-                },
+                }
               },
             },
             {
@@ -193,55 +215,104 @@ async function fetchProductSalesData(req, res) {
           $unwind: "$products",
         },
         {
-          $lookup: {
-            from: "products",
-            localField: "products.sku",
-            foreignField: "sku",
-            as: "products.info",
+          $match: {
+            payment_status: "success",
+            "products.shipmentStatus": {
+              $nin: ["cancelled", "declined"],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            totalAmount: {
+              $sum: "$products.price",
+            },
+            products: {
+              $push: "$$ROOT",
+            },
           },
         },
         {
           $unwind: {
-            path: "$products.info",
+            path: "$products",
             preserveNullAndEmptyArrays: true,
           },
         },
         {
-          $match: {
-            payment_status: "success",
-            'products.shipmentStatus': { $nin: ['cancelled', 'declined'] }
+          $project: {
+            _id: 1,
+            totalAmount: 1,
+            shareDiscount: {
+              $round: {
+                $multiply: [
+                  {
+                    $divide: [
+                      "$products.products.price",
+                      "$totalAmount",
+                    ],
+                  },
+                  "$products.OrderSummary.couponDiscount",
+                ],
+              },
+            },
+            products: 1,
+          },
+        },
+        {
+          $lookup: {
+            from: "products",
+            localField: "products.products.sku",
+            foreignField: "sku",
+            as: "productsDetail",
+          },
+        },
+        {
+          $unwind: {
+            path: "$productsDetail",
+            preserveNullAndEmptyArrays: true,
           },
         }
       ];
 
       let groupbyQuery = {
-
         $group: {
           _id: {
-            year: { $year: "$orderDate" },
-            month: { $month: "$orderDate" },
+            year: {
+              $year: "$products.orderDate",
+            },
+            month: {
+              $month: "$products.orderDate",
+            },
           },
-          overallDiscount: { $sum: "$discount" },
           totalsales: {
-            $sum: "$products.amount"
+            $sum: {
+              $subtract: [
+                "$products.products.amount",
+                "$shareDiscount",
+              ],
+            },
           },
           totalExpenses: {
             $sum: {
               $multiply: [
-                "$products.info.costPrice",
-                "$products.quantity",
+                "$productsDetail.costPrice",
+                "$products.products.quantity",
               ],
-            }
-          }
+            },
+          },
         },
       };
 
       if (type == 'yearly') {
         delete groupbyQuery.$group._id.date;
-        aggregationPipe.push(
-        )
+        // aggregationPipe.unshift({
+        //   $match: {
+        //     $
+        //   }
+        // })
       } else {
-        groupbyQuery.$group._id.date = { $dayOfMonth: "$orderDate" };
+        groupbyQuery.$group._id.date = { $dayOfMonth: "$products.orderDate" };
       }
 
       aggregationPipe.push(
@@ -249,24 +320,25 @@ async function fetchProductSalesData(req, res) {
         {
           $project: {
             _id: 1,
-            totalSales: {
-              $subtract: ['$totalsales', '$overallDiscount'],
-            },
+            totalsales: 1,
             totalExpenses: 1,
             totalProfit: {
               $subtract: [
-                { $subtract: ['$totalsales', '$overallDiscount'] },
-                '$totalExpenses'
-              ]
-            }
-          }
+                "$totalsales",
+                "$totalExpenses",
+              ],
+            },
+          },
         },
         {
-          $sort: { _id: 1 }
-        }
+          $sort: {
+            _id: 1,
+          },
+        },
       );
 
       const salesStats = await orders.aggregate(aggregationPipe);
+
       if (!salesStats) throw 401;
       if (controller) return salesStats;
 
@@ -284,71 +356,140 @@ async function fetchPopularProducts(req, res) {
 
     const popularProductStats = await orders.aggregate([
       {
-        $unwind: "$products",
+        $match:
+        {
+          payment_status: "success",
+        },
+      },
+      {
+        $unwind:
+        {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group:
+        {
+          _id: "$_id",
+          totalAmount: {
+            $sum: "$products.price",
+          },
+          products: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $unwind:
+        {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          totalAmount: 1,
+          shareDiscount: {
+            $round: {
+              $multiply: [
+                {
+                  $divide: [
+                    "$products.products.price",
+                    "$totalAmount",
+                  ],
+                },
+                "$products.OrderSummary.couponDiscount",
+              ],
+            },
+          },
+          products: 1,
+        },
       },
       {
         $match: {
-          payment_status: "success",
-          'products.shipmentStatus': { $nin: ['cancelled', 'declined'] },
-
-         //products only for particular month (current)
+          "products.payment_status": "success",
+          "products.products.shipmentStatus": {
+            $nin: ["cancelled", "declined"],
+          },
           $expr: {
             $eq: [
-              { $month: "$orderDate" },
-              { $month: new Date() },
-            ]
-          }
+              {
+                $month: "$products.orderDate",
+              },
+              {
+                $month: new Date(),
+              },
+            ],
+          },
         },
       },
       {
         $lookup: {
           from: "products",
-          localField: "products.sku",
+          localField: "products.products.sku",
           foreignField: "sku",
-          as: "products.info",
+          as: "productDetail",
         },
       },
       {
         $unwind: {
-          path: "$products.info",
+          path: "$productDetail",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
-          _id: "$products.info._id",
+          _id: "$productDetail._id",
           revenue: {
-            $sum: { 
-              $subtract: [ "$products.amount", "$discount" ],
+            $sum: {
+              $subtract: [
+                "$products.products.amount",
+                "$shareDiscount",
+              ],
             },
           },
           profit: {
             $sum: {
               $subtract: [
                 {
-                  $subtract: [ "$products.amount", "$discount" ],
+                  $subtract: [
+                    "$products.products.amount",
+                    "$shareDiscount",
+                  ],
                 },
                 {
                   $multiply: [
-                    "$products.quantity", 
-                    "$products.info.costPrice",
+                    "$products.products.quantity",
+                    "$productDetail.costPrice",
                   ],
                 },
               ],
             },
           },
-          name: { $first: "$products.name" },
+          name: {
+            $first: "$products.products.name",
+          },
           category: {
-            $first: "$products.info.info.category",
+            $first: "$productDetail.info.category",
           },
           brand: {
-            $first: "$products.info.info.brand",
+            $first: "$productDetail.info.brand",
           },
-          photo: { $first: "$products.image" },
+          photo: {
+            $first: "$products.products.image",
+          },
         },
       },
-      { $sort: { revenue: -1 } },
-      { $limit: 3 },
+      {
+        $sort: {
+          revenue: -1,
+        },
+      },
+      {
+        $limit: 3,
+      },
     ]);
 
     if (!popularProductStats) throw '401';
@@ -371,27 +512,72 @@ async function fetchCategorySalesData(req, res) {
         },
       },
       {
-        $unwind: "$products",
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.sku",
-          foreignField: "sku",
-          as: "products.info",
-        },
-      },
-      {
         $unwind: {
-          path: "$products.info",
+          path: "$products",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
-          _id: "$products.info.info.category",
+          _id: "$_id",
+          totalAmount: {
+            $sum: "$products.price",
+          },
+          products: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          totalAmount: 1,
+          shareDiscount: {
+            $round: {
+              $multiply: [
+                { $divide: ["$products.products.price", "$totalAmount"] },
+                "$products.OrderSummary.couponDiscount",
+              ],
+            },
+          },
+          products: 1,
+        },
+      },
+      {
+        $match: {
+          "products.payment_status": "success",
+          "products.products.shipmentStatus": {
+            $nin: ["cancelled", "declined"],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.products.sku",
+          foreignField: "sku",
+          as: "productDetail",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productDetail",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$productDetail.info.category",
           sales: {
-            $sum: "$products.amount",
+            $sum: {
+              $subtract: ["$products.products.amount", "$shareDiscount"],
+            },
           },
         },
       },
@@ -401,8 +587,8 @@ async function fetchCategorySalesData(req, res) {
         },
       },
       {
-        $limit: 3
-      }
+        $limit: 3,
+      },
     ]);
     if (!categoryStats) throw '401'; // throw error if aggregationPipe Fails
     if (controller) return categoryStats; // return calculated data if it arrives from controller
@@ -416,7 +602,7 @@ async function fetchCategorySalesData(req, res) {
 async function fetchReviewStats(req, res) {
   let sellerData = req.tokenData;
   let controller = req.controller ? true : false;
-  
+
   try {
     let aggregationPipe = [
 
@@ -478,9 +664,9 @@ async function addProduct(req, res) {
 
       data.forEach((product) => {
 
-
         // Purpose -> extracting any unique category or brands  
         // not inside the seller inventory
+
         if (!seller_info['categories'].includes(product.info.category.toLowerCase())) {
           seller_info['categories'].push(product.info.category);
         }
@@ -499,10 +685,8 @@ async function addProduct(req, res) {
       for (const product of data) {
         // Add the sellerID for each product
         product['sellerID'] = sellerID;
-
         // Generate SKU for the product
         product['sku'] = await SKU_generater.generateSKU(product);
-
         response = await products.create(product);
       }
 
@@ -513,7 +697,7 @@ async function addProduct(req, res) {
         productObject.data[key] = productObject.data.basicinfo[key];
       });
       productObject.data.sellerID = sellerID;
-      productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
+      productObject.data.info.orderQuantity.sort(function (a, b) { return a - b });
       productObject.data.sku = await SKU_generater.generateSKU(productObject.data);
 
       response = await products.create(productObject.data);
@@ -527,27 +711,70 @@ async function addProduct(req, res) {
   }
 }
 
-async function updateHighlightProduct(req, res) {
+async function updateProductStatus(req, res) {
+
   const sellerID = req.tokenData.id;
-  const highlight = req.body;
+  const productID = req.body._id;
+  const field = req.body.field;
+  const field_status = req.body.status;
+
   try {
+
+
+    if (field_status) {
+
+      const productDetails = await products.findById(productID);
+      let canActivateOrHighlight = productDetails.assets.some(asset => {
+        return asset.stockQuantity.some((item) => {
+          if (item.quantity > 0) {
+            return true;
+          }
+          return false;
+        });
+      });
+
+      if (!canActivateOrHighlight) {
+        throw ({ message: 'This product is Out Of Stock' });
+      }
+    }
+
     const response = await products.updateOne(
       {
-        '_id': new ObjectId(highlight._id),
+        '_id': new ObjectId(productID),
         'sellerID': sellerID
       },
       {
-        $set: { 'highlight': highlight.status }
+        $set: { [`status.${field}`]: field_status }
       });
 
-    const highlightCount = await products.find({ 'highlight': true }).count();
-
     if (!response) throw "Unable to Update";
-    return res.status(200).json({ 'highlightCount': highlightCount });
 
+    if (field == 'highlight') {
+      const highlightCount = await products.find({ [`status.${field}`]: true }).count();
+      return res.status(200).json({ 'highlightCount': highlightCount });
+    } else {
+      return res.status(200).json();
+    }
   } catch (err) {
     logger.error(err);
-    return res.status(401).send();
+    res.status(401).json(err);
+  }
+}
+
+async function stockQuantityStatus(productID){
+  try{
+    const productDetails = await products.findById(productID);
+    let totalQty = 0;
+
+    productDetails.assets.forEach(asset => {
+      asset.stockQuantity.forEach((item) => {
+          totalQty += item.quantity;
+      });
+    });
+
+    return totalQty
+  }catch(err){
+
   }
 }
 
@@ -563,18 +790,34 @@ async function updateProduct(req, res) {
     });
     delete productObject.data['basicinfo'];
     delete productObject.data['_id'];
-    productObject.data.info.orderQuantity.sort(function(a, b){return a - b});
+    productObject.data.info.orderQuantity.sort(function (a, b) { return a - b });
+
+    let qty = await stockQuantityStatus(_id) ;
 
     const response = await products.findOneAndUpdate({
       '_id': _id,
       'sellerID': sellerID
     }, { $set: productObject.data });
 
+    // let query = {$set: {"status.delete": false, "status.active": true}};
+    // if(qty == 0){
+    //   query.$set["status.delete"] = true;
+    //   query.$set["status.active"] = false;
+    // }
+    // await products.findOneAndUpdate({
+    //   '_id': _id,
+    //   'sellerID': sellerID
+    // }, query);
+
+    // console.log(qty, productObject.data);
+
     // SKU_generater.generateSKU(productObject.data);
 
     return res.status(200).json("uploaded");
   } catch (err) {
     logger.error(err);
+    console.log(err);
+    res.status(500).json("Unable to Update");
   }
 }
 
@@ -586,11 +829,11 @@ async function deleteProductInventory(req, res) {
     let response;
 
     if (Array.isArray(reqData.data)) {
-      response = await products.updateMany({ 'sellerID': sellerID, _id: { $in: reqData.data } }, { $set: { 'active': false } });
+      response = await products.updateMany({ 'sellerID': sellerID, _id: { $in: reqData.data } }, { $set: { 'status.delete': true } });
       return res.status(200).json({ message: 'Products Deleted' })
     }
 
-    response = await products.updateOne({ 'sellerID': sellerID, _id: reqData.data }, { $set: { 'active': false } });
+    response = await products.updateOne({ 'sellerID': sellerID, _id: reqData.data }, { $set: { 'status.delete': true } });
 
     if (!response) throw "Unable to Delete";
 
@@ -605,7 +848,9 @@ async function deleteProductInventory(req, res) {
 async function fetchProductInventory(req, res) {
   const sellerID = req.tokenData.id;
   const parameters = req.body;
+
   try {
+
     aggregationPipe = [
       {
         $match: {
@@ -681,15 +926,23 @@ async function fetchProductInventory(req, res) {
     ];
 
     let sortFilter = false;
+
     Object.keys(parameters.filter).forEach((key) => {
-      if (parameters.filter[key]) {
+
+      if (key == 'active' && !parameters.productID) {
+        aggregationPipe.unshift({ $match: { 'status.active': parameters.filter['active'] } });
+      }
+      else if (parameters.filter[key]) {
+
         if (key == 'categories') {
           aggregationPipe.unshift({ $match: { 'info.category': { $regex: parameters.filter['categories'], $options: 'i' } } });
         }
+
         if (key == 'rating') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'avgRating': parameters.filter[key] } });
           sortFilter = true;
         }
+
         else if (key == 'stockQuantity') {
           aggregationPipe[aggregationPipe.length - 1].$facet.data.push({ $sort: { 'inventory': parameters.filter[key] } });
           sortFilter = true;
@@ -697,7 +950,7 @@ async function fetchProductInventory(req, res) {
       }
     });
 
-    aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'active': true } });
+    aggregationPipe.unshift({ $match: { 'sellerID': new ObjectId(sellerID), 'status.delete': false } });
 
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       {
@@ -721,12 +974,19 @@ async function fetchProductInventory(req, res) {
       );
     }
 
+    if (parameters.productID) {
+      aggregationPipe.unshift({
+        $match: { _id: new ObjectId(parameters.productID) }
+      })
+    }
+
     aggregationPipe[aggregationPipe.length - 1].$facet.data.push(
       { $skip: (parameters.page - 1) * parameters.limit },
       { $limit: parameters.limit }
     );
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
+    console.log(parameters, response);
     res.status(200).json(response[0]);
 
   } catch (err) {
@@ -798,8 +1058,6 @@ async function updateDetails(req, res) {
   const email = emails.email
   const role = req.tokenData.role;
   const data = req.body.data;
-
-  console.log(data, "data coming ")
 
   if (data && role == 'admin' && email && data.name && data.name.firstname !== undefined) {
     const firstname = data.name.firstname;
@@ -927,7 +1185,7 @@ async function addFaq(req, res) {
     await category.save();
 
     return res.status(200).json({ success: true, message: 'Children added to the category' });
-  } 
+  }
   catch (error) {
     logger.error(error);
     return res.status(500).json({ success: false, message: 'An error occurred while adding children to the category' });
@@ -1041,6 +1299,10 @@ async function getPaginatedData(req, res) {
 }
 
 module.exports = {
+
+  //Admin notification
+  fetchAdminNotifications,
+
   // Stats Data
   getOverallInfo,
   fetchCategorySalesData,
@@ -1050,7 +1312,7 @@ module.exports = {
 
   addProduct,
   updateProduct,
-  updateHighlightProduct,
+  updateProductStatus,
   deleteProductInventory,
   fetchProductInventory,
   fetchProductDetail,

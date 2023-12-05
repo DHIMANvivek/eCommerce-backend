@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const webhookController = require('../../../../controller/stripe/stripe');
+const chatController = require('../../../../controller/chat/chat');
 const adminVerify = require('./../../../../middlewares/adminVerify');
 const jwtVerify = require('./../../../../middlewares/jwtVerify');
 
 // router.post('/webhook', webhookController.stripeWebhook);
-router.post('/create-payment-intent', webhookController.createPaymentIntent);
-router.post('/invoiceSend', webhookController.invoiceSend);
-router.post('/ticketStatus', webhookController.ticketStatus);
+router.get('/chat',jwtVerify, chatController.chatSocket);
+router.get('/allOnlineUsers',jwtVerify, chatController.allOnlineUsers);
 
 module.exports = router;
