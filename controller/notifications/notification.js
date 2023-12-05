@@ -1,5 +1,5 @@
 const notificationModel = require('../../models/notifications/notifications');
-const supportNotificationTokens = require('../../models/support-ticket/SupportNotificationTokens');
+const supportNotificationTokens = require('../../models/support-ticket/supportNotificationTokens');
 const admin = require('firebase-admin');
 require('dotenv').config();
 
