@@ -144,7 +144,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 const routes = require('./config/routes');
-app.use(routes);
+app.use('/api', routes);
 
 
 let port = 1000;
