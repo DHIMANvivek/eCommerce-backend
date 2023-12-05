@@ -144,6 +144,7 @@ const sendNotification = async (req, res) => {
       };
       admin.messaging().sendMulticast(message)
         .then((response) => {
+          console.log("Notification Failed :"+ response.failureCount , "Notification Sent :"+ response.successCount);
           res.status(200).json('Notification sent successfully');
         })
         .catch((error) => {

@@ -26,6 +26,9 @@ const chatSocket = async (socket) => {
     console.log('A user connected to /chat namespace.');
     socket.emit('message', "how may i help you?");
     const cookieString = JSON.stringify(socket.handshake.headers.cookie);
+    if(!cookieString) {
+    return;
+    }
     const cookiePairs = cookieString.split(';');
     const userTokenPair = cookiePairs.find(pair => pair.includes('userToken'));
 
