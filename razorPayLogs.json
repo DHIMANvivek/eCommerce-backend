@@ -3822,5 +3822,54 @@
             }
         },
         "created_at": 1701747604
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.captured",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_N8Fhbmj4La9Jat",
+                    "entity": "payment",
+                    "amount": 6300000,
+                    "currency": "INR",
+                    "status": "captured",
+                    "order_id": "order_N8FhLJvYYjpigU",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "netbanking",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": true,
+                    "description": "ORDER-ae55-7",
+                    "card_id": null,
+                    "bank": "ICIC",
+                    "wallet": null,
+                    "vpa": null,
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916283415102",
+                    "notes": {
+                        "description": "ORDER-ae55-7"
+                    },
+                    "fee": 148680,
+                    "tax": 22680,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "bank_transaction_id": "1176105"
+                    },
+                    "created_at": 1701689412,
+                    "base_amount": 6300000
+                }
+            }
+        },
+        "created_at": 1701689415
     }
 ]

@@ -233,30 +233,3 @@ error: 2023-12-04T06:36:51.104Z Error: read ECONNRESET
 error: 2023-12-04T06:37:21.861Z Error: read ECONNRESET
 error: 2023-12-04T06:38:04.700Z Error: read ECONNRESET
 error: 2023-12-04T07:10:23.616Z AxiosError: Request failed with status code 400
-error: 2023-12-04T06:28:40.308Z This product is Out Of Stock
-error: 2023-12-04T06:28:43.202Z This product is Out Of Stock
-error: 2023-12-04T06:28:45.264Z This product is Out Of Stock
-error: 2023-12-04T06:28:46.571Z This product is Out Of Stock
-error: 2023-12-04T06:28:48.893Z This product is Out Of Stock
-error: 2023-12-04T06:42:15.139Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:42:30.171Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:42:34.910Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:43:38.866Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:43:44.247Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:44:14.186Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:45:24.696Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:47:14.429Z This product is Out Of Stock
-error: 2023-12-04T06:48:21.261Z This product is Out Of Stock
-error: 2023-12-04T11:06:25.090Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-04T11:06:52.110Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-04T11:07:29.066Z Flannel Oversized Shirt ok is out of stock
-error: 2023-12-05T03:32:23.616Z This product is Out Of Stock
-error: 2023-12-05T05:03:04.120Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:03:34.580Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:06:32.457Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:07:40.556Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:09:21.228Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:10:04.402Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:11:22.671Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:13:00.337Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:13:13.047Z Cannot read properties of undefined (reading 'totalSales')
