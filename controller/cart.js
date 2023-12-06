@@ -15,8 +15,8 @@ async function fetchCart(req, res) {
         };
 
         if (req.headers.authorization) {
-            req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
-            delete req.headers;
+            req.tokenData = verifyToken(req.headers.authorization.split(' ')[1]);
+            req.hasAuthorization = true; 
         }
 
         if (req.tokenData) {

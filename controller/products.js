@@ -9,7 +9,7 @@ async function fetchProductDetails(req, res, sku = null, admincontroller = null)
         let query = {};
         let user;
 
-        if (req.headers.authorization) {
+        if (req.headers.authorization && !req.hasAuthorization) {
             user = verifyToken(req.headers.authorization.split(' ')[1]);
         }
         if (admincontroller) {
