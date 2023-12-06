@@ -14,10 +14,13 @@ async function fetchCart(req, res) {
             }
         };
 
+        console.log(cart, 'cart');
+        console.log(req.headers.authorization);
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
             delete req.headers;
         }
+        console.log( 'cart1');
 
         if (req.tokenData) {
             let userId = req.tokenData.id;
@@ -27,6 +30,7 @@ async function fetchCart(req, res) {
         else {
             cart.details = req.body;
         }
+        console.log( 'cart2');
 
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
@@ -71,8 +75,11 @@ async function fetchCart(req, res) {
             return item;
         }));
 
+        console.log( 'cart3');
+
         cart.amounts.subTotal = (Math.round((cart.amounts.subTotal) * 100) / 100);
         cart.amounts.total = cart.amounts.subTotal + cart.amounts.shipping;
+        console.log( 'cart4');
 
         res.status(200).json(cart);
     }
