@@ -15,11 +15,12 @@ async function fetchCart(req, res) {
         };
 
         console.log(cart, 'cart');
-        console.log(req.headers.authorization);
+
         if (req.headers.authorization) {
-            req.tokenData = verifyToken(req.headers.authorization.split(' ')[1])
-            delete req.headers;
+            req.tokenData = verifyToken(req.headers.authorization.split(' ')[1]);
+            req.hasAuthorization = true; 
         }
+        
         console.log( 'cart1');
 
         if (req.tokenData) {
