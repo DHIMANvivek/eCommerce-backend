@@ -14,15 +14,12 @@ async function fetchCart(req, res) {
             }
         };
 
-        console.log(cart, 'cart');
 
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1]);
             req.hasAuthorization = true; 
         }
         
-        console.log( 'cart1');
-
         if (req.tokenData) {
             let userId = req.tokenData.id;
             let cartExists = await Cart.findOne({ userId: userId });
@@ -31,7 +28,6 @@ async function fetchCart(req, res) {
         else {
             cart.details = req.body;
         }
-        console.log( 'cart2');
 
         cart.details = await Promise.all(cart.details.map(async (copy) => {
             let item = JSON.parse(JSON.stringify(copy));
