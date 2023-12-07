@@ -7,14 +7,16 @@ const ordersModel = require('./models/order');
 const cors = require('cors');
 require('dotenv').config();
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
-const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const stripe = require('stripe')(stripeSecret);
-const Secret = endPointSecret;
+const Secret = process.env.STRIPE_WEBHOOK_SECRET;;
 
-app.post('/webhook', express.raw({ type: 'application/json' }), async (request, response) => {
+app.post('/webhook', express.raw({ type: 'application/json' }),
+ async (request, response) => {
   let event;
   const signature = request.headers['stripe-signature'];
   try {
+    console.log('envetign function ',req.body);
     if (Secret) {
       event = stripe.webhooks.constructEvent(
         request.body,
@@ -23,6 +25,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
       );
     } else {
       event = JSON.parse(request.body);
+      console.log('event is ',event);
     }
 
     switch (event.type) {
@@ -36,7 +39,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
         const descriptionObject = JSON.parse(description);
         const orderId = descriptionObject.orderId;
 
-        const fs = require('fs').promises; 
+        // const fs = require('fs').promises; 
 
             try {
               const result = await ordersModel.updateOne(
@@ -104,6 +107,7 @@ app.use(
   }),
 );
 
+
 app.use(cors());
 
 require("dotenv").config();
@@ -113,7 +117,7 @@ require("./config/db/db");
 
 // Set up CORS headers
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://tradevogue.web.app', 'http://localhost:4200');
+  res.setHeader('Access-Control-Allow-Origin',  'http://localhost:4200');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE,FETCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();

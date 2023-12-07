@@ -159,7 +159,7 @@ async function deleteOffer(req, res) {
 
     const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
 
-    return res.status(200).json(data);
+    return res.status(200).json(data)
   } catch (error) {
     logger.error(error);
     res.status(500).json(error);

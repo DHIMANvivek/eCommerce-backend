@@ -233,3 +233,81 @@ error: 2023-12-04T06:36:51.104Z Error: read ECONNRESET
 error: 2023-12-04T06:37:21.861Z Error: read ECONNRESET
 error: 2023-12-04T06:38:04.700Z Error: read ECONNRESET
 error: 2023-12-04T07:10:23.616Z AxiosError: Request failed with status code 400
+error: 2023-12-05T05:54:23.420Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-06T01:47:02.500Z User already exists! Try to login.
+error: 2023-12-06T05:34:30.751Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:34:30.802Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:34:38.257Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:34:38.261Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:35:38.312Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:35:38.497Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:35:47.252Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:35:47.294Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:35:57.641Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:35:57.644Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:36:17.671Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:36:17.794Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:36:24.291Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:36:24.384Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:36:45.552Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:36:45.597Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:37:00.678Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:37:00.829Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:37:25.556Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:37:25.604Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:37:33.963Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:37:35.542Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:39:02.975Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:39:03.029Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:39:43.829Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:39:43.934Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:40:36.284Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:40:36.392Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:01.873Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:01.921Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:14.732Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:14.794Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:18.074Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:18.600Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:36.712Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:41:36.715Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:42:17.507Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:42:17.546Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:42:21.112Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:42:21.411Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:43:43.542Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:43:43.546Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:43:49.687Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:43:49.740Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:43:55.427Z Heavyweight Shirt is out of stock
+error: 2023-12-06T05:43:55.529Z Heavyweight Shirt is out of stock
+error: 2023-12-06T07:21:25.716Z Incorrect Password!
+error: 2023-12-06T10:00:35.195Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:00:48.837Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:01:19.622Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:03:45.602Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:09:58.974Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:32:34.020Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:33:21.452Z reponse is not defined
+error: 2023-12-06T10:33:41.287Z reponse is not defined
+error: 2023-12-06T10:33:41.339Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:34:32.292Z reponse is not defined
+error: 2023-12-06T10:34:32.366Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:35:13.494Z reponse is not defined
+error: 2023-12-06T10:35:13.559Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:35:35.831Z reponse is not defined
+error: 2023-12-06T10:35:35.894Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:35:54.218Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:36:43.519Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:37:13.429Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required.
+error: 2023-12-06T10:38:25.831Z orders validation failed: products.0.productInfo.image: Path `productInfo.image` is required., products.0._id: Path `_id` is required.
+error: 2023-12-06T10:39:32.291Z orders validation failed: products.0._id: Path `_id` is required.
+error: 2023-12-07T04:51:52.500Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-07T04:54:04.175Z connection timed out
+error: 2023-12-07T04:54:04.176Z Cannot read properties of undefined (reading 'assets')
+error: 2023-12-07T04:54:06.268Z connection timed out
+error: 2023-12-07T04:54:12.378Z connection timed out
+error: 2023-12-07T04:54:12.380Z connection timed out
+error: 2023-12-07T04:54:28.052Z connection timed out
+error: 2023-12-07T04:54:28.057Z connection timed out
+error: 2023-12-07T05:02:01.197Z A-line Kurti is out of stock
