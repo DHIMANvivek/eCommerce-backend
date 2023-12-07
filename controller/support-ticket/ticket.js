@@ -18,16 +18,26 @@ const webPushTokenDetails = async (req, res) => {
   try {
     const { email, token } = req.body;
     const supportNotification = await supportNotificationTokens.findOne({});
-
+    const existingEntryIndex = supportNotification.tokenDetail.findIndex(
+      (entry) => entry.email === email
+    );
     if (supportNotification) {
       if (!email && token) {
-        supportNotification.tokenDetail.push({ token });
+        const email = req.tokenData.email;
+        console.log(req.body, "payload coming")
+        const existingEntry = supportNotification.tokenDetail.find((entry) => entry.email === email);
+        if (existingEntry) {
+          if (!token) {
+            return res.status(400).json({ error: 'Token is required for updating an entry' });
+          }
+          existingEntry.token = token;
+        } else {
+          supportNotification.tokenDetail.push({ email, token });
+        }
+        // supportNotification.tokenDetail.push({ token , email });
         await supportNotification.save();
         res.status(200).json(supportNotification);
       } else {
-        const existingEntryIndex = supportNotification.tokenDetail.findIndex(
-          (entry) => entry.email === email
-        );
 
         if (existingEntryIndex !== -1) {
           if (token) {

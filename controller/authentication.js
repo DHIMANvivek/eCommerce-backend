@@ -45,7 +45,7 @@ async function login(req, res) {
 
 
 
-            const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
+            const tokenData = { email: userFound, id: userFound._id, role: userFound.role }
             const token = createToken(tokenData);
             res.status(200).json({ token, firstName });
             return;
@@ -67,7 +67,7 @@ async function login(req, res) {
             throw ({ message: 'Incorrect Password!' })
         }
 
-        const tokenData = { id: userFound._id, role: userFound.role }
+        const tokenData = {email: userFound.email ,id: userFound._id, role: userFound.role }
 
         const token = createToken(tokenData);
         res.status(200).json({

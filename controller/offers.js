@@ -159,7 +159,7 @@ async function deleteOffer(req, res) {
 
     const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
 
-    return res.status(200).json(data);
+    return res.status(200).json(data)
   } catch (error) {
     logger.error(error);
     res.status(500).json(error);
@@ -352,6 +352,7 @@ async function checkCoupon(couponId, userId) {
 async function updateCoupon(couponId, userId) {
   try {
     const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) },$inc:{couponUsersLimit:-1} });
+    console.log('response of update coupon is -------->',response);
     return new Promise((res, rej) => {
       res(response);
     })

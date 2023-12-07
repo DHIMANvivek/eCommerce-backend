@@ -266,14 +266,19 @@ async function TicketStatusTemplate(mailData) {
 }
 
 async function sendInvoiceTemplate(paymentData) {
-  let productList = JSON.parse(paymentData.description);
-  console.log(productList, "productList");
-  
+  // console.log(paymentData.data.object, "data is ");
+  // return;
+  // console.log(paymentData, "paymentData");
+  let productList = JSON.parse(paymentData.data.object.description);
+  // let payment_status = JSON.parse(paymentData.data.object.status);
+  console.log("payment_status", paymentData.data.object.status)
+  // console.log(productList, "productList");
+
   let productRows = productList.items.map(product => {
     let productDetails = `
       <a href="http://localhost:4200/product/${product.id}" style="text-decoration: none; color: #007bff;">${product.name}: ${product.id}</a>
     `;
-  
+
     return `
       <tr>
         <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
@@ -359,8 +364,8 @@ async function sendInvoiceTemplate(paymentData) {
           style: 'currency',
           currency: 'INR',
         })} </p>
-        <p><strong>Payment Status:</strong> ${paymentData.status}</p>
-        <p><strong>Payment Method:</strong> ${paymentData.payment_method}</p>
+        <p><strong>Payment Status:</strong> ${paymentData.data.object.status}</p>
+        <p><strong>Payment Method:</strong> ${paymentData.data.object.payment_method}</p>
         <p><strong>Payment Date:</strong> ${new Date(paymentData.created * 1000).toLocaleString()}</p>
       
         <p><strong>Payment ID:</strong> ${paymentData.id}</p>

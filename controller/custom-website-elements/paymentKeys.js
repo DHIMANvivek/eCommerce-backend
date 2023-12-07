@@ -3,7 +3,8 @@ const redisClient = require('./../../config/redisClient');
 const logger = require('./../../logger');
 
 
-async function getPaymentKeys(req, res) {
+
+async function getPaymentKeyPromise(req,res){
   try {
     const paymentKeys = await PaymentKeys.aggregate([
       {
@@ -30,6 +31,45 @@ async function getPaymentKeys(req, res) {
       }
     ]);
 
+    return new Promise((res,rej)=>{
+      res(paymentKeys);
+    })
+  } catch (error) {
+    console.log("error inside getPyment keys ")
+    logger.error(error);
+    res.status(500).json(error);
+  }
+}
+
+async function getPaymentKeys(req, res) {
+  try {
+    // const paymentKeys = await PaymentKeys.aggregate([
+    //   {
+    //     $unwind: "$keys"
+    //   },
+    //   {
+    //     $match: {
+    //       "keys.enable": true
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "users",
+    //       localField: "keys.adminId",
+    //       foreignField: "_id",
+    //       as: "keys.admin"
+    //     }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: "$_id",
+    //       keys: { $push: "$keys" }
+    //     }
+    //   }
+    // ]);
+
+    const paymentKeys=await getPaymentKeyPromise(req,res);
+    // console.log('payment keys is ',paymentKeys);
     res.status(200).json(paymentKeys);
   } catch (error) {
     logger.error(error);
@@ -222,6 +262,7 @@ async function getRedisData(req, res) {
 module.exports = {
   deletePaymentKeys,
   updatePaymentKeys,
+  getPaymentKeyPromise,
   addPaymentKeys,
   getPaymentKeys,
   getAllPaymentKeys,

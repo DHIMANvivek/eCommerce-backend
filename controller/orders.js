@@ -24,20 +24,7 @@ async function getLatestOrderId(req, res) {
 async function updateLatestOrderDetail(req, res) {
     try {
         const buyerId = req.tokenData.id;
-        // const buyerId ='6539e71dced882bb66fbae55';
-        // const { newPaymentStatus, transactionId, MOP } = req.body;
-        // const result = await ordersModel.updateOne(
-        //     { orderID: req.body.orderID },
-        //     {
-        //         $set: {
-        //             payment_status: newPaymentStatus,
-        //             transactionId: transactionId,
-        //             MOP: MOP,
-        //         }
-        //     }
-        // );
-
-
+        console.log('update order called----> ',req.body);
 
         const response=await ordersModel.findOne({ orderID: req.body.orderID ,payment_status:'success'},{_id:0,coupon:1,products:1});
         if(response?.coupon){
@@ -46,6 +33,7 @@ async function updateLatestOrderDetail(req, res) {
    
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
+                console.log('el of products array ios ',el);
                 await Products.updateOne(
                     {
                         sku: el.sku,
@@ -96,7 +84,7 @@ async function VerifyOrder(req, res) {
     }
 }
 
-async function verifyOrderSummary(req, res) {
+async function verifyOrderSummary(req, res,productData=false) {
     try {
         let FinalResponse = {};
         FinalResponse.savings = 0;
@@ -104,9 +92,14 @@ async function verifyOrderSummary(req, res) {
         FinalResponse.total = 0;
         FinalResponse.subTotal = 0;
         allProducts=JSON.parse(JSON.stringify(req.body.products));
-
+        let newProducts;
+        if(productData){
+            newProducts=[];
+        }    
+    
      await Promise.all(allProducts.map(async (element) => {
             let response = await ProductController.fetchProductDetails(req, res, element.sku);
+
             FinalResponse.total+=element.price*element.quantity;
             if (response?.discount) {
                 FinalResponse.savings += response.discount*element.quantity;
@@ -114,8 +107,8 @@ async function verifyOrderSummary(req, res) {
             if(element?.oldPrice){
                 FinalResponse.subTotal+=element?.oldPrice*element.quantity;
             }
-        
 
+         
             return new Promise((res, rej) => {
                 let colorArray = response.assets?.filter(el => el.color == element.color);
                 let particularColor=colorArray?.filter(el=>el.color==element.color);
@@ -124,6 +117,14 @@ async function verifyOrderSummary(req, res) {
                if( particularColorSize[0].quantity<=0){
                    rej({ message: response.name + ' is out of stock' });
                }
+
+               if(productData){
+                let elementDetails={sellerID:response.sellerID,sku:response.sku,productInfo:{name:response.name,image:element.image,category:response.info.category,brand:response.info.brand},
+                                quantity:element.quantity,color:element.color,size:element.size,price:element.price,
+                                _id:element._id
+                            };
+                newProducts.push(elementDetails);
+            }
 
                if(response?.oldPrice){
                 res({price:response.price * element.quantity,oldPrice:response?.oldPrice*element.quantity});
@@ -137,7 +138,6 @@ async function verifyOrderSummary(req, res) {
 
         if (req.body.couponId && req?.tokenData?.id) {
             let coupon = await checkCoupon(req.body.couponId, req.tokenData.id);
-            console.log("coupon is ",coupon)
             if (!coupon) { throw ({ message: 'Sorry This Coupon is not available for you' }) }
             if (coupon.discountType == 'percentage' && coupon.minimumPurchaseAmount > FinalResponse.total) { throw ({ message: `Minimum Purchase Amount is ${coupon.minimumPurchaseAmount}` }) }
             let discount = 0;
@@ -155,6 +155,9 @@ async function verifyOrderSummary(req, res) {
         }
         
 
+        if(productData){
+            req.body.products=newProducts;
+        }
         return new Promise((res, rej) => {
             res(FinalResponse);
         });
@@ -164,18 +167,22 @@ async function verifyOrderSummary(req, res) {
         res.status(500).json(error);
     }
 }
+
 async function createOrder(req, res) {
     try {
-        const verifyOrder = await verifyOrderSummary(req, res);
+        const verifyOrder = await verifyOrderSummary(req, res,true);
         req.body.buyerId = req.tokenData.id;
         delete req.body.details;
         req.body.OrderSummary={};
-        req.body.OrderSummary.subTotal=verifyOrder.total;
+        req.body.OrderSummary.subTotal=verifyOrder?.total;
+        console.log("verifyOrder is ",verifyOrder)
         if(verifyOrder?.discount){
             req.body.OrderSummary.couponDiscount=verifyOrder.discount;
             req.body.OrderSummary.total-=req.body.OrderSummary.couponDiscount;
+            req.body.coupon=req.body.couponId;
         }
 
+        console.log('req body is ',req.body);
 
         // order ID creation
         const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
@@ -252,7 +259,7 @@ async function getParicularUserOrders(req, res) {
           ];
 
           const data=await ordersModel.aggregate(aggregationPipe);
-        //   console.log('data come ups is ',data);
+          console.log('data come ups is ',data);
         res.status(200).json(data);
     } catch (error) {
         logger.error(error);
@@ -469,7 +476,7 @@ async function cancelOrderedProduct(req, res) {
     try {
         const orderUpdate = await ordersModel.findByIdAndUpdate(
             req.body.id,
-            { $set: { 'products.$[elem].shipmentStatus': 'cancelled' } },
+            { $set: { 'products.$[elem].shipmentStatus': 'cancelled', } ,},
             { arrayFilters: [{ 'elem.sku': req.body.sku }], new: true }
           );
           

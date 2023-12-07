@@ -1,4 +1,4 @@
-const { sendInvoiceTemplate , TicketStatusTemplate } = require('../../helpers/INDEX');
+const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const mailer = require('../../helpers/nodemailer');
 const ordersModel = require('../../models/order');
 const stripe = require('stripe')('sk_test_51NvsyeSENcdZfgNiy559a6dtaofzqfn00MVNCrPe4kQWAZNZulhdDmJePJTZvSSzzu4xnkTjHIjmWPVdzTW1L6oc00oI29MAG4');
@@ -8,15 +8,19 @@ const express = require('express');
 
 const app = express();
 
-const createPaymentIntent = async (req , res ) => {
-  const response = await fetch('http://localhost:1000/paymentKeys/get');
-    
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+const {getPaymentKeyPromise}=require('../custom-website-elements/paymentKeys');
 
-    const data = await response.json();
-    const privateKey = data[0].keys[0].privateKey;
+const createPaymentIntent = async (req , res ) => {
+//   const response = await fetch('http://localhost:1000/paymentKeys/get');
+
+    const response=await getPaymentKeyPromise(req,res);
+
+    // if (!response.ok) {
+    //     throw new Error('Network response was not ok');
+    // }
+
+    // const data = await response.json();
+    const privateKey = response[0].keys[0].privateKey;
 
     const stripe = require('stripe')(privateKey);
 
@@ -35,26 +39,26 @@ const createPaymentIntent = async (req , res ) => {
 
         res.json({ clientSecret: paymentIntent.client_secret, description: paymentIntent });
     } catch (error) {
-        console.error(error);
+        console.error(error,"--->");
         res.status(500).json({ error: 'An error occurred while creating the payment intent.' });
     }
 }
 
-const invoiceSend = async (req, res) => {
+// const invoiceSend = async (req, res) => {
 
-  // return;
-  const mailData = {
-      email: req.body.receipt_email,
-      subject: "Invoice",
-      invoice: req.body
-  }
-  const emailTemplate = sendInvoiceTemplate(mailData.invoice);
-  await mailer(mailData, emailTemplate);
+//   // return;
+//   const mailData = {
+//       email: req.body.receipt_email,
+//       subject: "Invoice",
+//       invoice: req.body
+//   }
+//   const emailTemplate = sendInvoiceTemplate(mailData.invoice);
+//   await mailer(mailData, emailTemplate);
 
-  res.status(200).json({
-      message: "done"
-  })
-}
+//   res.status(200).json({
+//       message: "done"
+//   })
+// }
 
 const ticketStatus = async (req, res) => {  
   try {
@@ -144,6 +148,6 @@ app.use(express.raw({ type: 'application/json' }));
 module.exports = {
   // stripeWebhook,
   createPaymentIntent,
-  invoiceSend,
+//   invoiceSend,
   ticketStatus
 }

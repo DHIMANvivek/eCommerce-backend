@@ -128,6 +128,7 @@ const toggleNotification = async (req, res) => {
 
 const sendNotification = async (req, res) => {
   const { title, body, icon, url, token, registration_ids } = req.body;
+
   try {
     if (req.tokenData.role === 'admin') {
       const tokens = registration_ids || [token].filter(Boolean);

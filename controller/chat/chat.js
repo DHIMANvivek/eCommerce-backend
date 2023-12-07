@@ -11,7 +11,6 @@ const io = socketIO(httpServer);
 
 io.use(jwtVerify);
 
-
 const allOnlineUsers = async (req, res) => {
     try {
         const onlineUsers = await UserModel.find({ is_online: 'true', role: 'user' });
@@ -20,7 +19,7 @@ const allOnlineUsers = async (req, res) => {
         console.error('Error retrieving online users:', error);
         throw error;
     }
-};
+ };
 
 const chatSocket = async (socket) => {
     console.log('A user connected to /chat namespace.');
@@ -83,8 +82,6 @@ const chatSocket = async (socket) => {
             }
           }
         
-    
-
         socket.on('disconnect', () => {
             console.log('User disconnected');
             UserModel.findByIdAndUpdate(id, { $set: { is_online: false } }, { new: true })
@@ -98,7 +95,7 @@ const chatSocket = async (socket) => {
             });
     });
     socket.on('replyMessage', async (message) => {
-        console.log('Received new replu replu message:', message);
+        console.log('Received new` message:', message);
         socket.broadcast.emit('replymessage', message);
     });
 

@@ -14,6 +14,13 @@ async function fetchCart(req, res) {
             }
         };
 
+<<<<<<< HEAD
+=======
+        if (req.headers.authorization) {
+            req.tokenData = verifyToken(req.headers.authorization.split(' ')[1]);
+            req.hasAuthorization = true; 
+        }
+>>>>>>> dev
 
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1]);

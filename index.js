@@ -4,10 +4,17 @@ const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
 const ordersModel = require('./models/order');
+const OfferModel = require('./models/offers');
 const cors = require('cors');
+const Products = require('./models/products')
 require('dotenv').config();
+const { sendInvoiceTemplate, TicketStatusTemplate } = require('./helpers/INDEX');
+const mailer = require('./helpers/nodemailer');
+const jwtVerify = require('./middlewares/jwtVerify');
+const { updateCoupon } = require('./controller/offers');
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
 const stripe = require('stripe')(stripeSecret);
 const Secret = endPointSecret;
 
@@ -36,50 +43,82 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
         const descriptionObject = JSON.parse(description);
         const orderId = descriptionObject.orderId;
 
-        const fs = require('fs').promises; 
+        try {
+          const result = await ordersModel.findOneAndUpdate(
+            { orderID: orderId },
+            {
+              $set: {
+                'products.$[].payment_status': 'success',
+                transactionId: payment,
+                MOP: 'card',
+              },
+            },
+            { projection: { buyerId: 1 ,products:1,coupon:1}, returnOriginal: false }
+          );
+          var buyerId = result.buyerId.toString();
+          
+          // const buyerId = req.tokenData.id;
 
-            try {
-              const result = await ordersModel.updateOne(
-                { orderID: `${orderId}` },
-                {
-                  $set: {
-                    payment_status: 'success',
-                    transactionId: payment,
-                    MOP: 'card',
-                  },
+          console.log(result.buyerId.toString(), "buyer id is ")
+
+          // const res=await ordersModel.findOne({ orderID: orderId  },{_id:0,coupon:1,products:1});
+          console.log(result, "res is -======")
+          if(result?.coupon){
+            console.log('goint to update coupon');
+            await updateCoupon(result.coupon.toString(),buyerId); 
+        }
+   
+        if (result?.products) {
+            await Promise.all(result.products.map(async (el) => {
+              console.log('goint to decrease  product');
+                await Products.updateOne(
+                    {
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    },
+                    {
+                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    },
+                    {
+                        arrayFilters: [
+                            { "outer.color": el.color },
+                            { "inner.size": el.size }
+                        ]
+                    }
+                );
+
+                let particularProduct = await Products.findOne({ sku: el.sku });
+                const allStockZero = particularProduct.assets.every(color => {
+                    return color.stockQuantity.every(size => size.quantity === 0);
+                });
+
+                if (allStockZero) {
+                    await Products.updateOne({sku:el.sku},{ $set:{"status.active": false} });
                 }
-              );
-              
-              // async function handleWebhookData(paymentIntent, orderId, payment) {
-              //   const webhookData = {
-              //     paymentIntentId: `${paymentIntent.id}`,
-              //     orderId,
-              //     paymentStatus: 'success',
-              //     transactionId: payment,
-              //     MOP: 'card',
-              //   };
-              
-              //   let existingData = [];
-              //   try {
-              //     const fileData = await fs.readFile('stripeLogs.json', 'utf-8');
-              //     existingData = JSON.parse(fileData);
-              //   } catch (err) {
-              //     console.error('Error reading or parsing the file:', err);
-              //   }
-              
-              //   existingData.push(webhookData);
-              
-              //   try {
-              //     await fs.writeFile('stripeLogs.json', JSON.stringify(existingData, null, 2));
-              //   } catch (err) {
-              //     console.error('Error writing to file:', err);
-              //   }
-              // }
-              
-              // await handleWebhookData(paymentIntent, orderId, payment);
-            } catch (err) {
-              console.error('Error updating order:', err);
+
+            }));
+
+
+        }
+          
+          const mailData = {
+            email: jsonData.data.object.receipt_email,
+            subject: "Invoice",
+            invoice: jsonData
           }
+
+          const emailTemplate = sendInvoiceTemplate(mailData.invoice);
+          await mailer(mailData, emailTemplate);
+
+          // product decrease query
+
+
+
+        } catch (err) {
+          console.error('Error updating order:', err);
+        }
+
         break;
       case 'payment_method.attached':
         const paymentMethod = event.data.object;
@@ -113,7 +152,7 @@ require("./config/db/db");
 
 // Set up CORS headers
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*', 'https://tradevogue.web.app', 'http://localhost:4200');
+  res.setHeader('Access-Control-Allow-Origin', 'https://tradevogue.web.app', 'http://localhost:4200');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE,FETCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();

@@ -16,8 +16,41 @@ const orderSchema = mongoose.Schema(
                     ref: 'products',
                     required: true,
                 },
+                //  NEW FIELDS
+                sellerID: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'sellerdetails',
+                },
 
-                //  one order has limitedprodcut or split the products in one order like 15 products split in 3 product
+                sku: {
+                    type: String,
+                    required: true,
+                },
+
+                // productInfo
+
+                productInfo: {
+                    name: {
+                        type: String,
+                        required: true
+                    },
+    
+                    image: {
+                        type: String,
+                        required: true
+                    },
+                    category: {
+                        type: String,
+                        required: true
+                    },
+                    brand: {
+                        type: String,
+                        required: true
+                    },
+                },
+
+                // orderInfo
+
                 quantity: {
                     type: Number,
                     required: true,
@@ -26,15 +59,10 @@ const orderSchema = mongoose.Schema(
                     type: String,
                     required: true,
                 },
-                sku: {
-                    type: String,
-                    required: true,
-                },
                 size: {
                     type: String,
                     required: true,
                 },
-                //  name , photo, category, color , sku, shipment  status,qty,price
                 amount: {
                     type: Number,
                     default: function () { return this.quantity * this.price }
@@ -44,27 +72,18 @@ const orderSchema = mongoose.Schema(
                     type: Number,
                     required: true
                 },
+
                 shipmentStatus: {
                     type: String,
                     enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
                     default: 'pending',
 
                 },
-                name: {
+                payment_status: {
                     type: String,
-                    required: true
+                    enum: ['success', 'pending', 'cancelled', 'failed', 'refund'],
+                    default: 'pending'
                 },
-                //  NEW FIELDS
-                SellerId: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'sellerdetails',
-                },
-                image: {
-                    type: String,
-                    required: true
-                },
-
-
             }
         ],
         invoice_status: {
@@ -82,11 +101,11 @@ const orderSchema = mongoose.Schema(
         },
         address: address,
 
-        payment_status: {
-            type: String,
-            enum: ['success', 'pending', 'cancelled', 'failed', 'refund'],
-            default: 'pending'
-        },
+        // payment_status: {
+        //     type: String,
+        //     enum: ['success', 'pending', 'cancelled', 'failed', 'refund'],
+        //     default: 'pending'
+        // },
         active: {
             type: Boolean,
             default: true,
@@ -101,11 +120,11 @@ const orderSchema = mongoose.Schema(
             type: String
         },
 
-        OrderSummary:{
-            subTotal:{type:Number},
-            shipping:{type:Number,default:0},
-            Total:{type:Number}  ,
-            couponDiscount:{type:Number,default:0}
+        OrderSummary: {
+            subTotal: { type: Number },
+            shipping: { type: Number, default: 0 },
+            Total: { type: Number },
+            couponDiscount: { type: Number, default: 0 }
         },
 
         coupon: {
@@ -119,19 +138,16 @@ const orderSchema = mongoose.Schema(
     }
 );
 
-
-
-
 orderSchema.pre('save', function (next) {
     this.OrderSummary.subTotal = this.products.reduce((totalAmount, product) => {
         return totalAmount + product.amount;
     }, 0);
 
-    if(this.OrderSummary.couponDiscount){
-        this.OrderSummary.Total=this.OrderSummary.subTotal-this.OrderSummary.couponDiscount+this.OrderSummary.shipping;
+    if (this.OrderSummary.couponDiscount) {
+        this.OrderSummary.Total = this.OrderSummary.subTotal - this.OrderSummary.couponDiscount + this.OrderSummary.shipping;
     }
-    else{
-        this.OrderSummary.Total=this.OrderSummary.subTotal+this.OrderSummary.shipping;
+    else {
+        this.OrderSummary.Total = this.OrderSummary.subTotal + this.OrderSummary.shipping;
     }
     next();
 });
