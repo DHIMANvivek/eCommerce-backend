@@ -352,6 +352,7 @@ async function checkCoupon(couponId, userId) {
 async function updateCoupon(couponId, userId) {
   try {
     const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) },$inc:{couponUsersLimit:-1} });
+    console.log('response of update coupon is -------->',response);
     return new Promise((res, rej) => {
       res(response);
     })

@@ -4,12 +4,17 @@ const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
 const ordersModel = require('./models/order');
+const OfferModel = require('./models/offers');
 const cors = require('cors');
+const Products = require('./models/products')
 require('dotenv').config();
-const { sendInvoiceTemplate , TicketStatusTemplate } = require('./helpers/INDEX');
+const { sendInvoiceTemplate, TicketStatusTemplate } = require('./helpers/INDEX');
 const mailer = require('./helpers/nodemailer');
+const jwtVerify = require('./middlewares/jwtVerify');
+const { updateCoupon } = require('./controller/offers');
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
 const stripe = require('stripe')(stripeSecret);
 const Secret = endPointSecret;
 
@@ -39,7 +44,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
         const orderId = descriptionObject.orderId;
 
         try {
-          const result = await ordersModel.updateOne(
+          const result = await ordersModel.findOneAndUpdate(
             { orderID: orderId },
             {
               $set: {
@@ -47,21 +52,67 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
                 transactionId: payment,
                 MOP: 'card',
               },
-            }
+            },
+            { projection: { buyerId: 1 ,products:1,coupon:1}, returnOriginal: false }
           );
+          var buyerId = result.buyerId.toString();
+          
+          // const buyerId = req.tokenData.id;
 
-          // return;
+          console.log(result.buyerId.toString(), "buyer id is ")
+
+          // const res=await ordersModel.findOne({ orderID: orderId  },{_id:0,coupon:1,products:1});
+          console.log(result, "res is -======")
+          if(result?.coupon){
+            console.log('goint to update coupon');
+            await updateCoupon(result.coupon.toString(),buyerId); 
+        }
+   
+        if (result?.products) {
+            await Promise.all(result.products.map(async (el) => {
+              console.log('goint to decrease  product');
+                await Products.updateOne(
+                    {
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    },
+                    {
+                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    },
+                    {
+                        arrayFilters: [
+                            { "outer.color": el.color },
+                            { "inner.size": el.size }
+                        ]
+                    }
+                );
+
+                let particularProduct = await Products.findOne({ sku: el.sku });
+                const allStockZero = particularProduct.assets.every(color => {
+                    return color.stockQuantity.every(size => size.quantity === 0);
+                });
+
+                if (allStockZero) {
+                    await Products.updateOne({sku:el.sku},{ $set:{"status.active": false} });
+                }
+
+            }));
+
+
+        }
+          
           const mailData = {
             email: jsonData.data.object.receipt_email,
             subject: "Invoice",
             invoice: jsonData
           }
 
-          console.log(mailData, "mailData is");
-
-          // return;
           const emailTemplate = sendInvoiceTemplate(mailData.invoice);
           await mailer(mailData, emailTemplate);
+
+          // product decrease query
+
 
 
         } catch (err) {

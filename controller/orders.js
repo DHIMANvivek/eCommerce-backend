@@ -33,6 +33,7 @@ async function updateLatestOrderDetail(req, res) {
    
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
+                console.log('el of products array ios ',el);
                 await Products.updateOne(
                     {
                         sku: el.sku,
@@ -174,11 +175,14 @@ async function createOrder(req, res) {
         delete req.body.details;
         req.body.OrderSummary={};
         req.body.OrderSummary.subTotal=verifyOrder?.total;
+        console.log("verifyOrder is ",verifyOrder)
         if(verifyOrder?.discount){
             req.body.OrderSummary.couponDiscount=verifyOrder.discount;
             req.body.OrderSummary.total-=req.body.OrderSummary.couponDiscount;
+            req.body.coupon=req.body.couponId;
         }
 
+        console.log('req body is ',req.body);
 
         // order ID creation
         const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });

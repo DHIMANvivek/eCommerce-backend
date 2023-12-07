@@ -69,7 +69,7 @@ async function getPaymentKeys(req, res) {
     // ]);
 
     const paymentKeys=await getPaymentKeyPromise(req,res);
-    console.log('payment keys is ',paymentKeys);
+    // console.log('payment keys is ',paymentKeys);
     res.status(200).json(paymentKeys);
   } catch (error) {
     logger.error(error);

@@ -268,7 +268,7 @@ async function TicketStatusTemplate(mailData) {
 async function sendInvoiceTemplate(paymentData) {
   // console.log(paymentData.data.object, "data is ");
   // return;
-  console.log(paymentData, "paymentData");
+  // console.log(paymentData, "paymentData");
   let productList = JSON.parse(paymentData.data.object.description);
   // let payment_status = JSON.parse(paymentData.data.object.status);
   console.log("payment_status", paymentData.data.object.status)

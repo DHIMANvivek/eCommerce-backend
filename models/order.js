@@ -138,9 +138,6 @@ const orderSchema = mongoose.Schema(
     }
 );
 
-
-
-
 orderSchema.pre('save', function (next) {
     this.OrderSummary.subTotal = this.products.reduce((totalAmount, product) => {
         return totalAmount + product.amount;
