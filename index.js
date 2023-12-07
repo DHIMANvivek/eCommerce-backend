@@ -186,7 +186,7 @@ const routes = require('./config/routes');
 app.use(routes);
 
 
-let port = 2001;
+let port = 1000;
 app.listen(port, (err) => {
   console.log(`listening to port ${port}`);
 });
