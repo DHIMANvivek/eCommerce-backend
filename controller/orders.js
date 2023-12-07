@@ -24,19 +24,6 @@ async function getLatestOrderId(req, res) {
 async function updateLatestOrderDetail(req, res) {
     try {
         const buyerId = req.tokenData.id;
-        // const buyerId ='6539e71dced882bb66fbae55';
-        // const { newPaymentStatus, transactionId, MOP } = req.body;
-        // const result = await ordersModel.updateOne(
-        //     { orderID: req.body.orderID },
-        //     {
-        //         $set: {
-        //             payment_status: newPaymentStatus,
-        //             transactionId: transactionId,
-        //             MOP: MOP,
-        //         }
-        //     }
-        // );
-
         console.log('update order called----> ',req.body);
 
         const response=await ordersModel.findOne({ orderID: req.body.orderID ,payment_status:'success'},{_id:0,coupon:1,products:1});
@@ -179,6 +166,7 @@ async function verifyOrderSummary(req, res,productData=false) {
         res.status(500).json(error);
     }
 }
+
 async function createOrder(req, res) {
     try {
         const verifyOrder = await verifyOrderSummary(req, res,true);

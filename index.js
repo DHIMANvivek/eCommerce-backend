@@ -6,17 +6,17 @@ const app = express();
 const ordersModel = require('./models/order');
 const cors = require('cors');
 require('dotenv').config();
+const { sendInvoiceTemplate , TicketStatusTemplate } = require('./helpers/INDEX');
+const mailer = require('./helpers/nodemailer');
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
-// const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const stripe = require('stripe')(stripeSecret);
-const Secret = process.env.STRIPE_WEBHOOK_SECRET;;
+const Secret = endPointSecret;
 
-app.post('/webhook', express.raw({ type: 'application/json' }),
- async (request, response) => {
+app.post('/webhook', express.raw({ type: 'application/json' }), async (request, response) => {
   let event;
   const signature = request.headers['stripe-signature'];
   try {
-    console.log('envetign function ',req.body);
     if (Secret) {
       event = stripe.webhooks.constructEvent(
         request.body,
@@ -25,7 +25,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }),
       );
     } else {
       event = JSON.parse(request.body);
-      console.log('event is ',event);
     }
 
     switch (event.type) {
@@ -39,50 +38,36 @@ app.post('/webhook', express.raw({ type: 'application/json' }),
         const descriptionObject = JSON.parse(description);
         const orderId = descriptionObject.orderId;
 
-        // const fs = require('fs').promises; 
+        try {
+          const result = await ordersModel.updateOne(
+            { orderID: orderId },
+            {
+              $set: {
+                'products.$[].payment_status': 'success',
+                transactionId: payment,
+                MOP: 'card',
+              },
+            }
+          );
 
-            try {
-              const result = await ordersModel.updateOne(
-                { orderID: `${orderId}` },
-                {
-                  $set: {
-                    payment_status: 'success',
-                    transactionId: payment,
-                    MOP: 'card',
-                  },
-                }
-              );
-              
-              // async function handleWebhookData(paymentIntent, orderId, payment) {
-              //   const webhookData = {
-              //     paymentIntentId: `${paymentIntent.id}`,
-              //     orderId,
-              //     paymentStatus: 'success',
-              //     transactionId: payment,
-              //     MOP: 'card',
-              //   };
-              
-              //   let existingData = [];
-              //   try {
-              //     const fileData = await fs.readFile('stripeLogs.json', 'utf-8');
-              //     existingData = JSON.parse(fileData);
-              //   } catch (err) {
-              //     console.error('Error reading or parsing the file:', err);
-              //   }
-              
-              //   existingData.push(webhookData);
-              
-              //   try {
-              //     await fs.writeFile('stripeLogs.json', JSON.stringify(existingData, null, 2));
-              //   } catch (err) {
-              //     console.error('Error writing to file:', err);
-              //   }
-              // }
-              
-              // await handleWebhookData(paymentIntent, orderId, payment);
-            } catch (err) {
-              console.error('Error updating order:', err);
+          // return;
+          const mailData = {
+            email: jsonData.data.object.receipt_email,
+            subject: "Invoice",
+            invoice: jsonData
           }
+
+          console.log(mailData, "mailData is");
+
+          // return;
+          const emailTemplate = sendInvoiceTemplate(mailData.invoice);
+          await mailer(mailData, emailTemplate);
+
+
+        } catch (err) {
+          console.error('Error updating order:', err);
+        }
+
         break;
       case 'payment_method.attached':
         const paymentMethod = event.data.object;
@@ -107,7 +92,6 @@ app.use(
   }),
 );
 
-
 app.use(cors());
 
 require("dotenv").config();
@@ -117,7 +101,7 @@ require("./config/db/db");
 
 // Set up CORS headers
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin',  'http://localhost:4200');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE,FETCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
