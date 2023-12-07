@@ -7,8 +7,8 @@ async function sendMail(data, Template) {
         const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'testnodemailerapis@gmail.com',
-                pass: 'eznt vjmy ctpx wngf'
+                user: 'business.tradevogue@gmail.com',
+                pass: 'rnpp kfjp dsol xcqj'
             }
         });
         let details = {

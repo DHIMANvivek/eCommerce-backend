@@ -233,117 +233,17 @@ error: 2023-12-04T06:36:51.104Z Error: read ECONNRESET
 error: 2023-12-04T06:37:21.861Z Error: read ECONNRESET
 error: 2023-12-04T06:38:04.700Z Error: read ECONNRESET
 error: 2023-12-04T07:10:23.616Z AxiosError: Request failed with status code 400
-error: 2023-12-04T06:28:40.308Z This product is Out Of Stock
-error: 2023-12-04T06:28:43.202Z This product is Out Of Stock
-error: 2023-12-04T06:28:45.264Z This product is Out Of Stock
-error: 2023-12-04T06:28:46.571Z This product is Out Of Stock
-error: 2023-12-04T06:28:48.893Z This product is Out Of Stock
-error: 2023-12-04T06:42:15.139Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:42:30.171Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:42:34.910Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:43:38.866Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:43:44.247Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:44:14.186Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:45:24.696Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:47:14.429Z This product is Out Of Stock
-error: 2023-12-04T06:48:21.261Z This product is Out Of Stock
-error: 2023-12-04T11:06:25.090Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-04T11:06:52.110Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-04T11:07:29.066Z Flannel Oversized Shirt ok is out of stock
-error: 2023-12-05T03:32:23.616Z This product is Out Of Stock
-error: 2023-12-05T05:03:04.120Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:03:34.580Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:06:32.457Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:07:40.556Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:09:21.228Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:10:04.402Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:11:22.671Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:13:00.337Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:13:13.047Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-06T15:56:36.452Z 404
-error: 2023-12-06T15:56:38.489Z 404
-error: 2023-12-06T15:56:41.424Z 404
-error: 2023-12-06T15:58:23.883Z 404
-error: 2023-12-06T15:58:25.348Z 404
-error: 2023-12-06T16:14:51.091Z Cast to embedded failed for value "{
-  firstname: 'VIVEK',
-  lastname: 'DHIMAN',
-  apartment: 'dhiman niwas 407/1 ,central town , street number 8',
-  city: [ 'Dad' ],
-  area: 'Ludhiana',
-  state: 'Punjab',
-  pincode: '142022',
-  country: 'IN'
-}" (type Object) at path "info.address" because of "CastError"
-error: 2023-12-06T16:15:25.293Z 404
-error: 2023-12-06T16:15:26.395Z 404
-error: 2023-12-06T16:15:27.279Z 404
-error: 2023-12-06T16:15:29.570Z 404
-error: 2023-12-07T04:08:14.083Z Please login/signup.
-error: 2023-12-07T04:08:14.083Z Please login/signup.
-error: 2023-12-07T04:08:15.533Z Please login/signup.
-error: 2023-12-07T04:08:15.533Z Please login/signup.
-error: 2023-12-07T04:09:02.434Z Please login/signup.
-error: 2023-12-07T04:09:02.434Z Please login/signup.
-error: 2023-12-07T04:09:04.678Z Please login/signup.
-error: 2023-12-07T04:09:04.678Z Please login/signup.
-error: 2023-12-07T04:09:05.512Z Please login/signup.
-error: 2023-12-07T04:09:05.512Z Please login/signup.
-error: 2023-12-07T04:09:06.319Z Please login/signup.
-error: 2023-12-07T04:09:06.319Z Please login/signup.
-error: 2023-12-07T04:09:07.695Z Please login/signup.
-error: 2023-12-07T04:09:07.695Z Please login/signup.
-error: 2023-12-07T04:09:08.830Z Please login/signup.
-error: 2023-12-07T04:09:08.830Z Please login/signup.
-error: 2023-12-07T04:11:08.413Z Please login/signup.
-error: 2023-12-07T04:11:08.413Z Please login/signup.
-error: 2023-12-07T04:21:04.465Z 404
-error: 2023-12-07T04:21:05.663Z 404
-error: 2023-12-07T04:21:06.299Z 404
-error: 2023-12-07T04:21:59.495Z Please login/signup.
-error: 2023-12-07T04:21:59.495Z Please login/signup.
-error: 2023-12-07T04:29:32.022Z A-line Kurti is out of stock
-error: 2023-12-07T04:41:39.726Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T04:42:03.344Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T04:45:44.198Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T05:03:24.477Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T05:13:44.653Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:28:19.991Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T06:16:31.654Z Unexpected token u in JSON at position 0
-error: 2023-12-07T06:18:30.238Z Unexpected token u in JSON at position 0
-error: 2023-12-07T06:21:56.806Z Unexpected token u in JSON at position 0
-error: 2023-12-07T06:38:34.563Z productData is not defined
-error: 2023-12-07T06:51:41.269Z Unexpected token s in JSON at position 0
-error: 2023-12-07T07:13:11.666Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:13:19.276Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:13:22.595Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:13:23.325Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:14.254Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:22.114Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:26.325Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:26.949Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:19.329Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:27.556Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:30.549Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:30.715Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:23.835Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T07:16:35.052Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:44.649Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:47.170Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:47.665Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:00.880Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T07:19:13.010Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:21.548Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:24.476Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:24.696Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:24:57.344Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:25:06.896Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:25:11.237Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:25:11.394Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T08:12:45.653Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T08:17:41.983Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T09:26:35.808Z 404
-error: 2023-12-07T09:26:51.908Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T09:27:47.786Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T09:43:19.785Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T09:45:55.942Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-04T09:49:39.299Z mongoose is not defined
+error: 2023-12-04T09:50:04.194Z mongoose is not defined
+error: 2023-12-04T09:50:04.320Z mongoose is not defined
+error: 2023-12-04T09:50:28.363Z mongoose is not defined
+error: 2023-12-04T09:51:33.528Z mongoose is not defined
+error: 2023-12-04T09:55:22.315Z mongoose is not defined
+error: 2023-12-04T09:55:52.695Z mongoose is not defined
+error: 2023-12-04T09:57:54.029Z mongoose is not defined
+error: 2023-12-04T10:03:11.920Z mongoose is not defined
+error: 2023-12-04T10:03:38.821Z mongoose is not defined
+error: 2023-12-04T10:03:38.876Z mongoose is not defined
+error: 2023-12-04T10:26:55.455Z log is not defined
+error: 2023-12-04T10:26:55.601Z log is not defined
+error: 2023-12-04T10:37:00.341Z Cannot set headers after they are sent to the client

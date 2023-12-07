@@ -133,8 +133,9 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
-
+        console.log(input, "in[uttt");
         const user = req.tokenData;
+        console.log(user, "user");
 
         const wishlister = await wishlist.findOne({
             userId: user.id
@@ -142,7 +143,8 @@ async function deleteWishlist(req, res) {
         if (wishlister) {
             await wishlister.wishlists.splice(input.index, 1);
         }
-        wishlister.save()
+
+        wishlister.save();
         return res.status(200).json({
             message: "Wishlist deleted!"
         })

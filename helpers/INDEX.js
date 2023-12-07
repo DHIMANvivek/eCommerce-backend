@@ -1,3 +1,4 @@
+require('dotenv').config();
 function ForgetTemplate(token) {
   let html =
     `<!DOCTYPE html>
@@ -25,33 +26,33 @@ function ForgetTemplate(token) {
       padding: 8px;
       text-align: left;
     }
-
+    header.img {
+      
+      transform: translateY(7px);
+    }
     td.header {
       border-block-end : 1px solid #f5f6f7;
     }
     tr {
       background-color : white;
     }
-
   </style>
 </head>
 <body>
 <div class="outer-div">
-<table >
+<table>
   <tr>
-    <td class="header" colspan="2">
-    <img src="http://drive.google.com/uc?export=view&id=1Bxzu7SoWFK1soNkb_R99kft1X3cWJqyE" alt="logo" width="150" height="50">
-      
+    <td class="header" colspan="2" height="50">
+    <img src="http://drive.google.com/uc?export=view&id=1Bxzu7SoWFK1soNkb_R99kft1X3cWJqyE" alt="logo" width="150" height="50" style="margin-top:9px;">
     </td>
   </tr>
   <tr>
     <td class="content" colspan="2">
-   
-      <p>Dear Sir/Ma'am,</p>
-      <p>A password reset event has been triggered. The password reset window is limited to 5 minutes.</p>
-      <p>If you do not reset your password within five minutes, you will need to submit a new request.</p>
-      <p>Complete the password reset process, visit the following link:</p>
-      <a href=http://localhost:4200/auth/forgetPassword/${token}> Forget Password</a>
+      <p style="padding-left:9px; padding-right: 9px">Dear Sir/Ma'am,</p>
+      <p style="padding-left:9px; padding-right: 9px">A password reset event has been triggered. The password reset window is limited to 5 minutes.</p>
+      <p style="padding-left:9px; padding-right: 9px">If you do not reset your password within five minutes, you will need to submit a new request.</p>
+      <p style="padding-left:9px; padding-right: 9px">Complete the password reset process, visit the following link:</p>
+      <a style="padding-left:9px; padding-right: 9px" href=${process.env.frontend_URL}/auth/forgetPassword/${token}> Forget Password</a>
     </td>
   </tr>
 </table>
@@ -110,11 +111,11 @@ function SignupTemplate() {
   </tr>
   <tr >
     <td colspan="2" style="padding: 15px">
-      <p>Dear Sir/Ma'am,</p>
-      <p>Welcome to Trade Vogue! We're thrilled to have you join our online shopping community. Thank you for signing up and becoming a part of our family.</p>
-      <p>As a member of Trade Vogue, you'll enjoy exclusive benefits, personalized recommendations, and access to a wide range of products and deals.</p>
-      <p>We can't wait to see you on our website and make your shopping experience memorable. Thank you for choosing us.</p>
-      <p>Happy shopping!</p>
+      <p style="padding-left:9px; padding-right: 9px" style="padding-left:9px; padding-right: 9px">Dear Sir/Ma'am,</p>
+      <p style="padding-left:9px; padding-right: 9px">Welcome to Trade Vogue! We're thrilled to have you join our online shopping community. Thank you for signing up and becoming a part of our family.</p>
+      <p style="padding-left:9px; padding-right: 9px">As a member of Trade Vogue, you'll enjoy exclusive benefits, personalized recommendations, and access to a wide range of products and deals.</p>
+      <p style="padding-left:9px; padding-right: 9px">We can't wait to see you on our website and make your shopping experience memorable. Thank you for choosing us.</p>
+      <p style="padding-left:9px; padding-right: 9px">Happy shopping!</p>
     </td>
   </tr>
 </table>
@@ -176,10 +177,10 @@ function SubscribeTemplate() {
     </tr>
     <tr>
       <td class="content" colspan="2">
-        <p>Dear Sir/Ma'am,</p>
-        <p>We hope this message finds you well. We are excited to express our gratitude for your continued support and loyalty. It's subscribers like you who make our community special, and we want to thank you for being a part of our journey.</p>
-        <p>As a token of our appreciation, we are pleased to offer you an exclusive 25% discount on your next purchase! This is our way of saying "thank you" for choosing to be a part of our family.</p>
-        <p>To redeem your 25% discount, simply use the following promo code at checkout: SUBSCRIBE25</p>
+        <p style="padding-left:9px; padding-right: 9px">Dear Sir/Ma'am,</p>
+        <p style="padding-left:9px; padding-right: 9px">We hope this message finds you well. We are excited to express our gratitude for your continued support and loyalty. It's subscribers like you who make our community special, and we want to thank you for being a part of our journey.</p>
+        <p style="padding-left:9px; padding-right: 9px">As a token of our appreciation, we are pleased to offer you an exclusive 25% discount on your next purchase! This is our way of saying "thank you" for choosing to be a part of our family.</p>
+        <p style="padding-left:9px; padding-right: 9px">To redeem your 25% discount, simply use the following promo code at checkout: SUBSCRIBE25</p>
       </td>
     </tr>
   </table>
@@ -283,9 +284,9 @@ async function sendInvoiceTemplate(paymentData) {
       <tr>
         <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
         <td style="padding: 8px; border: 1px solid #dddddd;"> ${product.price.toLocaleString('en-IN', {
-          style: 'currency',
-          currency: 'INR',
-        })}</td>
+      style: 'currency',
+      currency: 'INR',
+    })}</td>
         <td style="padding: 8px; border: 1px solid #dddddd;">${product.quantity} qty</td>
       </tr>
     `;
@@ -383,7 +384,7 @@ async function sendInvoiceTemplate(paymentData) {
 }
 
 async function sendDiscountTemplate(discountData) {
-  
+
   let html = `
     <!DOCTYPE html>
     <html>

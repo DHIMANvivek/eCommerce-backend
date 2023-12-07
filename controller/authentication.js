@@ -155,8 +155,6 @@ async function forgotPassword(req, res) {
                 'password': 1,
                 'provider': 1,
             });
-
-
         if (!user) {
             throw { message: "This email doesn't exist." }
         }

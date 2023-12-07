@@ -4,13 +4,10 @@ const admin = require('firebase-admin');
 require('dotenv').config();
 const app = express();
 const ordersModel = require('./models/order');
-const OfferModel = require('./models/offers');
 const cors = require('cors');
 const Products = require('./models/products')
-require('dotenv').config();
 const { sendInvoiceTemplate, TicketStatusTemplate } = require('./helpers/INDEX');
 const mailer = require('./helpers/nodemailer');
-const jwtVerify = require('./middlewares/jwtVerify');
 const { updateCoupon } = require('./controller/offers');
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -152,7 +149,7 @@ require("./config/db/db");
 
 // Set up CORS headers
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.setHeader('Access-Control-Allow-Origin', process.env.frontend_URL);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE,FETCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
