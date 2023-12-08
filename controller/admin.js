@@ -31,7 +31,7 @@ async function fetchAdminNotifications(req, res) {
   }
 }
 
-async function getOverallInfo(req, res, controller = false) {
+async function getOverallInfo(req, res) {
   try {
     let result = {};
     // const customerCountCurr = await users.find({ 'role': { $not: { $eq: 'admin' } } }).count();
@@ -41,10 +41,10 @@ async function getOverallInfo(req, res, controller = false) {
     //   'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     // }).count();
 
-    const customerCountCurr = (await orders.distinct('buyerId', { payment_status: 'success' })).length;
+    const customerCountCurr = (await orders.distinct('buyerId', { "products.payment_status": 'success' })).length;
 
     const customerCountPrev = (await orders.distinct('buyerId', {
-      payment_status: 'success',
+      "products.payment_status": 'success',
       'createdAt': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     })).length;
 
@@ -55,11 +55,10 @@ async function getOverallInfo(req, res, controller = false) {
       'change': Math.floor(customerChange)
     };
 
-
-    const orderCountTotal = await orders.find({ payment_status: 'success' }).count();
+    const orderCountTotal = await orders.find({ "products.payment_status": 'success' }).count();
 
     const orderCountPrev = await orders.find({
-      payment_status: 'success',
+      "products.payment_status": 'success',
       'orderDate': { $lte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 31) }
     }).count();
 
@@ -114,79 +113,107 @@ async function getOverallInfo(req, res, controller = false) {
         $unwind: "$products",
       },
       {
+        $match: {
+          "products.payment_status": "success",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          totalAmount: {
+            $sum: "$products.amount",
+          },
+          productsInfo: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$productsInfo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          sharedDiscount: {
+            $round: {
+              $multiply: [
+                {
+                  $divide: [
+                    "$productsInfo.products.amount",
+                    "$totalAmount",
+                  ],
+                },
+                "$productsInfo.OrderSummary.couponDiscount",
+              ],
+            },
+          },
+          productsInfo: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$productsInfo.products._id",
+          paymentStatus: {
+            $first:
+              "$productsInfo.products.payment_status",
+          },
+          shipmentStatus: {
+            $first:
+              "$productsInfo.products.shipmentStatus",
+          },
+          amount: {
+            $first: "$productsInfo.products.amount",
+          },
+          discount: {
+            $first: "$sharedDiscount",
+          },
+          orderDate: {
+            $first: "$productsInfo.orderDate",
+          },
+        },
+      },
+      {
         $facet: {
           prev: [
             {
               $match: {
-                payment_status: "success",
                 orderDate: {
                   $lte: new Date(
                     new Date().getFullYear(),
                     new Date().getMonth() - 1,
                     31
-                  ),
-                },
-                "products.shipmentStatus": {
-                  $nin: ["cancelled", "declined"],
-                },
-              },
+                  )
+                }
+              }
             },
             {
               $group: {
                 _id: null,
-                overallDiscount: {
-                  $sum: "$OrderSummary.couponDiscount",
-                },
-                totalsales: {
-                  $sum: "$products.amount",
-                }
-              },
-            },
-            {
-              $project: {
-
-                _id: 0,
                 totalSales: {
-                  $subtract: [
-                    "$totalsales",
-                    "$overallDiscount",
-                  ],
-                },
-              },
-            },
+                  $sum: {
+                    $subtract: ["$amount", "$discount"]
+                  }
+                }
+              }
+            }
           ],
           total: [
             {
-              $match: {
-                payment_status: "success",
-                "products.shipmentStatus": { $nin: ['cancelled', 'declined'] }
-              },
-            },
-            {
               $group: {
                 _id: null,
-                overallDiscount: {
-                  $sum: "$OrderSummary.couponDiscount",
-                },
-                totalsales: {
-                  $sum: "$products.amount",
-                }
-              },
-            },
-            {
-              $project: {
-                _id: 0,
                 totalSales: {
-                  $subtract: [
-                    "$totalsales",
-                    "$overallDiscount",
-                  ],
-                },
-              },
-            },
-          ],
-        },
-      },
+                  $sum: {
+                    $subtract: ["$amount", "$discount"]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
     ]);
 
     result['revenue'] = {
@@ -199,11 +226,13 @@ async function getOverallInfo(req, res, controller = false) {
 
   } catch (err) {
     logger.error(err);
+    return res.status(500);
   }
 }
 
 async function fetchProductSalesData(req, res) {
   let controller = req.controller ? true : false;
+
   const data = req.tokenData;
   const type = req.query.type;
 
@@ -216,26 +245,23 @@ async function fetchProductSalesData(req, res) {
         },
         {
           $match: {
-            payment_status: "success",
-            "products.shipmentStatus": {
-              $nin: ["cancelled", "declined"],
-            },
+            "products.payment_status": "success",
           },
         },
         {
           $group: {
             _id: "$_id",
             totalAmount: {
-              $sum: "$products.price",
+              $sum: "$products.amount",
             },
-            products: {
+            orderInfo: {
               $push: "$$ROOT",
             },
           },
         },
         {
           $unwind: {
-            path: "$products",
+            path: "$orderInfo",
             preserveNullAndEmptyArrays: true,
           },
         },
@@ -248,28 +274,28 @@ async function fetchProductSalesData(req, res) {
                 $multiply: [
                   {
                     $divide: [
-                      "$products.products.price",
+                      "$orderInfo.products.amount",
                       "$totalAmount",
                     ],
                   },
-                  "$products.OrderSummary.couponDiscount",
+                  "$orderInfo.OrderSummary.couponDiscount",
                 ],
               },
             },
-            products: 1,
+            orderInfo: 1,
           },
         },
         {
           $lookup: {
             from: "products",
-            localField: "products.products.sku",
+            localField: "orderInfo.products.sku",
             foreignField: "sku",
-            as: "productsDetail",
+            as: "productInfo",
           },
         },
         {
           $unwind: {
-            path: "$productsDetail",
+            path: "$productInfo",
             preserveNullAndEmptyArrays: true,
           },
         }
@@ -279,16 +305,16 @@ async function fetchProductSalesData(req, res) {
         $group: {
           _id: {
             year: {
-              $year: "$products.orderDate",
+              $year: "$orderInfo.orderDate",
             },
             month: {
-              $month: "$products.orderDate",
+              $month: "$orderInfo.orderDate",
             },
           },
           totalsales: {
             $sum: {
               $subtract: [
-                "$products.products.amount",
+                "$orderInfo.products.amount",
                 "$shareDiscount",
               ],
             },
@@ -296,23 +322,24 @@ async function fetchProductSalesData(req, res) {
           totalExpenses: {
             $sum: {
               $multiply: [
-                "$productsDetail.costPrice",
-                "$products.products.quantity",
+                "$productInfo.costPrice",
+                "$orderInfo.products.quantity",
               ],
             },
           },
         },
       };
 
+      // aggregationPipe.unshift({
+      //   $match: {
+      //     $
+      //   }
+      // })
+
       if (type == 'yearly') {
         delete groupbyQuery.$group._id.date;
-        // aggregationPipe.unshift({
-        //   $match: {
-        //     $
-        //   }
-        // })
       } else {
-        groupbyQuery.$group._id.date = { $dayOfMonth: "$products.orderDate" };
+        groupbyQuery.$group._id.date = { $dayOfMonth: "$orderInfo.orderDate" };
       }
 
       aggregationPipe.push(
@@ -356,34 +383,30 @@ async function fetchPopularProducts(req, res) {
 
     const popularProductStats = await orders.aggregate([
       {
-        $match:
-        {
-          payment_status: "success",
+        $match: {
+          "products.payment_status": "success",
         },
       },
       {
-        $unwind:
-        {
+        $unwind: {
           path: "$products",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
-        $group:
-        {
+        $group: {
           _id: "$_id",
           totalAmount: {
-            $sum: "$products.price",
+            $sum: "$products.amount",
           },
-          products: {
+          orderInfo: {
             $push: "$$ROOT",
           },
         },
       },
       {
-        $unwind:
-        {
-          path: "$products",
+        $unwind: {
+          path: "$orderInfo",
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -396,27 +419,25 @@ async function fetchPopularProducts(req, res) {
               $multiply: [
                 {
                   $divide: [
-                    "$products.products.price",
+                    "$orderInfo.products.amount",
                     "$totalAmount",
                   ],
                 },
-                "$products.OrderSummary.couponDiscount",
+                "$orderInfo.OrderSummary.couponDiscount",
               ],
             },
           },
-          products: 1,
+          orderInfo: 1,
         },
       },
       {
         $match: {
-          "products.payment_status": "success",
-          "products.products.shipmentStatus": {
-            $nin: ["cancelled", "declined"],
-          },
+          "orderInfo.products.payment_status":
+            "success",
           $expr: {
             $eq: [
               {
-                $month: "$products.orderDate",
+                $month: "$orderInfo.orderDate",
               },
               {
                 $month: new Date(),
@@ -428,24 +449,24 @@ async function fetchPopularProducts(req, res) {
       {
         $lookup: {
           from: "products",
-          localField: "products.products.sku",
+          localField: "orderInfo.products.sku",
           foreignField: "sku",
-          as: "productDetail",
+          as: "productInfo",
         },
       },
       {
         $unwind: {
-          path: "$productDetail",
+          path: "$productInfo",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
-          _id: "$productDetail._id",
+          _id: "$productInfo._id",
           revenue: {
             $sum: {
               $subtract: [
-                "$products.products.amount",
+                "$orderInfo.products.amount",
                 "$shareDiscount",
               ],
             },
@@ -455,30 +476,34 @@ async function fetchPopularProducts(req, res) {
               $subtract: [
                 {
                   $subtract: [
-                    "$products.products.amount",
+                    "$orderInfo.products.amount",
                     "$shareDiscount",
                   ],
                 },
                 {
                   $multiply: [
-                    "$products.products.quantity",
-                    "$productDetail.costPrice",
+                    "$orderInfo.products.quantity",
+                    "$productInfo.costPrice",
                   ],
                 },
               ],
             },
           },
           name: {
-            $first: "$products.products.name",
+            $first:
+              "$orderInfo.products.productInfo.name",
           },
           category: {
-            $first: "$productDetail.info.category",
+            $first:
+              "$orderInfo.products.productInfo.category",
           },
           brand: {
-            $first: "$productDetail.info.brand",
+            $first:
+              "$orderInfo.products.productInfo.brand",
           },
           photo: {
-            $first: "$products.products.image",
+            $first:
+              "$orderInfo.products.productInfo.image",
           },
         },
       },
@@ -507,30 +532,30 @@ async function fetchCategorySalesData(req, res) {
   try {
     const categoryStats = await orders.aggregate([
       {
-        $match: {
-          payment_status: "success",
-        },
-      },
-      {
         $unwind: {
           path: "$products",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
+        $match: {
+          "products.payment_status": "success",
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           totalAmount: {
-            $sum: "$products.price",
+            $sum: "$products.amount",
           },
-          products: {
+          orderInfo: {
             $push: "$$ROOT",
           },
         },
       },
       {
         $unwind: {
-          path: "$products",
+          path: "$orderInfo",
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -541,42 +566,28 @@ async function fetchCategorySalesData(req, res) {
           shareDiscount: {
             $round: {
               $multiply: [
-                { $divide: ["$products.products.price", "$totalAmount"] },
-                "$products.OrderSummary.couponDiscount",
+                {
+                  $divide: [
+                    "$orderInfo.products.amount",
+                    "$totalAmount",
+                  ],
+                },
+                "$orderInfo.OrderSummary.couponDiscount",
               ],
             },
           },
-          products: 1,
-        },
-      },
-      {
-        $match: {
-          "products.payment_status": "success",
-          "products.products.shipmentStatus": {
-            $nin: ["cancelled", "declined"],
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.products.sku",
-          foreignField: "sku",
-          as: "productDetail",
-        },
-      },
-      {
-        $unwind: {
-          path: "$productDetail",
-          preserveNullAndEmptyArrays: true,
+          orderInfo: 1,
         },
       },
       {
         $group: {
-          _id: "$productDetail.info.category",
+          _id: "$orderInfo.products.productInfo.category",
           sales: {
             $sum: {
-              $subtract: ["$products.products.amount", "$shareDiscount"],
+              $subtract: [
+                "$orderInfo.products.amount",
+                "$shareDiscount",
+              ],
             },
           },
         },
@@ -761,19 +772,19 @@ async function updateProductStatus(req, res) {
   }
 }
 
-async function stockQuantityStatus(productID){
-  try{
+async function stockQuantityStatus(productID) {
+  try {
     const productDetails = await products.findById(productID);
     let totalQty = 0;
 
     productDetails.assets.forEach(asset => {
       asset.stockQuantity.forEach((item) => {
-          totalQty += item.quantity;
+        totalQty += item.quantity;
       });
     });
 
     return totalQty
-  }catch(err){
+  } catch (err) {
 
   }
 }
@@ -792,7 +803,7 @@ async function updateProduct(req, res) {
     delete productObject.data['_id'];
     productObject.data.info.orderQuantity.sort(function (a, b) { return a - b });
 
-    let qty = await stockQuantityStatus(_id) ;
+    let qty = await stockQuantityStatus(_id);
 
     const response = await products.findOneAndUpdate({
       '_id': _id,
@@ -809,14 +820,12 @@ async function updateProduct(req, res) {
     //   'sellerID': sellerID
     // }, query);
 
-    // console.log(qty, productObject.data);
 
     // SKU_generater.generateSKU(productObject.data);
 
     return res.status(200).json("uploaded");
   } catch (err) {
     logger.error(err);
-    console.log(err);
     res.status(500).json("Unable to Update");
   }
 }
@@ -986,7 +995,6 @@ async function fetchProductInventory(req, res) {
     );
     let response = JSON.parse(JSON.stringify(await products.aggregate(aggregationPipe)));
 
-    console.log(parameters, response);
     res.status(200).json(response[0]);
 
   } catch (err) {

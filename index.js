@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const admin = require('firebase-admin');
+const compress = require('compression');
+
 require('dotenv').config();
 const app = express();
 const ordersModel = require('./models/order');
@@ -140,6 +142,8 @@ app.use(
   }),
 );
 
+
+app.use(compress());
 app.use(cors());
 
 require("dotenv").config();
