@@ -19,7 +19,7 @@ module.exports = new mongoose.Schema({
         lowercase: true
     },
     area:{
-        type: [String],
+        type: String,
         trim: true,
         required:true,
         lowercase: true

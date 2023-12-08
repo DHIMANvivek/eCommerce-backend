@@ -123,7 +123,7 @@ async function deleteAddress(req, res) {
                 'info.address.$.status': false
             }
         });
-        res.status(200).json(updatedValue);
+        res.status(200).json({message:'Address deleted successFully'});
     } catch (error) {
         logger.error(error);
         res.status(500).json(error);
@@ -149,6 +149,7 @@ async function updateAddress(req, res) {
         res.status(500).json(error)
     }
 }
+
 
 async function DefaultAddress(req, res) {
     try {

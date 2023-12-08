@@ -138,10 +138,7 @@ async function signup(req, res) {
 
     } catch (error) {
         logger.error(error);
-        if (error.message) return res.status(500).json(error);
-        res.status(500).json({
-            message: 'Internal Server Error'
-        });
+        return res.status(500).json(error);
     }
 
 }

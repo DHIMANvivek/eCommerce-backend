@@ -50,7 +50,9 @@ const orderSchema = mongoose.Schema(
                 },
 
                 // orderInfo
-
+                costPrice:{
+                    type:Number,
+                },
                 quantity: {
                     type: Number,
                     required: true,
@@ -72,7 +74,10 @@ const orderSchema = mongoose.Schema(
                     type: Number,
                     required: true
                 },
-
+                productDiscount:{
+                    type:Number,
+                    default:0
+                },
                 shipmentStatus: {
                     type: String,
                     enum: ['pending', 'shipped', 'delivered', 'cancelled', 'declined'],
