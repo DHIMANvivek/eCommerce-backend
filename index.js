@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const admin = require('firebase-admin');
 const compress = require('compression');
 
 require('dotenv').config();

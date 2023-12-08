@@ -33,6 +33,7 @@ async function setSocials(req, res) {
             await Socials.create(socialsData);
         }
 
+        redisClient.del(`socials/getInstagram`);
         res.status(200).json({
             message: 'Successfully updated Social Details'
         })
