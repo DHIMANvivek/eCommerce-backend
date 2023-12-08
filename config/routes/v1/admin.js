@@ -40,7 +40,7 @@ router.get('/getAdminDetails', adminController.getAdminDetails);
 
 // FAQs
 // router.post('/deleteFaq', adminController.deleteFaq);
-router.post('/updateFaq', adminController.updateFaq);
+// router.post('/updateFaq', adminController.updateFaq);
 // router.post('/addFaq', adminController.addFaq);
 
 // router.get('/getFaq', adminController.getFaq);

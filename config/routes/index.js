@@ -66,23 +66,24 @@ router.get('/checkUser', (req, res) => {
 
 })
 
-router.get('/getPaginatedData/:model', getPaginatedData);
+// router.get('/getPaginatedData', getPaginatedData);
 
-async function getPaginatedData(req, res) {
-    const modelName = req.params.model;
-    const page = parseInt(req.query.page, 1) || 1;
-    const pageSize = parseInt(req.query.pageSize, 3) || 10;
+// async function getPaginatedData(req, res) {
+//     // const modelName = req.params.model;
+//     // const page = parseInt(req.query.page, 1) || 1;
+//     // const pageSize = parseInt(req.query.pageSize, 5) || 10;
 
-    try {
-        const Model = require(`../../models/custom-website-elements/${modelName}`);
-        const data = await paginateResults(Model, page, pageSize);
+//     try {
+//         // const Model = require(`../../models/custom-website-elements/${modelName}`);
+//         // const data = await paginateResults(Model, page, pageSize);
+//         const result = await faqModel.find({});
 
-        res.status(200).json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-}
+//         res.status(200).json(result);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// }
 
 router.use(function (req, res) {
     return res.status(404).json({

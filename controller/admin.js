@@ -1328,17 +1328,9 @@ module.exports = {
   updateFeatures,
   updateDetails,
   getAdminDetails,
-  // createOffer,
-  // getOffers,
-  // deleteOffer,
-  // getProductPrice,
   updateFaq,
   deleteFaq,
   addFaq,
-  // updateOffer
-  // getProductPrice
-  // updateOffer,
-  // getProductPrice,
   addPaymentKeys,
   getPaymentKeys,
   updatePaymentKeys,

@@ -1,6 +1,7 @@
 const { set } = require('../../models/address');
 const faqData = require('./../../models/custom-website-elements/faq');
 const logger = require('./../../logger');
+const faqModel = require('../../models/custom-website-elements/faq');
 
 /* getFaq without aggregation 
 async function getFaq(req, res) {
@@ -24,7 +25,7 @@ async function getFaq(req, res) {
 async function getFaq(req, res) {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 2;
+    const limit = parseInt(req.query.limit) || 10;
 
     const skip = (page - 1) * limit;
 
@@ -245,5 +246,5 @@ module.exports = {
   getFaq,
   addFaq,
   updateFaq,
-  deleteFaq
+  deleteFaq,
 }
