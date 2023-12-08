@@ -402,3 +402,37 @@ error: 2023-12-07T09:26:51.908Z Cannot read properties of undefined (reading 'to
 error: 2023-12-07T09:27:47.786Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-07T09:43:19.785Z Cannot read properties of null (reading 'products')
 error: 2023-12-07T09:45:55.942Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-08T14:05:13.177Z orders validation failed: address.area: Cast to string failed for value "[ 'area' ]" (type Array) at path "area"
+error: 2023-12-08T14:05:22.749Z Cast to embedded failed for value "{
+  firstname: 'vivek',
+  lastname: 'dhiman',
+  apartment: 'dhiman niwas 407/a , central town , street 8 , basant city , ludhiana',
+  area: [ 'area' ],
+  landmark: 'area',
+  pincode: 142022,
+  town_city: 'ludhiana',
+  state: 'punjab',
+  mobile: 6283415102,
+  _id: '65408974d8a482266f2b2c26'
+}" (type Object) at path "info.address" because of "CastError"
+error: 2023-12-08T16:17:39.207Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-08T16:25:04.775Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-08T16:42:59.935Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-08T16:43:31.836Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-08T16:50:53.073Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-08T16:51:25.246Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T16:52:10.280Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T16:59:04.243Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:00:11.975Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:02:09.105Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:03:32.864Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:12:44.489Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:12:53.790Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:17:33.257Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:18:35.837Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:21:42.771Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:21:42.793Z Cannot read properties of undefined (reading 'object')
+error: 2023-12-08T17:29:09.320Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-08T17:30:35.585Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-08T18:50:54.182Z CARLA HOODED CHECKS SHIRT is out of stock
+error: 2023-12-08T18:51:03.056Z CARLA HOODED CHECKS SHIRT is out of stock

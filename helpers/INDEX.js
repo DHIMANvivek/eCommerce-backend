@@ -267,121 +267,153 @@ async function TicketStatusTemplate(mailData) {
 }
 
 async function sendInvoiceTemplate(paymentData) {
-  // console.log(paymentData.data.object, "data is ");
-  // return;
-  // console.log(paymentData, "paymentData");
-  let productList = JSON.parse(paymentData.data.object.description);
-  // let payment_status = JSON.parse(paymentData.data.object.status);
-  console.log("payment_status", paymentData.data.object.status)
-  // console.log(productList, "productList");
 
-  let productRows = productList.items.map(product => {
-    let productDetails = `
-      <a href="http://localhost:4200/product/${product.id}" style="text-decoration: none; color: #007bff;">${product.name}: ${product.id}</a>
+  console.log(paymentData, "paymentData------------------");
+
+  if(paymentData.data.object) {
+    console.log("inside Email paymentData.data.object")
+    let productList = JSON.parse(paymentData.data.object.description);
+    // let payment_status = JSON.parse(paymentData.data.object.status);
+    console.log("payment_status", paymentData.data.object.status)
+    // console.log(productList, "productList");
+  
+    let productRows = productList.items.map(product => {
+      let productDetails = `
+        <a href="http://localhost:4200/product/${product.id}" style="text-decoration: none; color: #007bff;">${product.name}: ${product.id}</a>
+      `;
+  
+      return `
+        <tr>
+          <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
+          <td style="padding: 8px; border: 1px solid #dddddd;"> ${product.price.toLocaleString('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+      })}</td>
+          <td style="padding: 8px; border: 1px solid #dddddd;">${product.quantity} qty</td>
+        </tr>
+      `;
+    }).join('');
+  
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          /* Add inline CSS for better email client compatibility */
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+          }
+  
+          .outer-div {
+            width: 70%;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+          }
+  
+          h1 {
+            color: #333;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+  
+          th {
+            background-color: #f2f2f2;
+            padding: 8px;
+            border: 1px solid #dddddd;
+          }
+  
+          td {
+            padding: 8px;
+            border: 1px solid #dddddd;
+          }
+  
+          a {
+            text-decoration: none;
+            color: #007bff;
+          }
+  
+          a:hover {
+            color: #0056b3;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="outer-div">
+          <h1>Payment Successful</h1>
+          <p>Dear Customer,</p>
+          <p>Your payment was successful. Below are the details:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Product Details</th>
+                <th>Item Price</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${productRows}
+            </tbody>
+          </table>
+          <p><strong>Total Amount:</strong> ${productList.subTtotal.toLocaleString('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+          })} </p>
+          <p><strong>Payment Status:</strong> ${paymentData.data.object.status}</p>
+          <p><strong>Payment Method:</strong> ${paymentData.data.object.payment_method}</p>
+          <p><strong>Payment Date:</strong> ${new Date(paymentData.created * 1000).toLocaleString()}</p>
+        
+          <p><strong>Payment ID:</strong> ${paymentData.id}</p>
+          <p><strong>Receipt Email:</strong> ${paymentData.receipt_email}</p>
+          <p>Our team is here to assist you. If you have any further questions or need additional help, please don't hesitate to reach out to us.</p>
+          <p>Thank you for your purchase. We appreciate your business!</p>
+          <p>Best regards,</p>
+          <p>The Support Team</p>
+        </div>
+      </body>
+      </html>
     `;
+  
+    return html;
+  }  else if(paymentData){
+     console.log(paymentData, "productList------------------");
+     return;
+     const productRows = `
+       <tr>
+         <td style="padding: 8px; border: 1px solid #dddddd;">${productList.productInfo.name}</td>
+         <td style="padding: 8px; border: 1px solid #dddddd;"> ${productList.price.toLocaleString('en-IN', {
+           style: 'currency',
+           currency: 'INR',
+         })}</td>
+         <td style="padding: 8px; border: 1px solid #dddddd;">${productList.quantity} qty</td>
+       </tr>
+     `;
+   
+     const html = `
+       <!DOCTYPE html>
+       <!-- Email template for Razorpay payment -->
+       <!-- Construct your email template using productRows and paymentData properties -->
+     `;
+   
+     // Here, you can send the email using your preferred email service provider
+     // Email sending logic goes here...
+   
+     return html; 
+  }
 
-    return `
-      <tr>
-        <td style="padding: 8px; border: 1px solid #dddddd;">${productDetails}</td>
-        <td style="padding: 8px; border: 1px solid #dddddd;"> ${product.price.toLocaleString('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-    })}</td>
-        <td style="padding: 8px; border: 1px solid #dddddd;">${product.quantity} qty</td>
-      </tr>
-    `;
-  }).join('');
 
-  let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        /* Add inline CSS for better email client compatibility */
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #f5f5f5;
-          margin: 0;
-          padding: 0;
-        }
+  
 
-        .outer-div {
-          width: 70%;
-          margin: 20px auto;
-          background-color: #fff;
-          border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          padding: 20px;
-        }
+  }
 
-        h1 {
-          color: #333;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th {
-          background-color: #f2f2f2;
-          padding: 8px;
-          border: 1px solid #dddddd;
-        }
-
-        td {
-          padding: 8px;
-          border: 1px solid #dddddd;
-        }
-
-        a {
-          text-decoration: none;
-          color: #007bff;
-        }
-
-        a:hover {
-          color: #0056b3;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="outer-div">
-        <h1>Payment Successful</h1>
-        <p>Dear Customer,</p>
-        <p>Your payment was successful. Below are the details:</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Product Details</th>
-              <th>Item Price</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${productRows}
-          </tbody>
-        </table>
-        <p><strong>Total Amount:</strong> ${productList.subTtotal.toLocaleString('en-IN', {
-          style: 'currency',
-          currency: 'INR',
-        })} </p>
-        <p><strong>Payment Status:</strong> ${paymentData.data.object.status}</p>
-        <p><strong>Payment Method:</strong> ${paymentData.data.object.payment_method}</p>
-        <p><strong>Payment Date:</strong> ${new Date(paymentData.created * 1000).toLocaleString()}</p>
-      
-        <p><strong>Payment ID:</strong> ${paymentData.id}</p>
-        <p><strong>Receipt Email:</strong> ${paymentData.receipt_email}</p>
-        <p>Our team is here to assist you. If you have any further questions or need additional help, please don't hesitate to reach out to us.</p>
-        <p>Thank you for your purchase. We appreciate your business!</p>
-        <p>Best regards,</p>
-        <p>The Support Team</p>
-      </div>
-    </body>
-    </html>
-  `;
-
-  return html;
-}
 
 async function sendDiscountTemplate(discountData) {
 

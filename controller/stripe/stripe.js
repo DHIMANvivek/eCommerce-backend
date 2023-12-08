@@ -4,11 +4,11 @@ const express = require('express');
 
 const app = express();
 
-const {getPaymentKeyPromise}=require('../custom-website-elements/paymentKeys');
+const {getstripePaymentKeyPromise}=require('../custom-website-elements/paymentKeys');
 const {decryptPaymentKeys}=require('../custom-website-elements/paymentKeys');   
 const createPaymentIntent = async (req , res ) => {
 
-    const response=await getPaymentKeyPromise(req,res);
+    const response=await getstripePaymentKeyPromise(req,res);
     const keysResponse = await decryptPaymentKeys(response[0].keys);
 
     const privateKey = keysResponse[0].decryptedPrivateKey;

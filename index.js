@@ -63,6 +63,8 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
           if(result?.couponId){
             await updateCoupon(result.couponId,buyerId); 
         }
+
+        
    
         if (result?.products) {
             await Promise.all(result.products.map(async (el) => {

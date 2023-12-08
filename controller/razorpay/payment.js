@@ -6,24 +6,33 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const fs = require('fs');
 const ordersModel = require('../../models/order');
-
+const Products = require('../../models/products')
+const {getrazorPaymentKeyPromise}=require('../custom-website-elements/paymentKeys');
+const {decryptPaymentKeys}=require('../custom-website-elements/paymentKeys');   
+const { sendInvoiceTemplate } = require('../../helpers/INDEX');
+const mailer = require('../../helpers/nodemailer');
+const userModel = require('../../models/users');
 
 app.use(cors())
 app.use(bodyParser.json())
 
 const createUpiPayment = async (req, res) => {
-    console.log(req.body, req.tokenData.id, "coming email is ");
+
+    console.log(req.body, "req.body is ----------------------------------------");
+
+    const response=await getrazorPaymentKeyPromise(req,res);
+
+    const keysResponse = await decryptPaymentKeys(response[0]);
     try {
-        const keys = await PaymentKeys.findOne({});
 
-        if (keys && keys.razorKey && keys.razorKey.length > 0) {
+        if (keysResponse && keysResponse[0].decryptedPublicKey && keysResponse[0].decryptedPrivateKey) {
             // Find the enabled Razorpay key
-            const enabledRazorKey = keys.razorKey.find(key => key.enable === true);
 
-            if (enabledRazorKey) {
+            console.log(keysResponse[0].decryptedPublicKey, keysResponse[0].decryptedPrivateKey, "coming email is ");
+            
                 const razorpayInstance = new Razorpay({
-                    key_id: enabledRazorKey.rzpIdKey,
-                    key_secret: enabledRazorKey.rzpSecretKey
+                    key_id: keysResponse[0].decryptedPublicKey,
+                    key_secret: keysResponse[0].decryptedPrivateKey
                 });
 
                 const amount = req.body.amount;
@@ -37,16 +46,18 @@ const createUpiPayment = async (req, res) => {
                 razorpayInstance.orders.create(options, (err, order) => {
                     if (!err) {
                         console.log(order, "order is ");
+                        
+                        console.log(req.body.items, "----------------------------------------------------");
                         res.status(200).send({
                             success: true,
                             msg: 'Order Created',
                             order_id: order.id,
                             amount: amount,
                             key_id: razorpayInstance.key_id,
-                            product_name: req.body.items[0].name,
+                            product_name: req.body.items,
                             description: req.body.order_id,
                             notes: [
-                                req.body.order_id
+                                req.body.items
                             ],
                             email: 'googlydhiman.4236@gmail.com',
                         });
@@ -54,9 +65,6 @@ const createUpiPayment = async (req, res) => {
                         res.status(400).send({ success: false, msg: 'Something went wrong!' });
                     }
                 });
-            } else {
-                res.status(400).send({ success: false, msg: 'No enabled Razorpay key found' });
-            }
         }
      } catch (error) {
         console.log(error, "error is ");
@@ -66,9 +74,6 @@ const createUpiPayment = async (req, res) => {
 
     const verify = async (req, res) => {
         const secret = 'tradevogue';
-
-        console.log(req.body.payload, "body is from verify"); 
-    
         const shasum = crypto.createHmac('sha256', secret)
         shasum.update(JSON.stringify(req.body))
         const digest = shasum.digest('hex')
@@ -77,31 +82,83 @@ const createUpiPayment = async (req, res) => {
 
         if (digest === req.headers['x-razorpay-signature']) {
             console.log('request is legit');
-    
-            //existing code to read/write data to JSON file
+
+            const orderId = req.body.payload.payment.entity.description;
             let paymentData = [];
-            try {
-                const fs = require('fs')
+
+        try {
+             const fs = require('fs')
                 if (fs.existsSync('razorPayLogs.json')) { 
                     const existingData = fs.readFileSync('razorPayLogs.json', 'utf8');
                     paymentData = JSON.parse(existingData); 
                 }
 
+          const result = await ordersModel.findOneAndUpdate(
+            { orderID: orderId },
+            {
+              $set: {
+                'products.$[].payment_status': 'success',
+                transactionId: req.body.payload.payment.entity.id,
+                MOP: req.body.payload.payment.entity.method,
+              },
+            },
+            { projection: { buyerId: 1 ,products:1,coupon:1}, returnOriginal: false }
+          );
+          var buyerId = result.buyerId.toString();
+          const user = await userModel.findOne({ _id: buyerId }, { _id: 0, email: 1, name: 1 });
 
-                const result = await ordersModel.updateOne(
-                    { orderID: req.body.payload.payment.entity.description },
+          if(result?.couponId){
+            await updateCoupon(result.couponId,buyerId); 
+        }
+   
+        if (result?.products) {
+            await Promise.all(result.products.map(async (el) => {
+              console.log('goint to decrease  product');
+                await Products.updateOne(
                     {
-                      $set: {
-                        payment_status: 'success',
-                        transactionId: req.body.payload.payment.entity.id,
-                        MOP: req.body.payload.payment.entity.method,
-                      },
+                        sku: el.sku,
+                        'assets.color': el.color,
+                        'assets.stockQuantity.size': el.size
+                    },
+                    {
+                        $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': -el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': el.quantity },
+                    },
+                    {
+                        arrayFilters: [
+                            { "outer.color": el.color },
+                            { "inner.size": el.size }
+                        ]
                     }
-                  );
+                );
 
-            } catch (err) {
-                console.error(err);
-            }
+                let particularProduct = await Products.findOne({ sku: el.sku });
+                const allStockZero = particularProduct.assets.every(color => {
+                    return color.stockQuantity.every(size => size.quantity === 0);
+                });
+
+                if (allStockZero) {
+                    await Products.updateOne({sku:el.sku},{ $set:{"status.active": false} });
+                }
+
+            }));
+        }
+          
+        //   const mailData = {
+        //     email: user.email,
+        //     subject: "Invoice",
+        //     invoice: result.products[0]
+        //   }
+
+        //   const emailTemplate = sendInvoiceTemplate(mailData.invoice);
+        //   await mailer(mailData, emailTemplate);
+
+          // product decrease query
+
+
+
+        } catch (err) {
+          console.error('Error updating order:', err);
+        }
     
             paymentData.push(req.body); 
     
