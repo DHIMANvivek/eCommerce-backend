@@ -1,26 +1,17 @@
 const { TicketStatusTemplate } = require('../../helpers/INDEX');
 const mailer = require('../../helpers/nodemailer');
-const ordersModel = require('../../models/order');
-const stripe = require('stripe')('sk_test_51NvsyeSENcdZfgNiy559a6dtaofzqfn00MVNCrPe4kQWAZNZulhdDmJePJTZvSSzzu4xnkTjHIjmWPVdzTW1L6oc00oI29MAG4');
-const endpointSecret = 'whsec_3ab6989c4dd3fa67a11fb76b2cbb4a4e15687f60550b2d2fbe4b85ab3d0e0c94';
-
 const express = require('express');
 
 const app = express();
 
 const {getPaymentKeyPromise}=require('../custom-website-elements/paymentKeys');
-
+const {decryptPaymentKeys}=require('../custom-website-elements/paymentKeys');   
 const createPaymentIntent = async (req , res ) => {
-//   const response = await fetch('http://localhost:1000/paymentKeys/get');
 
     const response=await getPaymentKeyPromise(req,res);
+    const keysResponse = await decryptPaymentKeys(response[0].keys);
 
-    // if (!response.ok) {
-    //     throw new Error('Network response was not ok');
-    // }
-
-    // const data = await response.json();
-    const privateKey = response[0].keys[0].privateKey;
+    const privateKey = keysResponse[0].decryptedPrivateKey;
 
     const stripe = require('stripe')(privateKey);
 
@@ -43,22 +34,6 @@ const createPaymentIntent = async (req , res ) => {
         res.status(500).json({ error: 'An error occurred while creating the payment intent.' });
     }
 }
-
-// const invoiceSend = async (req, res) => {
-
-//   // return;
-//   const mailData = {
-//       email: req.body.receipt_email,
-//       subject: "Invoice",
-//       invoice: req.body
-//   }
-//   const emailTemplate = sendInvoiceTemplate(mailData.invoice);
-//   await mailer(mailData, emailTemplate);
-
-//   res.status(200).json({
-//       message: "done"
-//   })
-// }
 
 const ticketStatus = async (req, res) => {  
   try {

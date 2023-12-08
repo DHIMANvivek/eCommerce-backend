@@ -12,6 +12,7 @@ router.post('/add', jwtVerify , paymentKeys.addPaymentKeys);
 router.get('/getAll', AdminVerify , paymentKeys.getAllPaymentKeys);
 router.post('/update', AdminVerify , paymentKeys.updatePaymentKeys);
 router.post('/delete', AdminVerify , paymentKeys.deletePaymentKeys);
-router.get('/get-redis-data', paymentKeys.getRedisData);
+router.get('/decrypt/:index', AdminVerify , paymentKeys.getDecryptedPaymentKeysViaIndex);
+router.get('/decrypt', AdminVerify , paymentKeys.getDecryptedPaymentKeys);
 
 module.exports = router;

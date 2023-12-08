@@ -9,12 +9,18 @@ const AdminKeysSchema = new mongoose.Schema({
                 required: true
             },
             publicKey: {
-                type: String,
-                required: true
+                iv: {type: String},
+                encryptedData: {type: String},
+                key: {type: String},
+                required: true,
+                type: Object
             },
             privateKey: {
-                type: String,
-                required: true
+                iv: {type: String},
+                encryptedData: {type: String},
+                key: {type: String},
+                required: true,
+                type: Object
             },
             enable: {
                 type: Boolean,
@@ -30,12 +36,18 @@ const AdminKeysSchema = new mongoose.Schema({
                 required: true
             },
             rzpIdKey: {
-                type: String,
-                required: true
+                iv: {type: String},
+                encryptedData: {type: String},
+                key: {type: String},
+                required: true,
+                type: Object
             },
             rzpSecretKey: {
-                type: String,
-                required: true
+                iv: {type: String},
+                encryptedData: {type: String},
+                key: {type: String},
+                required: true,
+                type: Object
             },
             enable: {
                 type: Boolean,
