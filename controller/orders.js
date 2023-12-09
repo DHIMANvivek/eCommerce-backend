@@ -34,7 +34,7 @@ async function updateLatestOrderDetail(req, res) {
 
         if (response?.products) {
             await Promise.all(response.products.map(async (el) => {
-                console.log('el of products array ios ',el);
+                console.log('el of products array ios ', el);
                 await Products.updateOne(
                     {
                         sku: el.sku,
@@ -179,17 +179,18 @@ async function createOrder(req, res) {
         req.body.OrderSummary.subTotal = verifyOrder?.total;
         if (verifyOrder?.discount) {
             req.body.OrderSummary.couponDiscount = verifyOrder.discount;
-            req.body.coupon=req.body.couponId;
+            req.body.coupon = req.body.couponId;
             let sum = req.body.products.reduce((acc, val) => {
                 return val.price * val.quantity + acc
             }, 0);
             let productUpdated = JSON.parse(JSON.stringify(req.body.products)).map((el) => {
-                 el.productDiscount = Math.floor(((el.price * el.quantity) / sum) * req.body.OrderSummary.couponDiscount);
-                 return el;
+                el.productDiscount = Math.floor(((el.price * el.quantity) / sum) * req.body.OrderSummary.couponDiscount);
+                return el;
             })
 
-            req.body.products=productUpdated;
-        }   
+            req.body.products = productUpdated;
+        }
+
 
 
         // order ID creation
@@ -230,7 +231,7 @@ async function getParicularUserOrders(req, res) {
         // const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'sucess'}).sort({ createdAt: -1 });
 
         let parameters = req.body;
-        let active =(parameters?.active);
+        let active = (parameters?.active);
         const skip = (parameters.currentPage - 1) * parameters.limit;
         const limit = parameters.limit;
 
@@ -239,7 +240,7 @@ async function getParicularUserOrders(req, res) {
                 $match: {
                     buyerId: new moongoose.Types.ObjectId(req.tokenData.id),
                     active: active,
-                    'products.payment_status':parameters.paymentStatus
+                    'products.payment_status': parameters.paymentStatus
                 },
             },
             {
@@ -411,7 +412,7 @@ async function getSellerOrderDetails(req, res) {
                 'email': 1,
                 'mobile': 1,
                 '_id': 0
-        });
+            });
 
         // console.log(response);
 
@@ -484,33 +485,34 @@ async function getOverallOrderData(req, res, controller = false) {
 async function cancelOrderedProduct(req, res) {
     try {
 
-        const decreasingAmount=req.body.product.amount-(req.body.product?.productDiscount?req.body.product?.productDiscount:0);
+        const decreasingAmount = req.body.product.amount - (req.body.product?.productDiscount ? req.body.product?.productDiscount : 0);
 
         const orderUpdate = await ordersModel.findByIdAndUpdate(
             req.body.id,
-            { 
+            {
                 $set: {
-                 'products.$[elem].shipmentStatus': 'cancelled', 
-                 'products.$[elem].payment_status': 'refund',
-                 
-                }, 
-                $inc:{'OrderSummary.Total':-Math.floor(decreasingAmount)}
+                    'products.$[elem].shipmentStatus': 'cancelled',
+                    'products.$[elem].payment_status': 'refund',
+
+                },
+                $inc: { 'OrderSummary.Total': -Math.floor(decreasingAmount) }
             },
             { arrayFilters: [{ 'elem.sku': req.body.product.sku }], new: true }
         );
 
         //    if(orderUpdate) 
 
-       let check= orderUpdate.products.every((el)=>(el.shipmentStatus=='cancelled' && el.payment_status=='refund'));
-        if(check){
-          await ordersModel.findByIdAndUpdate(
+        let check = orderUpdate.products.every((el) => (el.shipmentStatus == 'cancelled' && el.payment_status == 'refund'));
+        if (check) {
+            await ordersModel.findByIdAndUpdate(
                 req.body.id,
-                { $set: { active: false,'OrderSummary.Total':0 },
-        
+                {
+                    $set: { active: false, 'OrderSummary.Total': 0 },
+
                 },
             );
         }
-  
+
 
         return res.status(200).json({ message: 'Product cancelled successfully' });
     } catch (error) {
@@ -523,7 +525,15 @@ async function cancelOrder(req, res) {
     try {
         const orderUpdate = await ordersModel.findByIdAndUpdate(
             req.body.orderId,
-            { $set: { active: false ,'OrderSummary.Total':0} },
+            {
+                $set: {
+                    active: false,
+                    'OrderSummary.Total': 0,
+                    'products.$[].shipmentStatus': 'cancelled',
+                    'products.$[].payment_status': 'refund'
+
+                }
+            },
         );
 
         return res.status(200).json({ message: 'Order cancelled successfully' });

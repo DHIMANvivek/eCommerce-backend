@@ -423,3 +423,72 @@ error: 2023-12-08T20:42:40.619Z orders validation failed: OrderSummary.: Cast to
 error: 2023-12-09T00:59:10.133Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-09T01:00:12.427Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-09T01:00:21.973Z Cannot read properties of undefined (reading 'totalSales')
+<<<<<<< Updated upstream
+=======
+error: 2023-12-08T02:30:15.263Z Wishlist of same name already exists!
+error: 2023-12-08T02:30:31.864Z Wishlist of same name already exists!
+error: 2023-12-09T04:20:24.888Z Try to login manually.
+error: 2023-12-09T04:20:24.891Z Try to login manually.
+error: 2023-12-09T04:20:43.612Z Try to login manually.
+error: 2023-12-09T04:20:43.626Z Try to login manually.
+error: 2023-12-09T04:21:25.007Z Try to login manually.
+error: 2023-12-09T04:21:25.068Z Try to login manually.
+error: 2023-12-09T04:25:21.256Z Try to login manually.
+error: 2023-12-09T04:25:21.259Z Try to login manually.
+error: 2023-12-09T04:29:44.053Z Try to login manually
+error: 2023-12-09T04:29:44.058Z Try to login manually
+error: 2023-12-09T04:29:44.061Z Try to login manually
+error: 2023-12-09T04:31:36.984Z Try to login manually
+error: 2023-12-09T04:31:36.988Z Try to login manually.
+error: 2023-12-09T04:32:22.027Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:32:22.048Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:32:22.099Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:32:22.141Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:34:08.138Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:34:08.142Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:34:08.143Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:34:08.219Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:34:08.220Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:34:08.297Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:35:42.187Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.190Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.191Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.193Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.197Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.220Z Cannot read properties of null (reading '_id')
+error: 2023-12-09T04:37:01.356Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.361Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.364Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.366Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.366Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.396Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:38:06.480Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.486Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.487Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.492Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.493Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.519Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:38:40.259Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.267Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.274Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.275Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.284Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.304Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:56:31.817Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:57:33.100Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T05:09:41.842Z Assignment to constant variable.
+error: 2023-12-09T05:11:52.032Z input is not defined
+error: 2023-12-09T05:12:52.881Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T05:54:35.392Z Cannot read properties of undefined (reading 'addresses')
+error: 2023-12-09T05:55:12.711Z Cannot read properties of undefined (reading 'addresses')
+error: 2023-12-09T06:03:04.716Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
+error: 2023-12-09T06:03:15.913Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
+error: 2023-12-09T06:16:04.157Z You cannot add more than 3 addresses
+error: 2023-12-09T07:46:57.537Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
+error: 2023-12-09T07:55:24.012Z Wishlist of same name already exists!
+error: 2023-12-09T08:23:36.797Z Parameter "obj" to Document() must be an object, got "652d42dcb8fde95e78d23de2" (type string)
+error: 2023-12-09T08:29:10.664Z wishlister.save is not a function
+error: 2023-12-09T08:29:22.606Z wishlister.save is not a function
+error: 2023-12-09T08:33:49.445Z c
+error: 2023-12-09T10:01:43.798Z The positional operator did not find the match needed from the query.
+>>>>>>> Stashed changes

@@ -128,8 +128,8 @@ const orderSchema = mongoose.Schema(
         OrderSummary: {
             subTotal: { type: Number },
             shipping: { type: Number, default: 0 },
+            couponDiscount: { type: Number, default: 0 },
             Total: { type: Number,default: function () { return this.OrderSummary.subTotal - this.OrderSummary.couponDiscount } },
-            couponDiscount: { type: Number, default: 0 }
         },
 
         coupon: {

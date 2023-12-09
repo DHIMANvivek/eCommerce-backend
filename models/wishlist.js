@@ -19,10 +19,21 @@ const wishlistSchema = mongoose.Schema(
                 },
                 products: [
                     {
+
                         type: mongoose.Schema.Types.ObjectId,
                         ref: 'products',
+                        // active:{
+                        //     type:Boolean,
+                        //     default:true
+                        // }
                     },
+                    
                 ],
+                active: {
+                    type: Boolean,
+                    default: true,
+                },
+        
             },
         ],
         active: {
