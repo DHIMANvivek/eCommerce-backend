@@ -288,287 +288,55 @@ error: 2023-12-04T10:03:38.876Z mongoose is not defined
 error: 2023-12-04T10:26:55.455Z log is not defined
 error: 2023-12-04T10:26:55.601Z log is not defined
 error: 2023-12-04T10:37:00.341Z Cannot set headers after they are sent to the client
-error: 2023-12-04T06:28:40.308Z This product is Out Of Stock
-error: 2023-12-04T06:28:43.202Z This product is Out Of Stock
-error: 2023-12-04T06:28:45.264Z This product is Out Of Stock
-error: 2023-12-04T06:28:46.571Z This product is Out Of Stock
-error: 2023-12-04T06:28:48.893Z This product is Out Of Stock
-error: 2023-12-04T06:42:15.139Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:42:30.171Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:42:34.910Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:43:38.866Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:43:44.247Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:44:14.186Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:45:24.696Z Cannot set properties of undefined (setting 'delete')
-error: 2023-12-04T06:47:14.429Z This product is Out Of Stock
-error: 2023-12-04T06:48:21.261Z This product is Out Of Stock
-error: 2023-12-04T11:06:25.090Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-04T11:06:52.110Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-04T11:07:29.066Z Flannel Oversized Shirt ok is out of stock
-error: 2023-12-05T03:32:23.616Z This product is Out Of Stock
-error: 2023-12-05T05:03:04.120Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:03:34.580Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:06:32.457Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:07:40.556Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:09:21.228Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:10:04.402Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:11:22.671Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:13:00.337Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:13:13.047Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-06T15:56:36.452Z 404
-error: 2023-12-06T15:56:38.489Z 404
-error: 2023-12-06T15:56:41.424Z 404
-error: 2023-12-06T15:58:23.883Z 404
-error: 2023-12-06T15:58:25.348Z 404
-error: 2023-12-06T16:14:51.091Z Cast to embedded failed for value "{
-  firstname: 'VIVEK',
-  lastname: 'DHIMAN',
-  apartment: 'dhiman niwas 407/1 ,central town , street number 8',
-  city: [ 'Dad' ],
-  area: 'Ludhiana',
-  state: 'Punjab',
-  pincode: '142022',
-  country: 'IN'
-}" (type Object) at path "info.address" because of "CastError"
-error: 2023-12-06T16:15:25.293Z 404
-error: 2023-12-06T16:15:26.395Z 404
-error: 2023-12-06T16:15:27.279Z 404
-error: 2023-12-06T16:15:29.570Z 404
-error: 2023-12-07T04:08:14.083Z Please login/signup.
-error: 2023-12-07T04:08:14.083Z Please login/signup.
-error: 2023-12-07T04:08:15.533Z Please login/signup.
-error: 2023-12-07T04:08:15.533Z Please login/signup.
-error: 2023-12-07T04:09:02.434Z Please login/signup.
-error: 2023-12-07T04:09:02.434Z Please login/signup.
-error: 2023-12-07T04:09:04.678Z Please login/signup.
-error: 2023-12-07T04:09:04.678Z Please login/signup.
-error: 2023-12-07T04:09:05.512Z Please login/signup.
-error: 2023-12-07T04:09:05.512Z Please login/signup.
-error: 2023-12-07T04:09:06.319Z Please login/signup.
-error: 2023-12-07T04:09:06.319Z Please login/signup.
-error: 2023-12-07T04:09:07.695Z Please login/signup.
-error: 2023-12-07T04:09:07.695Z Please login/signup.
-error: 2023-12-07T04:09:08.830Z Please login/signup.
-error: 2023-12-07T04:09:08.830Z Please login/signup.
-error: 2023-12-07T04:11:08.413Z Please login/signup.
-error: 2023-12-07T04:11:08.413Z Please login/signup.
-error: 2023-12-07T04:21:04.465Z 404
-error: 2023-12-07T04:21:05.663Z 404
-error: 2023-12-07T04:21:06.299Z 404
-error: 2023-12-07T04:21:59.495Z Please login/signup.
-error: 2023-12-07T04:21:59.495Z Please login/signup.
-error: 2023-12-07T04:29:32.022Z A-line Kurti is out of stock
-error: 2023-12-07T04:41:39.726Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T04:42:03.344Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T04:45:44.198Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T05:03:24.477Z orders validation failed: products.0.productInfo.brand: Path `productInfo.brand` is required., products.0.productInfo.category: Path `productInfo.category` is required., products.0.productInfo.image: Path `productInfo.image` is required., products.0.productInfo.name: Path `productInfo.name` is required., products.1.productInfo.brand: Path `productInfo.brand` is required., products.1.productInfo.category: Path `productInfo.category` is required., products.1.productInfo.image: Path `productInfo.image` is required., products.1.productInfo.name: Path `productInfo.name` is required., products.2.productInfo.brand: Path `productInfo.brand` is required., products.2.productInfo.category: Path `productInfo.category` is required., products.2.productInfo.image: Path `productInfo.image` is required., products.2.productInfo.name: Path `productInfo.name` is required., products.3.productInfo.brand: Path `productInfo.brand` is required., products.3.productInfo.category: Path `productInfo.category` is required., products.3.productInfo.image: Path `productInfo.image` is required., products.3.productInfo.name: Path `productInfo.name` is required., products.4.productInfo.brand: Path `productInfo.brand` is required., products.4.productInfo.category: Path `productInfo.category` is required., products.4.productInfo.image: Path `productInfo.image` is required., products.4.productInfo.name: Path `productInfo.name` is required.
-error: 2023-12-07T05:13:44.653Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:28:19.991Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T06:16:31.654Z Unexpected token u in JSON at position 0
-error: 2023-12-07T06:18:30.238Z Unexpected token u in JSON at position 0
-error: 2023-12-07T06:21:56.806Z Unexpected token u in JSON at position 0
-error: 2023-12-07T06:38:34.563Z productData is not defined
-error: 2023-12-07T06:51:41.269Z Unexpected token s in JSON at position 0
-error: 2023-12-07T07:13:11.666Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:13:19.276Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:13:22.595Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:13:23.325Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:14.254Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:22.114Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:26.325Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:14:26.949Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:19.329Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:27.556Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:30.549Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:15:30.715Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:23.835Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T07:16:35.052Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:44.649Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:47.170Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:16:47.665Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:00.880Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T07:19:13.010Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:21.548Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:24.476Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:19:24.696Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:24:57.344Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:25:06.896Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:25:11.237Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T07:25:11.394Z Cannot read properties of undefined (reading 'tokenData')
-error: 2023-12-07T08:12:45.653Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T08:17:41.983Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T09:26:35.808Z 404
-error: 2023-12-07T09:26:51.908Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T09:27:47.786Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T09:43:19.785Z Cannot read properties of null (reading 'products')
-error: 2023-12-07T09:45:55.942Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T14:05:13.177Z orders validation failed: address.area: Cast to string failed for value "[ 'area' ]" (type Array) at path "area"
-error: 2023-12-08T14:05:22.749Z Cast to embedded failed for value "{
-  firstname: 'vivek',
-  lastname: 'dhiman',
-  apartment: 'dhiman niwas 407/a , central town , street 8 , basant city , ludhiana',
-  area: [ 'area' ],
-  landmark: 'area',
-  pincode: 142022,
-  town_city: 'ludhiana',
-  state: 'punjab',
-  mobile: 6283415102,
-  _id: '65408974d8a482266f2b2c26'
-}" (type Object) at path "info.address" because of "CastError"
-error: 2023-12-08T16:17:39.207Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T16:25:04.775Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T16:42:59.935Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T16:43:31.836Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T16:50:53.073Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T16:51:25.246Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T16:52:10.280Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T16:59:04.243Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:00:11.975Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:02:09.105Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:03:32.864Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:12:44.489Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:12:53.790Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:17:33.257Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:18:35.837Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:21:42.771Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:21:42.793Z Cannot read properties of undefined (reading 'object')
-error: 2023-12-08T17:29:09.320Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T17:30:35.585Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T18:50:54.182Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T18:51:03.056Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-05T05:52:48.336Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:53:07.738Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:53:20.888Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:53:30.955Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:54:35.429Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T05:54:43.604Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:43:25.996Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:44:29.023Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:46:28.012Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:46:34.417Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:47:13.116Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:49:05.046Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:49:13.235Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:49:27.028Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:50:30.295Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:51:55.041Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:52:22.102Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:53:09.645Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:54:20.274Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:54:25.733Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T06:55:52.335Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:01:16.035Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:01:27.483Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:02:22.962Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:02:28.765Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:03:45.149Z Kindly Signup!
-error: 2023-12-05T07:04:02.129Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:04:18.081Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:05:08.985Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:05:14.011Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:05:36.928Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:06:30.585Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:06:35.745Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:07:15.523Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:07:17.576Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:07:19.895Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:07:23.182Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:07:30.101Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-05T07:07:31.733Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-06T09:16:15.118Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-06T09:16:37.411Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-06T09:17:35.683Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-06T09:17:41.507Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:47:58.671Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:49:21.208Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:52:15.767Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:52:49.280Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:53:23.920Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:57:17.968Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T05:57:26.179Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T06:46:22.257Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:01:35.870Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:01:42.986Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:02:37.871Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:02:42.196Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:05:45.053Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:06:46.649Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:07:42.642Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:07:47.556Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:12:40.522Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:28:00.520Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T07:39:44.777Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T09:44:57.965Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-07T10:24:28.940Z Arguments must be aggregate pipeline operators
-error: 2023-12-07T10:24:34.367Z Arguments must be aggregate pipeline operators
-error: 2023-12-08T03:35:06.504Z Kindly Signup!
-error: 2023-12-08T03:35:15.267Z Kindly Signup!
-error: 2023-12-08T04:43:53.269Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:44:12.978Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:44:28.986Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:44:50.849Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:46:04.182Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:47:47.967Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:48:23.345Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:52:36.742Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:53:08.259Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:53:41.369Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:53:54.957Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:54:14.584Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:55:04.766Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T03:32:15.449Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T03:39:32.972Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T03:57:08.336Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T04:59:41.106Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T05:02:51.035Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T05:04:38.564Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T05:07:52.489Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T05:12:10.156Z Please login/signup.
-error: 2023-12-08T05:12:10.156Z Please login/signup.
-error: 2023-12-08T05:25:10.984Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T05:25:39.266Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-08T06:26:41.310Z Heavyweight Shirt is out of stock
-error: 2023-12-08T07:22:38.743Z AxiosError: Request failed with status code 400
-error: 2023-12-08T10:15:42.081Z You are already a user
-error: 2023-12-08T10:38:29.660Z E11000 duplicate key error collection: 651281ec114f8225fea6fa41_test.home-layouts index: name_1 dup key: { name: "default" }
-error: 2023-12-08T12:20:15.057Z Cast to embedded failed for value "{
-  firstname: 'abhishek',
-  lastname: 'rana',
-  apartment: '142',
-  area: [ 'Jammu H.O' ],
-  landmark: 'near g.n.e',
-  pincode: '180001',
-  town_city: 'Jammu',
-  state: 'Jammu & Kashmir',
-  mobile: '6284164462',
-  _id: '6572f868db78f6f1e2f452d5'
-}" (type Object) at path "info.address" because of "CastError"
-error: 2023-12-08T12:24:30.320Z Cast to embedded failed for value "{
-  firstname: 'abhishek',
-  lastname: 'rana',
-  apartment: '142',
-  area: [ 'Sarabha Nagar' ],
-  landmark: 'near g.n.e',
-  pincode: '141001',
-  town_city: 'Ludhiana',
-  state: 'Punjab',
-  mobile: 6284164462,
-  _id: '6572f868db78f6f1e2f452d5'
-}" (type Object) at path "info.address" because of "CastError"
-error: 2023-12-08T12:48:40.541Z orders validation failed: address.state: Path `state` is required., address.pincode: true, address.area: Path `area` is required., address.apartment: Path `apartment` is required., address.firstname: Path `firstname` is required.
-error: 2023-12-08T12:49:43.615Z orders validation failed: address.state: Path `state` is required., address.pincode: true, address.area: Path `area` is required., address.apartment: Path `apartment` is required., address.firstname: Path `firstname` is required.
-error: 2023-12-08T13:16:02.690Z discountAmount is not defined
-error: 2023-12-08T13:21:49.832Z You cannot add more than 3 addresses
-error: 2023-12-08T13:30:15.091Z users validation failed: info.address.0.area: Cast to string failed for value "[ 'Basti Jodhewal' ]" (type Array) at path "area", info.address.1.area: Cast to string failed for value "[ 'dugri' ]" (type Array) at path "area"
-error: 2023-12-08T17:26:53.887Z User already exists! Try to login.
-error: 2023-12-08T19:27:34.305Z You cannot add more than 3 addresses
-error: 2023-12-08T19:33:46.984Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T19:39:08.650Z Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
-error: 2023-12-08T19:40:09.568Z Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
-error: 2023-12-08T19:40:35.947Z Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
-error: 2023-12-08T20:41:47.429Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total", OrderSummary.Total: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
-error: 2023-12-08T20:42:10.580Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total", OrderSummary.Total: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
-error: 2023-12-08T20:42:40.619Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total", OrderSummary.Total: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
-error: 2023-12-09T00:59:10.133Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-09T01:00:12.427Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-09T01:00:21.973Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-09T04:20:24.888Z Try to login manually.
+error: 2023-12-09T04:20:24.891Z Try to login manually.
+error: 2023-12-09T04:20:43.612Z Try to login manually.
+error: 2023-12-09T04:20:43.626Z Try to login manually.
+error: 2023-12-09T04:21:25.007Z Try to login manually.
+error: 2023-12-09T04:21:25.068Z Try to login manually.
+error: 2023-12-09T04:25:21.256Z Try to login manually.
+error: 2023-12-09T04:25:21.259Z Try to login manually.
+error: 2023-12-09T04:29:44.053Z Try to login manually
+error: 2023-12-09T04:29:44.058Z Try to login manually
+error: 2023-12-09T04:29:44.061Z Try to login manually
+error: 2023-12-09T04:31:36.984Z Try to login manually
+error: 2023-12-09T04:31:36.988Z Try to login manually.
+error: 2023-12-09T04:32:22.027Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:32:22.048Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:32:22.099Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:32:22.141Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:34:08.138Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:34:08.142Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:34:08.143Z Cannot read properties of null (reading 'provider')
+error: 2023-12-09T04:34:08.219Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:34:08.220Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:34:08.297Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:35:42.187Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.190Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.191Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.193Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.197Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:35:42.220Z Cannot read properties of null (reading '_id')
+error: 2023-12-09T04:37:01.356Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.361Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.364Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.366Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.366Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:37:01.396Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:38:06.480Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.486Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.487Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.492Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.493Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:06.519Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:38:40.259Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.267Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.274Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.275Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.284Z E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "jahnavi.30583@lpu.co.in" }
+error: 2023-12-09T04:38:40.304Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:56:31.817Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T04:57:33.100Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T05:09:41.842Z Assignment to constant variable.
+error: 2023-12-09T05:11:52.032Z input is not defined
+error: 2023-12-09T05:12:52.881Z Cannot read properties of null (reading 'email')
