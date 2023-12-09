@@ -340,3 +340,9 @@ error: 2023-12-09T04:57:33.100Z Cannot read properties of null (reading 'email')
 error: 2023-12-09T05:09:41.842Z Assignment to constant variable.
 error: 2023-12-09T05:11:52.032Z input is not defined
 error: 2023-12-09T05:12:52.881Z Cannot read properties of null (reading 'email')
+error: 2023-12-09T05:54:35.392Z Cannot read properties of undefined (reading 'addresses')
+error: 2023-12-09T05:55:12.711Z Cannot read properties of undefined (reading 'addresses')
+error: 2023-12-09T06:03:04.716Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
+error: 2023-12-09T06:03:15.913Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
+error: 2023-12-09T06:16:04.157Z You cannot add more than 3 addresses
+error: 2023-12-09T07:46:57.537Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"

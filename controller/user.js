@@ -27,6 +27,9 @@ async function getDetails(req, res) {
 
 async function updateDetails(req, res) {
     try {
+        if(req.body.email){
+            delete req.body.email;
+        }
         const basicDetails = await Users.findByIdAndUpdate(req.tokenData.id, req.body, { new: true });
         res.status(200).json(basicDetails)
     } catch (error) {
@@ -98,6 +101,7 @@ async function getPaginatedData(req, res) {
 
 async function addAddress(req, res) {
     try {
+        console.log('req boduy si ',req.body);
         const findUserAddress=await getActiveAddresses(req);
 if(findUserAddress.length>0 && findUserAddress[0].addresses.length==3){
     throw({message:'You cannot add more than 3 addresses'});
