@@ -13,6 +13,11 @@ let userSchema = new mongoose.Schema({
         unique: true,
         match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
     },
+    mobile:{
+        type: Number,
+        trim: true,
+        match:/^[6-9]\\d{9}$/,
+    },
     name: {
         firstname: {
             type: String,
@@ -49,12 +54,6 @@ let userSchema = new mongoose.Schema({
         },
         address: {
             type: [address],
-            // validate: {
-            //     validator: function (address) {
-            //         return address.length <= 3;
-            //     },
-            //     message: 'You can only add a maximum of 3 addresses.'
-            // }
         }
     },
     photo: {

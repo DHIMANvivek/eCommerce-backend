@@ -400,7 +400,6 @@ async function addPaymentKeys(req, res) {
 }
 
 function decryptData(encryptedData, key, iv) {
-  console.log(encryptedData, key, iv, "coming inside decrypt data");
   const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));
   let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
   decryptedData += decipher.final('utf8');

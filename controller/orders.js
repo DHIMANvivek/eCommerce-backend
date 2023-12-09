@@ -179,28 +179,18 @@ async function createOrder(req, res) {
         req.body.OrderSummary.subTotal = verifyOrder?.total;
         if (verifyOrder?.discount) {
             req.body.OrderSummary.couponDiscount = verifyOrder.discount;
-            req.body.OrderSummary.total -= req.body.OrderSummary.couponDiscount;
+            req.body.coupon=req.body.couponId;
             let sum = req.body.products.reduce((acc, val) => {
                 return val.price * val.quantity + acc
             }, 0);
-            // req.body.products.reduce((acc,val)=>{
-            //     console.log("acc is ",val);
-            // },0)
             let productUpdated = JSON.parse(JSON.stringify(req.body.products)).map((el) => {
-                // console.log("el is ", el.quantity, " el price is ", el.price, " req body is ", req.body.OrderSummary.couponDiscount);
-                 el.productDiscount = ((el.price * el.quantity) / sum) * req.body.OrderSummary.couponDiscount;
+                 el.productDiscount = Math.floor(((el.price * el.quantity) / sum) * req.body.OrderSummary.couponDiscount);
                  return el;
             })
 
-            // console.log("productu[date is ", productUpdated)
             req.body.products=productUpdated;
         }   
-        // console.log("verify order is ",req.body.products);
 
-        // return;
-
-
-        console.log('req body is ',req.body);
 
         // order ID creation
         const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
@@ -217,7 +207,6 @@ async function createOrder(req, res) {
         res.status(200).json({ orderId: req.body.orderID });
 
     } catch (error) {
-        console.log("error is ", error);
         logger.error(error);
         res.status(500).json(error);
     }
@@ -241,7 +230,7 @@ async function getParicularUserOrders(req, res) {
         // const getAllOrders = await ordersModel.find({ buyerId: req.tokenData.id ,payment_status:'sucess'}).sort({ createdAt: -1 });
 
         let parameters = req.body;
-        let active = parameters?.active !== undefined ? parameters?.active : true;
+        let active =(parameters?.active);
         const skip = (parameters.currentPage - 1) * parameters.limit;
         const limit = parameters.limit;
 
@@ -250,7 +239,7 @@ async function getParicularUserOrders(req, res) {
                 $match: {
                     buyerId: new moongoose.Types.ObjectId(req.tokenData.id),
                     active: active,
-                    // 'products.payment_status':'success'
+                    'products.payment_status':parameters.paymentStatus
                 },
             },
             {
@@ -496,6 +485,7 @@ async function cancelOrderedProduct(req, res) {
     try {
 
         const decreasingAmount=req.body.product.amount-(req.body.product?.productDiscount?req.body.product?.productDiscount:0);
+
         const orderUpdate = await ordersModel.findByIdAndUpdate(
             req.body.id,
             { 
@@ -516,7 +506,8 @@ async function cancelOrderedProduct(req, res) {
           await ordersModel.findByIdAndUpdate(
                 req.body.id,
                 { $set: { active: false,'OrderSummary.Total':0 },
-             },
+        
+                },
             );
         }
   

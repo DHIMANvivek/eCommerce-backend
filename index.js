@@ -60,8 +60,8 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (request, 
           console.log(result.buyerId.toString(), "buyer id is ")
 
           // const res=await ordersModel.findOne({ orderID: orderId  },{_id:0,coupon:1,products:1});
-          if(result?.couponId){
-            await updateCoupon(result.couponId,buyerId); 
+          if(result?.coupon){
+            await updateCoupon(result.coupon,buyerId); 
         }
 
         

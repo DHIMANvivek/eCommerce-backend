@@ -117,7 +117,7 @@ async function deleteAddress(req, res) {
     try {
         const updatedValue = await Users.updateOne({
             _id: req.tokenData.id,
-            'info.address._id': req.body.address_id
+            'info.address._id': new mongoose.Types.ObjectId( req.query.address_id)
         }, {
             $set: {
                 'info.address.$.status': false
@@ -125,6 +125,7 @@ async function deleteAddress(req, res) {
         });
         res.status(200).json({message:'Address deleted successFully'});
     } catch (error) {
+        console.log('erorr is ',error);
         logger.error(error);
         res.status(500).json(error);
     }
@@ -153,18 +154,20 @@ async function updateAddress(req, res) {
 
 async function DefaultAddress(req, res) {
     try {
-        let FindAddress = await Users.findOne({ _id: req.tokenData.id }, { 'info.address': 1 });
-        FindAddress.info.address[req.body.index] = (FindAddress.info.address[0]);
-        FindAddress.info.address[0] = (req.body.address);
-        await FindAddress.save();
-        const result = await getActiveAddresses(req);
-        res.status(200).json(result[0].addresses);
+let FindAddress=await Users.findOne({_id:req.tokenData.id},{'info.address':1});
+let AddressSelected=FindAddress.info.address[req.body.index];
+FindAddress.info.address[req.body.index]=JSON.parse(JSON.stringify((FindAddress.info.address[0])));
+FindAddress.info.address[0]=AddressSelected;
+await FindAddress.save();
+// const result=await getActiveAddresses(req);
+res.status(200).json({title:'Default address set successfully'});
 
     } catch (error) {
         logger.error(error);
         res.status(500).json(error)
     }
 }
+
 
 async function getOrders(req, res) {
     try {
@@ -181,69 +184,8 @@ async function getOrders(req, res) {
 }
 
 
-// incomplete
-async function addReview(req, res) {
-    try {
-        const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.body.id] } }] });
-
-        res.status(200).json(getAllCoupons);
-
-    }
-    catch (error) {
-        logger.error(error);
-        res.status(500).json(error);
-    }
-}
 
 
-// async function getCoupons(req, res) {
-//     try {
-//         const getAllCoupons = await OffersModel.find({ $and: [{ OfferType: 'coupon' }, { userUsed: { $nin: [req.tokenData.id] } }, { startDate: { $lte: (new Date()) } }, { "status.active": false }, { "status.deleted": false }], });
-//         res.status(200).json(getAllCoupons);
-
-//     } catch (error) {
-//         res.status(500).json(error);
-//     }
-// }
-
-async function usedCoupon(req, res) {
-    try {
-        req.body.id = new mongoose.Types.ObjectId('6513a7af4e2d06d1e0e44660');
-        req.body.couponId = new mongoose.Types.ObjectId('65312dcde94dc6738db7bb21');
-        const findCoupon = await OffersModel.findById(req.body.couponId);
-
-        findCoupon.userUsed.push(req.body.id);
-        await findCoupon.save();
-        res.status(200).json(findCoupon);
-    } catch (error) {
-        logger.error(error);
-        res.status(500).json(error);
-    }
-}
-
-// async function getCoupons(req,res){
-// try {
-//     const getAllCoupons=await OffersModel.find({$and:[{OfferType:'coupon'},{userUsed:{$nin: [ req.body.id ] }}]});
-//     res.status(200).json(getAllCoupons);
-
-// } catch (error) {
-//     res.status.json(error);
-// }
-// }
-
-async function UserCoupon(req, res) {
-    try {
-        const findCoupon = await OffersModel.findById(req.body.couponId);
-
-        // info.adddr
-        findCoupon.userId.push(req.body.userId);
-        await findCoupon.save();
-        res.status(200).json(findCoupon);
-    } catch (error) {
-        logger.error(error);
-
-    }
-}
 
 async function getFaq(req, res) {
     try {
@@ -282,7 +224,6 @@ module.exports = {
     updateDetails,
     getAddress,
     DefaultAddress,
-    usedCoupon,
     addAddress,
     deleteAddress,
     updateAddress,

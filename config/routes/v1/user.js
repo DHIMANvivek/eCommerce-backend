@@ -17,12 +17,12 @@ router.post('/subscribe', authController.subscribeMail)
 // router.use(JwtVerify)
 router.use(JwtVerify);
 router.get('/getDetails',userController.getDetails)
-router.post('/updateDetails', userController.updateDetails)
+router.patch('/updateDetails', userController.updateDetails)
 router.get('/getAddress',userController.getAddress)
 router.post('/addAddress', userController.addAddress)
-router.post('/deleteAddress', userController.deleteAddress)
-router.post('/updateAdress', userController.updateAddress)
-router.post('/setDefault',userController.DefaultAddress)
+router.delete('/deleteAddress', userController.deleteAddress)
+router.patch('/updateAdress', userController.updateAddress)
+router.patch('/setDefault',userController.DefaultAddress)
 
 // router.get('/getFaq', userController.getFaq);
 router.post('/sendData', userController.sendData);
@@ -37,6 +37,5 @@ router.get('/getPaginatedData/:model', userController.getPaginatedData);
 // router.post('/webPushDetails', userController.webPushDetails);
 // router.get('/getPaymentKeys', userController.getPaymentKeys);
 
-// router.get('/coupons',userController.getCoupons);
-router.post('/used',userController.usedCoupon)
+
 module.exports = router;
