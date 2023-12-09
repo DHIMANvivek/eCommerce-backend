@@ -68,6 +68,7 @@ const chatSocket = async (socket) => {
                 sender: id,
                 receiver: '652b9c1480dd9b13abd5ee3a',
                 message: message,
+                createdAt: new Date(), 
             });
 
             try {
@@ -94,17 +95,54 @@ const chatSocket = async (socket) => {
                 });
             });
     });
+
     socket.on('replyMessage', async (message) => {
-        console.log('Received new` message:', message);
+        console.log('Received new  message:', message);
+            try {
+        
+            } catch (err) {
+                console.log('Error saving message:', err);
+                throw err;
+            }
         socket.broadcast.emit('replymessage', message);
+    });
+
+    socket.on('saveadminMessage', async (message) => {
+        console.log('Received new admin2 message:', message);
+
+        socket.broadcast.emit('loadadminNewChat', message.message);
+
+            try {
+             const newMessage = new ChatModel({
+                sender: '652b9c1480dd9b13abd5ee3a',
+                receiver: message.receiver,
+                adminMessage: message.message,
+                createdAt: new Date(), 
+            });
+
+            console.log('Message saved successfully:', newMessage);
+
+                const savedMessage = await newMessage.save();
+
+        
+        socket.broadcast.emit('loadadminNewChat', message);
+        }
+        catch (err) {
+            console.log('Error saving message:', err);
+            throw err;
+        }
     });
 
     socket.on('existChat', async (message) => {
         console.log('Received sender id :', message);
-        var chats = await ChatModel.find({ sender: message, receiver: '652b9c1480dd9b13abd5ee3a' })
+        var userchats = await ChatModel.find({ sender: message, receiver: '652b9c1480dd9b13abd5ee3a' })
+        var adminchats = await ChatModel.find({ sender: '652b9c1480dd9b13abd5ee3a', receiver: message });
+        console.log('Received new user message:', userchats);
+        console.log('Received new admin message:', adminchats);
 
-        if(chats) {
-            socket.emit('loadExistChat', chats);
+        if(userchats) {
+            socket.emit('loadExistChat', userchats);
+            socket.emit('loadadminExistChat', adminchats);
         }
     });
 

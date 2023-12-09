@@ -12,6 +12,9 @@ const chatSchema = new mongoose.Schema({
     message: {
         type: String,
     },
+    adminMessage: {
+        type: String
+    },
     isRead: {
         type: Boolean,
         default: false,
@@ -20,9 +23,8 @@ const chatSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    createdAt: {
+      createdAt: {
         type: Date,
-        default: Date.now(),
     },
 });
 module.exports = mongoose.model('chatDatas', chatSchema);
