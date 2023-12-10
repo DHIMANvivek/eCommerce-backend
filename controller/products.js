@@ -209,12 +209,12 @@ async function fetchProducts(req, res) {
         }
         if (minPrice) {
             matchedProducts.items = JSON.parse(JSON.stringify(matchedProducts.items.filter((item) => {
-                return (item.discount ? (item.price - item.discount) : item.price) >= minPrice;
+                return item.price >= minPrice;
             })));
         }
         if (maxPrice) {
             matchedProducts.items = (matchedProducts.items.filter((item) => {
-                return (item.discount ? (item.price - item.discount) : item.price) <= maxPrice;
+                return item.price <= maxPrice;
             }));
         }
 

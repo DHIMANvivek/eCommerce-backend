@@ -22,7 +22,7 @@ const allOnlineUsers = async (req, res) => {
  };
 
 const chatSocket = async (socket) => {
-    console.log('A user connected to /chat namespace.');
+    // console.log('A user connected to /chat namespace.');
     socket.emit('message', "how may i help you?");
     const cookieString = JSON.stringify(socket.handshake.headers.cookie);
     if(!cookieString) {
@@ -37,7 +37,7 @@ const chatSocket = async (socket) => {
         userToken = keyValue[1];
     }
     if(!userToken) {
-        console.log('No user token found');
+        // console.log('No user token found');
         return;
     }
     const parts = userToken.split('.');

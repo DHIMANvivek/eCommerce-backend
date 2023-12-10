@@ -303,7 +303,7 @@ async function getCoupons(req, res) {
             { couponType: 'custom', 'UserEmails.email': { $in: [user?.email] } },
             {
               couponType: { $in: ['global', 'new'] },
-              userUsed: { $not: { $in: [(tokenData.id)] } },
+              userUsed: { $not: { $in: [(tokenData?.id)] } },
             },
           ],
         },

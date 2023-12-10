@@ -72,11 +72,8 @@ async function fetchCart(req, res) {
             return item;
         }));
 
-        console.log( 'cart3');
-
         cart.amounts.subTotal = (Math.round((cart.amounts.subTotal) * 100) / 100);
         cart.amounts.total = cart.amounts.subTotal + cart.amounts.shipping;
-        console.log( 'cart4');
 
         res.status(200).json(cart);
     }
