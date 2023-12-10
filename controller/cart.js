@@ -14,11 +14,12 @@ async function fetchCart(req, res) {
             }
         };
 
+
         if (req.headers.authorization) {
             req.tokenData = verifyToken(req.headers.authorization.split(' ')[1]);
             req.hasAuthorization = true; 
         }
-
+        
         if (req.tokenData) {
             let userId = req.tokenData.id;
             let cartExists = await Cart.findOne({ userId: userId });
@@ -71,8 +72,11 @@ async function fetchCart(req, res) {
             return item;
         }));
 
+        console.log( 'cart3');
+
         cart.amounts.subTotal = (Math.round((cart.amounts.subTotal) * 100) / 100);
         cart.amounts.total = cart.amounts.subTotal + cart.amounts.shipping;
+        console.log( 'cart4');
 
         res.status(200).json(cart);
     }
