@@ -74,6 +74,7 @@ const chatSocket = async (socket) => {
             try {
                 const savedMessage = await newMessage.save();
                 socket.emit('userMessage', savedMessage);
+                socket.broadcast.emit('getChatDetail', true);
                 io.to('admin').emit('newMessage', savedMessage.message);
 
                 console.log('Message saved successfully:', savedMessage);
@@ -82,7 +83,7 @@ const chatSocket = async (socket) => {
                 throw err;
             }
           }
-        
+
         socket.on('disconnect', () => {
             console.log('User disconnected');
             UserModel.findByIdAndUpdate(id, { $set: { is_online: false } }, { new: true })
@@ -105,6 +106,11 @@ const chatSocket = async (socket) => {
                 throw err;
             }
         socket.broadcast.emit('replymessage', message);
+    });
+    
+    socket.on('receivedUserMessage', async (message) => {
+        console.log('Received new user message:', message);
+        socket.broadcast.emit('receivedUserMessage', message);
     });
 
     socket.on('saveadminMessage', async (message) => {
@@ -158,8 +164,7 @@ const chatSocket = async (socket) => {
         console.log('Received new user message:', message);
         socket.broadcast.emit('loadNewChat', message);
     });
-
-
+    
     socket.emit('welcomeMessage', 'Welcome to the chat!');
 };
 

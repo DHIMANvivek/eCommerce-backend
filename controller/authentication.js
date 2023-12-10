@@ -26,8 +26,7 @@ async function login(req, res) {
 
         let userFound = await usersModel.findOne({
             email: input.email
-        },{name:1,password:1,role:1})
-
+        },{email:1,name:1,password:1,role:1})
 
         let firstName;
         // PURE GOOGLE LOGIN
@@ -142,7 +141,8 @@ async function signup(req, res) {
         const mailSent = await mailer(mailData, SignupTemplate())
         const tokenData = {
             id: userCreated._id,
-            role: userCreated.role
+            role: userCreated.role,
+            email: userCreated.email
         }
         const token = createToken(tokenData);
         res.status(200).json({ token, firstName });

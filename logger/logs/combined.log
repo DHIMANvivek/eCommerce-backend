@@ -636,19 +636,3 @@ error: 2023-12-09T08:29:10.664Z wishlister.save is not a function
 error: 2023-12-09T08:29:22.606Z wishlister.save is not a function
 error: 2023-12-09T08:33:49.445Z The positional operator did not find the match needed from the query.
 error: 2023-12-09T10:01:43.798Z The positional operator did not find the match needed from the query.
-error: 2023-12-10T12:05:14.297Z Cannot read properties of undefined (reading 'id')
-error: 2023-12-10T12:31:25.350Z Cannot read properties of undefined (reading 'id')
-error: 2023-12-10T12:31:45.750Z Cannot read properties of undefined (reading 'id')
-error: 2023-12-08T10:57:26.553Z Incorrect Password!
-error: 2023-12-08T10:57:30.025Z Incorrect Password!
-error: 2023-12-08T10:57:38.641Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-08T10:57:39.645Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-09T06:44:40.238Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
-error: 2023-12-09T06:58:22.052Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-09T07:38:25.879Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-09T11:06:31.981Z CARLA HOODED CHECKS SHIRT is out of stock
-error: 2023-12-09T11:07:27.871Z orders validation failed: OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
-error: 2023-12-09T11:08:57.732Z orders validation failed: address.area: Cast to string failed for value "[ 'sadasd' ]" (type Array) at path "area", OrderSummary.: Cast to Number failed for value "NaN" (type number) at path "OrderSummary.Total"
-error: 2023-12-10T12:56:40.429Z orders validation failed: address.area: Cast to string failed for value "[ 'sadasd' ]" (type Array) at path "area"
-error: 2023-12-10T12:57:01.081Z orders validation failed: address.area: Cast to string failed for value "[ 'sadasd' ]" (type Array) at path "area"
-error: 2023-12-10T12:59:46.539Z orders validation failed: address.area: Cast to string failed for value "[ 'sadasd' ]" (type Array) at path "area"

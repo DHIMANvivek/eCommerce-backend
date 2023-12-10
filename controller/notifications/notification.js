@@ -3,6 +3,16 @@ const supportNotificationTokens = require('../../models/support-ticket/supportNo
 const admin = require('firebase-admin');
 require('dotenv').config();
 
+const express = require('express');
+const app = express();
+const socketIO = require('socket.io');
+const httpServer = require('http').createServer(app);
+const jwtVerify = require('../../middlewares/jwtVerify');
+
+const io = socketIO(httpServer);
+
+io.use(jwtVerify);
+
 const serviceAccount = require('../../tradevogue-firebase-adminsdk-mohjp-c7361ba1b1.json');
 
 // private keys of notification in env 
@@ -26,6 +36,38 @@ const getfcmToken = async (req, res) => {
   } else {
   }
 }
+
+const userFcmtoken = async (req, res) => {
+  try {
+
+     if (!req.tokenData) {
+      return res.status(200).send('OK'); 
+    }
+    
+    const email = req.tokenData.email || req.body.email;
+
+    const supportNotification = await supportNotificationTokens.findOne({});
+
+    if (!supportNotification) {
+      return res.status(404).send('Data not found');
+    }
+
+    const matchingTokenDetail = supportNotification.tokenDetail.find(
+      tokenDetail => tokenDetail.email === email
+    );
+
+    if (!matchingTokenDetail) {
+      return;
+    }
+
+    const { token } = matchingTokenDetail;
+    res.status(200).send({ token });
+  } catch (error) {
+     console.log(error);
+  }
+};
+
+
 
 const getNotification = async (req, res) => {
   try {
@@ -108,6 +150,14 @@ const updateNotifications = async (req, res) => {
   }
 }
 
+const notificationSocket = async (socket, status) => {
+  console.log('A user connected to /notification namespace.');
+  socket.on('notificationStatus', (status) => {
+    console.log('notificationStatus', status);
+      socket.broadcast.emit('notificationStatus', status);
+  });
+}
+
 const toggleNotification = async (req, res) => {
   try {
     const { id, state } = req.body;
@@ -120,11 +170,22 @@ const toggleNotification = async (req, res) => {
       return res.status(404).json({ message: 'Notification not found' });
     }
 
+    if (updatedNotifications.state === true) {
+      await notificationSocket(io.of('/notification'), true);
+    }else {
+      await notificationSocket(io.of('/notification'), false);
+    }
+
+    
+
     res.status(200).json({ message: 'Notification updated successfully', updatedNotifications });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+
 
 const sendNotification = async (req, res) => {
   const { title, body, icon, url, token, registration_ids } = req.body;
@@ -191,5 +252,7 @@ module.exports = {
   toggleNotification,
   comingNotification,
   sendNotification,
-  deleteNotification
+  deleteNotification,
+  userFcmtoken,
+  notificationSocket
 }

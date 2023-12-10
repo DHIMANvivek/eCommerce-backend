@@ -23,6 +23,10 @@ io.of('/chat').on('connection', function (socket) {
     require('../../controller/chat/chat').chatSocket(socket);
 });
 
+io.of('/notification').on('connection', function (socket) {
+    require('../../controller/notifications/notification').notificationSocket(socket);
+});
+
 app.use(express.json());
 
 const AdminVerify = require('../../middlewares/adminVerify');
