@@ -24,6 +24,7 @@ io.of('/chat').on('connection', function (socket) {
 });
 
 app.use(express.json());
+
 const AdminVerify = require('../../middlewares/adminVerify');
 const { verifyToken } = require('../../helpers/jwt');
 const jwtVerify = require('../../middlewares/jwtVerify')
