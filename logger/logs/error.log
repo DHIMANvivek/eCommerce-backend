@@ -423,3 +423,6 @@ error: 2023-12-08T20:42:40.619Z orders validation failed: OrderSummary.: Cast to
 error: 2023-12-09T00:59:10.133Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-09T01:00:12.427Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-09T01:00:21.973Z Cannot read properties of undefined (reading 'totalSales')
+error: 2023-12-11T06:08:31.488Z Floral Embroidered Kurti is out of stock
+error: 2023-12-11T06:34:46.521Z orders validation failed: address: Cast to Embedded failed for value "true" (type boolean) at path "address" because of "ObjectExpectedError"
+error: 2023-12-11T06:39:02.579Z orders validation failed: address.area: Cast to string failed for value "[ 'dugri' ]" (type Array) at path "area"

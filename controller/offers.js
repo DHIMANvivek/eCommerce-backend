@@ -310,6 +310,7 @@ async function getCoupons(req, res) {
       },
     ]);
     
+    console.log('getCoupons is ',getAllCoupons);
 
   res.status(200).json(getAllCoupons);
 
