@@ -518,6 +518,24 @@ async function cancelOrderedProduct(req, res) {
             );
         }
 
+        await Products.updateOne(
+            {
+                sku: req.body.product.sku,
+                'assets.color': req.body.product.color,
+                'assets.stockQuantity.size': req.body.product.size
+            },
+            {
+                $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': req.body.product.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': -req.body.product.quantity },
+                $set:{'status.active':true}
+            },
+            {
+                arrayFilters: [
+                    { "outer.color":  req.body.product.color },
+                    { "inner.size":  req.body.product.size }
+                ]
+            }
+        );
+
 
         return res.status(200).json({ message: 'Product cancelled successfully' });
     } catch (error) {
@@ -528,8 +546,11 @@ async function cancelOrderedProduct(req, res) {
 
 async function cancelOrder(req, res) {
     try {
-        const orderUpdate = await ordersModel.findByIdAndUpdate(
-            req.body.orderId,
+
+        const orderUpdate = await ordersModel.findOneAndUpdate(
+           { _id:req.body.orderId,
+            'products.shipmentStatus': 'pending',
+            },
             {
                 $set: {
                     active: false,
@@ -540,6 +561,33 @@ async function cancelOrder(req, res) {
                 }
             },
         );
+
+
+        console.log("orderupdate is ",orderUpdate);
+        // return;
+
+        orderUpdate.products.forEach(async(el)=>{
+            if(el.payment_status=='success' && el.shipmentStatus=='pending'){
+                console.log('conditioon true');
+            await Products.updateOne(
+                {
+                    sku: el.sku,
+                    'assets.color': el.color,
+                    'assets.stockQuantity.size': el.size
+                },
+                {
+                    $inc: { 'assets.$[outer].stockQuantity.$[inner].quantity': el.quantity, 'assets.$[outer].stockQuantity.$[inner].unitSold': -el.quantity },
+                    $set:{'status.active':true}
+                },
+                {
+                    arrayFilters: [
+                        { "outer.color": el.color },
+                        { "inner.size": el.size }
+                    ]
+                }
+            );
+            }
+        })
 
         return res.status(200).json({ message: 'Order cancelled successfully' });
     } catch (error) {
