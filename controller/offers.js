@@ -322,7 +322,6 @@ async function getCoupons(req, res) {
 async function checkCoupon(couponId, userId) {
   try {
 
-    console.log('couponid is ',couponId," user id ",userId);
     const response = await OfferModel.findOne({
       $and: [
         { OfferType: 'coupon' },

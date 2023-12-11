@@ -106,7 +106,6 @@ async function addToWishlist(req, res) {
         }
 
         const itemAlreadyExists = await wishlist.findOne({ userId: user.id, 'wishlists.wishlistName': input.wishlistName, 'wishlists.products': { $in: [input.productId] } });
-
         if (itemAlreadyExists) {
             res.status(200).json({
                 message: "Item already exists in " + input.wishlistName + '!'

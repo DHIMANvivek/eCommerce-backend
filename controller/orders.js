@@ -109,6 +109,9 @@ async function verifyOrderSummary(req, res, productData = false) {
                 FinalResponse.subTotal += element?.oldPrice * element.quantity;
             }
 
+            else{
+                FinalResponse.subTotal+=element.price*element.quantity;
+            }
 
             return new Promise((res, rej) => {
                 let colorArray = response.assets?.filter(el => el.color == element.color);
@@ -129,10 +132,12 @@ async function verifyOrderSummary(req, res, productData = false) {
                 }
 
                 if (response?.oldPrice) {
-                    res({ price: response.price * element.quantity, oldPrice: response?.oldPrice * element.quantity });
+                    res('Resolve');
+                    // res({ price: response.price * element.quantity, oldPrice: response?.oldPrice * element.quantity });
                 }
                 else {
-                    res({ price: response.price * element.quantity });
+                    res('Resolve');
+                    // res({ price: response.price * element.quantity });
                 }
             });
         }));
