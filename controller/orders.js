@@ -182,6 +182,7 @@ async function createOrder(req, res) {
         delete req.body.details;
         req.body.OrderSummary = {};
         req.body.OrderSummary.subTotal = verifyOrder?.total;
+       
         if (verifyOrder?.discount) {
             req.body.OrderSummary.couponDiscount = verifyOrder.discount;
             req.body.coupon = req.body.couponId;
@@ -198,6 +199,7 @@ async function createOrder(req, res) {
 
 
 
+        console.log('req body is ',req.body);
         // order ID creation
         const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
         if (!UserLastOrder) {

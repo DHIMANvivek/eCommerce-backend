@@ -21,7 +21,7 @@ const bannerSchema = new mongoose.Schema(
         },
         contentAlign: {
             type: String,
-            default : 'Left'
+            // default : 'Left'
         },
         colors: {
             titleColor: {

@@ -50,7 +50,8 @@ async function showWishlists(req, res) {
 
 async function addToWishlist(req, res) {
     try {
-        const input = req.body;
+        const input = req.body;8
+        console.log(input, "inputttt");
         const user = req.tokenData;
         console.log('addtowishlist called');
         const wishlister = await wishlist.findOne({
@@ -305,22 +306,22 @@ async function removeFromWishlist(req, res) {
 
 // used in case of emergency 
 async function createDefault(req, res) {
-    try {
-        const getAllusers = await UserModel.find({}, { _id: 1 });
-        // console.log('get all user si ', getAllusers);
-        getAllusers.forEach(async (el) => {
-            const defaultWishlist = {
-                wishlistName: 'my wishlist',
-                products: []
-            }
-            await wishlist.create({
-                userId: el._id,
-                wishlists: [defaultWishlist]
-            });
-        })
-    } catch (error) {
-        console.log('error is ', error);
-    }
+    // try {
+    //     const getAllusers = await UserModel.find({}, { _id: 1 });
+    //     // console.log('get all user si ', getAllusers);
+    //     getAllusers.forEach(async (el) => {
+    //         const defaultWishlist = {
+    //             wishlistName: 'my wishlist',
+    //             products: []
+    //         }
+    //         await wishlist.create({
+    //             userId: el._id,
+    //             wishlists: [defaultWishlist]
+    //         });
+    //     })
+    // } catch (error) {
+    //     console.log('error is ', error);
+    // }
 }
 
 module.exports = {

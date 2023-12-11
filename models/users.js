@@ -96,6 +96,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.post('save', async function (){
+    console.log("wishlist created");
     const defaultWishlist = {
         wishlistName : 'my wishlist',
         products : []

@@ -636,17 +636,3 @@ error: 2023-12-09T08:29:10.664Z wishlister.save is not a function
 error: 2023-12-09T08:29:22.606Z wishlister.save is not a function
 error: 2023-12-09T08:33:49.445Z The positional operator did not find the match needed from the query.
 error: 2023-12-09T10:01:43.798Z The positional operator did not find the match needed from the query.
-error: 2023-12-10T12:39:25.179Z Cannot read properties of undefined (reading 'id')
-error: 2023-12-10T12:39:27.025Z Cannot read properties of undefined (reading 'id')
-error: 2023-12-10T13:57:40.958Z Incorrect Password!
-error: 2023-12-10T13:57:48.247Z Incorrect Password!
-error: 2023-12-10T14:02:21.829Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:02:36.744Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:02:37.472Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:02:38.091Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:02:38.924Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:02:40.102Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:02:40.748Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:03:02.384Z Your Current discount is conflicting with diwali third
-error: 2023-12-10T14:03:16.771Z Your Current discount is conflicting with diwali 3
-error: 2023-12-11T03:34:01.574Z orders validation failed: address.area: Cast to string failed for value "[ 'Basti Jodhewal' ]" (type Array) at path "area"
