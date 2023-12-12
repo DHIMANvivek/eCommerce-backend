@@ -87,6 +87,7 @@ async function VerifyOrder(req, res) {
 
 async function verifyOrderSummary(req, res, productData = false) {
     try {
+        console.log('req body is ',req.body);
         let FinalResponse = {};
         FinalResponse.savings = 0;
         FinalResponse.shipping = 0;
@@ -131,14 +132,7 @@ async function verifyOrderSummary(req, res, productData = false) {
                     newProducts.push(elementDetails);
                 }
 
-                if (response?.oldPrice) {
-                    res('Resolve');
-                    // res({ price: response.price * element.quantity, oldPrice: response?.oldPrice * element.quantity });
-                }
-                else {
-                    res('Resolve');
-                    // res({ price: response.price * element.quantity });
-                }
+                res();
             });
         }));
 
@@ -165,11 +159,14 @@ async function verifyOrderSummary(req, res, productData = false) {
         if (productData) {
             req.body.products = newProducts;
         }
+
+        console.log('FinalResponse i s------------> ',FinalResponse);
         return new Promise((res, rej) => {
             res(FinalResponse);
         });
 
     } catch (error) {
+        console.log('error si ',error);
         logger.error(error);
         res.status(500).json(error);
     }
@@ -178,6 +175,7 @@ async function verifyOrderSummary(req, res, productData = false) {
 async function createOrder(req, res) {
     try {
         const verifyOrder = await verifyOrderSummary(req, res, true);
+        // console.log('verify Order is ',verifyOrder);
         req.body.buyerId = req.tokenData.id;
         delete req.body.details;
         req.body.OrderSummary = {};
@@ -199,7 +197,7 @@ async function createOrder(req, res) {
 
 
 
-        console.log('req body is ',req.body);
+        // console.log('req body is ',req.body);
         // order ID creation
         const UserLastOrder = await ordersModel.findOne({ buyerId: req.tokenData.id }).sort({ createdAt: -1 });
         if (!UserLastOrder) {

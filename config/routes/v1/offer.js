@@ -7,7 +7,7 @@ router.post('/get',OfferController.getOffers)
 router.post('/delete',OfferController.deleteOffer)
 router.post('/update',OfferController.updateOffer)
 router.get('/getCoupons',OfferController.getCoupons)
-router.post('/statusUpdate',OfferController.updateOfferStatus)
+router.patch('/statusUpdate',OfferController.updateOfferStatus)
 
 
 module.exports=router;

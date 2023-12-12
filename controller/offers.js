@@ -7,78 +7,122 @@ const mailer = require('../helpers/nodemailer')
 const { sendDiscountTemplate} = require('../helpers/INDEX');
 const logger = require('./../logger');
 
-function createQuery(req) {
-  let query = {};
-  req.body = JSON.parse(JSON.stringify(req.body));
-  if (req.body?.ExtraInfo?.categories && req.body.ExtraInfo.categories.length == 0) {
-    req.body.ExtraInfo.categories = null;
-  }
+// function createQuery(req) {
+//   let query = {};
+//   // req.body = JSON.parse(JSON.stringify(req.body));
+//   if (req.body?.ExtraInfo?.categories && req.body.ExtraInfo.categories.length == 0) {
+//     req.body.ExtraInfo.categories = null;
+//   }
 
-  if (req.body?.ExtraInfo?.brands && req.body?.ExtraInfo.brands.length == 0) {
-    req.body.ExtraInfo.brands = null;
-  }
+//   if (req.body?.ExtraInfo?.brands && req.body?.ExtraInfo.brands.length == 0) {
+//     req.body.ExtraInfo.brands = null;
+//   }
 
-  //  GLOBAL QUERY 
-  if (!req.body?.ExtraInfo?.brands && !req.body?.ExtraInfo?.categories) {
-    query['ExtraInfo.categories'] = null,
-      query['ExtraInfo.brands'] = null
-  }
+//   //  GLOBAL QUERY 
+//   if (!req.body?.ExtraInfo?.brands && !req.body?.ExtraInfo?.categories) {
+//     query['ExtraInfo.categories'] = null,
+//       query['ExtraInfo.brands'] = null
+//   }
 
-  if (req.body?.ExtraInfo?.brands && req.body?.ExtraInfo?.categories) {
-    query['ExtraInfo.brands'] = {$in:req.body.ExtraInfo.brands};
-    query['ExtraInfo.categories'] = {$in:req.body.ExtraInfo.categories};
-  }
+//   if (req.body?.ExtraInfo?.brands && req.body?.ExtraInfo?.categories) {
+//     query['ExtraInfo.brands'] = {$in:req.body.ExtraInfo.brands};
+//     query['ExtraInfo.categories'] = {$in:req.body.ExtraInfo.categories};
+//   }
 
  
 
-  else if (req.body?.ExtraInfo?.brands && !req.body?.ExtraInfo?.categories) {
-    query = {
-      $and: [
-        { 'ExtraInfo.brands': {$in:req.body.ExtraInfo.brands} },  // At least one of these brands must be present
-        { 'ExtraInfo.categories': null }
-      ]
-    }
+//   else if (req.body?.ExtraInfo?.brands && !req.body?.ExtraInfo?.categories) {
+//     query = {
+//       $and: [
+//         { 'ExtraInfo.brands': {$in:req.body.ExtraInfo.brands} },  // At least one of these brands must be present
+//         { 'ExtraInfo.categories': null }
+//       ]
+//     }
+//   }
+
+//   else if (!req.body?.ExtraInfo?.brands && req.body?.ExtraInfo?.categories) {
+//     query = {
+//       $and: [
+//         { 'ExtraInfo.brands': null },
+//         { 'ExtraInfo.categories': {$in:req.body.ExtraInfo.categories} }
+//       ]
+//     }
+//   }
+
+//   query['status.active'] = true;
+//   query.OfferType = 'discount';
+
+//   let newquery = {
+//     $or: [
+//       { startDate: { $gte: req.body.startDate, $lte: req.body.endDate } },
+//       { endDate: { $gte: req.body.startDate, $lte: req.body.endDate } },
+//       { startDate: { $lte: req.body.startDate }, endDate: { $gte: req.body.endDate } }
+//     ]
+
+
+//   }
+
+//   Object.assign(query, newquery);
+//   return query;
+// }
+function createQuery(req) {
+  let query = {
+    'status.active': true,
+    'status.deleted':false,
+    OfferType: 'discount',
+  };
+
+  if (req.body?.ExtraInfo?.categories) {
+    query['ExtraInfo.categories'] = req.body.ExtraInfo.categories.length > 0 ? { $in: req.body.ExtraInfo.categories } : null;
   }
 
-  else if (!req.body?.ExtraInfo?.brands && req.body?.ExtraInfo?.categories) {
-    query = {
-      $and: [
-        { 'ExtraInfo.brands': null },
-        { 'ExtraInfo.categories': {$in:req.body.ExtraInfo.categories} }
-      ]
-    }
+  if (req.body?.ExtraInfo?.brands) {
+    query['ExtraInfo.brands'] = req.body.ExtraInfo.brands.length > 0 ? { $in: req.body.ExtraInfo.brands } : null;
   }
 
-  query['status.active'] = true;
-  query.OfferType = 'discount';
+  if (query['ExtraInfo.brands'] && query['ExtraInfo.categories']) {
+    query.$and = [
+      { 'ExtraInfo.brands': query['ExtraInfo.brands'] },
+      { 'ExtraInfo.categories': query['ExtraInfo.categories'] },
+    ];
+    // Remove the individual properties from the query
+    delete query['ExtraInfo.brands'];
+    delete query['ExtraInfo.categories'];
+  } else if (query['ExtraInfo.brands']) {
+    // Only brands are specified
+    query.$and  = [{ 'ExtraInfo.brands': query['ExtraInfo.brands'] }, { 'ExtraInfo.categories': null }];
+    delete query['ExtraInfo.brands'];
+  } else if (query['ExtraInfo.categories']) {
+    // Only categories are specified
+    query.$and  = [{ 'ExtraInfo.brands': null }, { 'ExtraInfo.categories': query['ExtraInfo.categories'] }];
+    delete query['ExtraInfo.categories'];
+  }
 
-  let newquery = {
+  const dateQuery = {
     $or: [
       { startDate: { $gte: req.body.startDate, $lte: req.body.endDate } },
       { endDate: { $gte: req.body.startDate, $lte: req.body.endDate } },
-      { startDate: { $lte: req.body.startDate }, endDate: { $gte: req.body.endDate } }
-    ]
+      { startDate: { $lte: req.body.startDate }, endDate: { $gte: req.body.endDate } },
+    ],
+  };
 
+  Object.assign(query, dateQuery);
 
-  }
-
-  Object.assign(query, newquery);
   return query;
 }
 
+
 async function createOffer(req, res) {
   try {
+
     if (req.body.OfferType == 'discount') {
-      req.body.Link = generateLink(req);
+      // req.body.Link = generateLink(req);
       let query = createQuery(req);
-
-
       let results = await OfferModel.find(query);
-
       for (let result of results) {
         if (result && result._id != req.body.id) {
           if (result.status.active) {
-            req.body.status = { deleted: false, active: false };
+            req.body.status={active:false,deleted:false};
           }
         }
       }
@@ -88,13 +132,24 @@ async function createOffer(req, res) {
     await newOffer.save();
     res.status(200).json(newOffer);
   } catch (error) {
+    console.log('error is ',error);
+    logger.error(error);
     res.status(500).json(error);
   }
 }
-async function getOffers(req, res) {
+
+
+async function getOffersCommon(req,res,parameterGiven=false){
   try {
-    
-   let parameters =req.body; 
+    console.log('req body come up in getOffer common ',parameterGiven);
+    let parameters;
+    if(parameterGiven){
+      parameters=parameterGiven;
+    }
+    else{
+      parameters =req.body; 
+    }
+     console.log('parameter sis ',parameters);
     const skip =  (parameters.currentPage - 1) * parameters.limit ;
     const limit= parameters.limit;
     
@@ -103,11 +158,12 @@ async function getOffers(req, res) {
       {
         $match: {
           "status.deleted": false,
+          "status.active":parameters.active,
           $or: [
             { OfferType: query },
             { discountType: query },
             { Title: query },
-            { couponcode: query },
+            { couponCode: query },
           ],
         },
       },
@@ -137,6 +193,17 @@ async function getOffers(req, res) {
     
 
     const data=await OfferModel.aggregate(aggregationPipe);
+    return new Promise((res,rej)=>{
+     res( data);
+    })
+  } catch (error) {
+    
+  }
+}
+
+async function getOffers(req, res) {
+  try {
+        const data=await getOffersCommon(req,res);
     res.status(200).json(data);
 
   } catch (error) {
@@ -149,17 +216,17 @@ async function getOffers(req, res) {
 
 async function deleteOffer(req, res) {
   try {
-    if (Array.isArray(req.body)) {
-      await OfferModel.updateMany({ _id: { $in: req.body } }, { $set: { "status.deleted": true } });
+    
+    if (Array.isArray(req.body.data)) {
+      await OfferModel.updateMany({ _id: { $in: req.body.data } }, { $set: { "status.deleted": true } });
     }
 
     else {
       await OfferModel.updateOne({ _id: req.body.id }, { $set: { "status.deleted": true } });
     }
 
-    const data = await OfferModel.find({ 'status.deleted': false }).sort({ createdAt: -1 });
-
-    return res.status(200).json(data)
+    const data=await getOffersCommon(req,res,req.body.parameters);
+    return res.status(200).json({message:'Delted offer sucess',data})
   } catch (error) {
     logger.error(error);
     res.status(500).json(error);
@@ -212,7 +279,7 @@ function generateLink(req) {
 async function updateOffer(req, res) {
   try {
     if (req.body.OfferType == 'discount') {
-      req.body.Link = generateLink(req);
+      // req.body.Link = generateLink(req);
       let query = createQuery(req);
       req.body['status.active'] = true;
       let results = await OfferModel.find(query);
@@ -223,9 +290,31 @@ async function updateOffer(req, res) {
           }
         }
       }
+
+      req.body.userUsed = null;
+      req.body.UserEmails = null;
+      req.body.couponType=null;
+      req.body.couponCode=null;
+      req.body.couponUsersLimit=null;
+      req.body.minimumPurchaseAmount=null;
     }
     
+  
+    if(req.body.OfferType=='coupon'){
+        req.body.ExtraInfo=null;
+        req.body['status.active'] = true;
+        req.body.userUsed=[];
+        if(req.body.couponType!='custom'){
+            req.body.UserEmails=null;
+           
+        }
+        else{
+            req.body.couponUsersLimit=null;
+        }
+    }
+
     result = await OfferModel.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true });
+
     res.status(200).json(result);
   } catch (error) {
     logger.error(error);
@@ -235,34 +324,35 @@ async function updateOffer(req, res) {
 
 async function updateOfferStatus(req, res) {
   try {
+    console.log('body is ',req.body);
     let status = req.body.status;
+    let parameters=req.body.parameters;
     req.body = req.body.data;
     if (req.body.OfferType == 'discount' && status) {
       let query = createQuery(req);
       let results = await OfferModel.find(query);
 
       for (let result of results) {
-        result = JSON.parse(JSON.stringify(result));
         if (result && result._id != req.body._id) {
+          console.log('result is ',result," req body is  ",req.body);
           throw { message: `Your Current discount is conflicting with ${result.Title}` };
         }
       }
 
     }
 
-    if (!status) {
-      req.body.status = false;
-    }
-
-    if(req.body.couponType=='custom'){
-      req.body.userUsed=[];
-    }
+  
     const updateOfferStatus = await OfferModel.updateOne({ _id: req.body._id }, {
       $set: { 'status.active': status }
     })
-    res.status(200).json({ message: 'offer status updated sucess' })
+
+    let data=await getOffersCommon(req,res,parameters);
+    if(!data.length){
+      data=[];
+    }
+    res.status(200).json({ message: 'offer status updated sucess',data:data })
   } catch (error) {
-    console.log('eroror come yp is ',error);
+    console.log('error come up is ',error);
     logger.error(error);
     res.status(500).json(error)
   }
@@ -352,7 +442,6 @@ async function checkCoupon(couponId, userId) {
 async function updateCoupon(couponId, userId) {
   try {
     const response = await OfferModel.findOneAndUpdate({ _id: couponId, userUsed: { $nin: [userId] } }, { $push: { userUsed: (userId) },$inc:{couponUsersLimit:-1} });
-    console.log('response of update coupon is -------->',response);
     return new Promise((res, rej) => {
       res(response);
     })

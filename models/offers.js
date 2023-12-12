@@ -14,17 +14,24 @@ let offerSchema = mongoose.Schema({
         type:String
     },
 
-    couponcode: {
-        type: String,
-        unique:true,
-        required:   function validate() {
-                if (this.OfferType == 'coupon') return true;
-            },
+    // couponcode: {
+    //     type: String,
+    //     unique:true,
+    //     required:   function validate() {
+    //             if (this.OfferType == 'coupon') return true;
+    //         },
         
-        unique:function validate() {
-            if (this.OfferType == 'coupon') return true;
+    //     unique:function validate() {
+    //         if (this.OfferType == 'coupon') return true;
+    //     },
+    // },
+    couponCode: {
+        type: String,
+        // unique:true,
+        required: function () {
+          return this.OfferType === 'coupon';
         },
-    },
+      },
 
     Title: {
         type: String,
@@ -78,21 +85,26 @@ let offerSchema = mongoose.Schema({
 
     maximumDiscount: {
         type: Number,
-        // required: true,
         min:0
     },
+    // minimumPurchaseAmount: {
+    //     type: Number,
+    //     required: function validate() {
+    //         if (this.OfferType == 'coupon') return true;
+
+    //     },
+    //     min:0
+    // },
+
     minimumPurchaseAmount: {
         type: Number,
-        required: function validate() {
-            if (this.OfferType == 'coupon') return true;
-
+        min: 0,
+        required: function () {
+          return this.OfferType === 'coupon';
         },
-        min:0
-    },
+      },
 
     ExtraInfo:{
-    //    type: Object,
-    //     lowercase: true 
     categories:[{type:String,lowercase:true}],
     brands:[{type:String}]    
     },
@@ -101,35 +113,55 @@ let offerSchema = mongoose.Schema({
     couponType: {
         type: String,
         enum: ['global', 'custom','new'],
-        required:function validate(){
+        required:function(){
             return (this.OfferType == 'coupon');
         },
         
     },
-    userUsed:[
-        {
-        // ref:'users',
-        // type: mongoose.Schema.Types.ObjectId,
+    // userUsed:[
+    //     {
+    //     // ref:'users',
+    //     // type: mongoose.Schema.Types.ObjectId,
         
-    }
-    ],
+    // }
+    // ],
     
-    UserEmails:[
+    userUsed: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User', // Assuming your user model is named 'User'
+        },
+        
+      ],
+    // UserEmails:[
 
-        {     type:Object,
-            required:function validate(){
-                if (this.OfferType == 'coupon' && this.couponType=='custom') return true;
-            }
-        }
+    //     {     type:Object,
+    //         required:function validate(){
+    //             if (this.OfferType == 'coupon' && this.couponType=='custom') return true;
+    //         }
+    //     }
        
-    ],
+    // ],
+    UserEmails: [
+        {
+           email: {
+              type: String,
+              lowercase: true,
+              required: function () {
+                 return this.OfferType === 'coupon' && this.couponType === 'custom';
+              },
+           },
+        },
+     ],
+     
+  
 
-    Link:{
-        type:String,
-    },
+    // Link:{
+    //     type:String,
+    // },
     couponUsersLimit: {
         type: Number,
-        required: function validate() {
+        required: function () {
             if (this.OfferType == 'coupon' && this.couponType!='custom') return true;
 
         },
@@ -149,14 +181,39 @@ let offerSchema = mongoose.Schema({
     },
 
 
-
-
 },
     {
         timestamps: true,
         autoindex: true
     }
+    
 
 )
 
+offerSchema.pre('save', function (next) {
+        if (this.OfferType === 'discount') {
+          this.userUsed = null;
+          this.UserEmails = null;
+          req.body.couponType=null;
+          req.body.couponCode=null;
+          req.body.minimumPurchaseAmount=null;
+          req.body.couponUsersLimit=null;
+        } 
+
+        if(this.OfferType=='coupon'){
+            this.ExtraInfo=null;
+            if(this.couponType!='custom'){
+                this.UserEmails=null;
+                this.userUsed=[];
+            }
+            else{
+                this.userUsed=null;
+                this.couponUsersLimit=null;
+            }
+        }
+        next();
+})
+
+
+  
 module.exports = mongoose.model('Offers', offerSchema);
