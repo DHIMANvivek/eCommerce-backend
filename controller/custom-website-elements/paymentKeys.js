@@ -2,6 +2,9 @@ const PaymentKeys = require('./../../models/custom-website-elements/paymentKeys'
 const logger = require('./../../logger');
 const crypto = require('crypto');
 require('dotenv').config();
+const bcryptjs = require('bcryptjs');
+const usersModel = require('../../models/users');
+const { log } = require('console');
 
 async function getstripePaymentKeyPromise(req, res) {
   try {
@@ -432,6 +435,33 @@ async function getDecryptedPaymentKeys(req , res) {
   
 }
 
+async function verifyPassword(req, res) {
+  try {
+    const userFound = await usersModel.findOne({
+      email: req.tokenData.email
+    }, { email: 1, name: 1, password: 1, role: 1 });
+
+    if (!userFound) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const compare = await bcryptjs.compare(req.body.password, userFound.password);
+
+    if (compare) {
+      return res.status(200).json('okay');
+    } else {
+      throw ({message: "Please Enter Correct Password"})
+    }
+  } catch (err) {
+    console.log('error is ',err);
+        logger.error(err);
+        if (err.message) return res.status(500).json(err);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+  }
+}
+
 async function deletePaymentKeys(req, res) {
   const { id } = req.body;
   console.log(id, "coming id is ");
@@ -459,6 +489,7 @@ async function deletePaymentKeys(req, res) {
       return;
     }
   } catch (error) {
+    
     logger.error(error);
     res.status(500).json(error);
   }
@@ -474,5 +505,6 @@ module.exports = {
   getDecryptedPaymentKeysViaIndex,
   getDecryptedPaymentKeys,
   decryptPaymentKeys,
-  getrazorPaymentKeyPromise
+  getrazorPaymentKeyPromise,
+  verifyPassword
 }

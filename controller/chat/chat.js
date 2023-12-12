@@ -116,7 +116,7 @@ const chatSocket = async (socket) => {
     socket.on('saveadminMessage', async (message) => {
         console.log('Received new admin2 message:', message);
 
-        socket.broadcast.emit('loadadminNewChat', message.message);
+        socket.broadcast.emit('saveadminMessage', message);
 
             try {
              const newMessage = new ChatModel({
@@ -153,7 +153,7 @@ const chatSocket = async (socket) => {
     });
 
     socket.on("upload", (file, callback) => {
-        console.log(file); 
+        console.log(file);
         writeFile("/tmp/upload", file, (err) => {
           callback({ message: err ? "failure" : "success" });
         });

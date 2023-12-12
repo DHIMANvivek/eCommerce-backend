@@ -43,7 +43,7 @@ router.use('/offer', require('./v1/offer'));
 router.use('/wishlist', jwtVerify, require('./v1/wishlist'));
 router.use('/socials', require('./v1/custom-website-elements/socials'));
 router.use('/faqs', require('./v1/custom-website-elements/faqs'));
-router.use('/paymentkeys', require('./v1/custom-website-elements/paymentKeys'));
+router.use('/paymentKeys', require('./v1/custom-website-elements/paymentKeys'));
 router.use('/banners', require('./v1/custom-website-elements/banners'));
 router.use('/sales', require('./v1/custom-website-elements/sales'));
 router.use('/tc', require('./v1/tc'));
@@ -70,25 +70,6 @@ router.get('/checkUser', (req, res) => {
     return res.status(500).json(null);
 
 })
-
-// router.get('/getPaginatedData', getPaginatedData);
-
-// async function getPaginatedData(req, res) {
-//     // const modelName = req.params.model;
-//     // const page = parseInt(req.query.page, 1) || 1;
-//     // const pageSize = parseInt(req.query.pageSize, 5) || 10;
-
-//     try {
-//         // const Model = require(`../../models/custom-website-elements/${modelName}`);
-//         // const data = await paginateResults(Model, page, pageSize);
-//         const result = await faqModel.find({});
-
-//         res.status(200).json(result);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// }
 
 router.use(function (req, res) {
     return res.status(404).json({

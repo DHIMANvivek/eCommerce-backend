@@ -423,6 +423,273 @@ error: 2023-12-08T20:42:40.619Z orders validation failed: OrderSummary.: Cast to
 error: 2023-12-09T00:59:10.133Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-09T01:00:12.427Z Cannot read properties of undefined (reading 'totalSales')
 error: 2023-12-09T01:00:21.973Z Cannot read properties of undefined (reading 'totalSales')
-error: 2023-12-11T06:08:31.488Z Floral Embroidered Kurti is out of stock
-error: 2023-12-11T06:34:46.521Z orders validation failed: address: Cast to Embedded failed for value "true" (type boolean) at path "address" because of "ObjectExpectedError"
-error: 2023-12-11T06:39:02.579Z orders validation failed: address.area: Cast to string failed for value "[ 'dugri' ]" (type Array) at path "area"
+error: 2023-12-09T11:11:34.663Z orders validation failed: address.area: Cast to string failed for value "[ 'area' ]" (type Array) at path "area"
+error: 2023-12-09T11:11:41.268Z orders validation failed: address.area: Cast to string failed for value "[ 'area' ]" (type Array) at path "area"
+error: 2023-12-09T11:12:06.566Z orders validation failed: address.area: Cast to string failed for value "[ 'area' ]" (type Array) at path "area"
+error: 2023-12-09T11:14:03.346Z orders validation failed: address.area: Cast to string failed for value "[ 'area' ]" (type Array) at path "area"
+error: 2023-12-09T15:27:35.941Z Cast to embedded failed for value "{
+  firstname: 'VIVEK',
+  lastname: 'DHIMAN',
+  apartment: 'dhiman niwas 407/1 ,central town , street number 8',
+  city: [ 'Pamal' ],
+  area: 'Ludhiana',
+  state: 'Punjab',
+  pincode: '142021',
+  country: 'IN'
+}" (type Object) at path "info.address" because of "CastError"
+error: 2023-12-09T15:28:08.464Z 404
+error: 2023-12-09T15:29:36.865Z 404
+error: 2023-12-09T15:30:48.536Z 404
+error: 2023-12-09T15:30:49.590Z 404
+error: 2023-12-09T15:30:51.209Z 404
+error: 2023-12-09T15:31:11.206Z 404
+error: 2023-12-10T05:30:03.411Z Please login/signup.
+error: 2023-12-10T05:30:03.411Z Please login/signup.
+error: 2023-12-10T05:35:49.105Z Please login/signup.
+error: 2023-12-10T05:35:49.105Z Please login/signup.
+error: 2023-12-10T05:39:40.143Z Please login/signup.
+error: 2023-12-10T05:39:40.143Z Please login/signup.
+error: 2023-12-10T06:52:24.876Z You are not eligible for this route
+error: 2023-12-10T06:54:47.768Z You are not eligible for this route
+error: 2023-12-10T06:57:59.771Z You are not eligible for this route
+error: 2023-12-10T07:03:45.983Z Please login/signup.
+error: 2023-12-10T07:03:45.983Z Please login/signup.
+error: 2023-12-10T07:37:42.316Z You are not eligible for this route
+error: 2023-12-10T10:19:05.561Z Please login/signup.
+error: 2023-12-10T10:19:05.561Z Please login/signup.
+error: 2023-12-10T10:20:41.186Z Please login/signup.
+error: 2023-12-10T10:20:41.186Z Please login/signup.
+error: 2023-12-10T10:20:41.310Z Please login/signup.
+error: 2023-12-10T10:20:41.310Z Please login/signup.
+error: 2023-12-10T10:20:48.314Z Please login/signup.
+error: 2023-12-10T10:20:48.314Z Please login/signup.
+error: 2023-12-10T10:20:48.786Z Please login/signup.
+error: 2023-12-10T10:20:48.786Z Please login/signup.
+error: 2023-12-10T10:22:09.635Z Please login/signup.
+error: 2023-12-10T10:22:09.635Z Please login/signup.
+error: 2023-12-10T10:22:10.086Z Please login/signup.
+error: 2023-12-10T10:22:10.086Z Please login/signup.
+error: 2023-12-10T10:22:14.070Z Please login/signup.
+error: 2023-12-10T10:22:14.070Z Please login/signup.
+error: 2023-12-10T10:22:22.638Z Please login/signup.
+error: 2023-12-10T10:22:22.638Z Please login/signup.
+error: 2023-12-10T10:22:22.860Z Please login/signup.
+error: 2023-12-10T10:22:22.860Z Please login/signup.
+error: 2023-12-10T10:22:26.178Z Please login/signup.
+error: 2023-12-10T10:22:26.178Z Please login/signup.
+error: 2023-12-10T10:22:28.645Z Please login/signup.
+error: 2023-12-10T10:22:28.645Z Please login/signup.
+error: 2023-12-10T10:22:28.960Z Please login/signup.
+error: 2023-12-10T10:22:28.960Z Please login/signup.
+error: 2023-12-10T10:22:44.305Z Please login/signup.
+error: 2023-12-10T10:22:44.305Z Please login/signup.
+error: 2023-12-10T10:22:44.389Z Please login/signup.
+error: 2023-12-10T10:22:44.389Z Please login/signup.
+error: 2023-12-10T10:23:11.030Z Please login/signup.
+error: 2023-12-10T10:23:11.030Z Please login/signup.
+error: 2023-12-10T10:25:13.447Z Please login/signup.
+error: 2023-12-10T10:25:13.447Z Please login/signup.
+error: 2023-12-10T10:25:14.173Z Please login/signup.
+error: 2023-12-10T10:25:14.173Z Please login/signup.
+error: 2023-12-10T10:25:35.192Z Please login/signup.
+error: 2023-12-10T10:25:35.192Z Please login/signup.
+error: 2023-12-10T10:27:14.743Z You are not eligible for this route
+error: 2023-12-10T10:27:28.426Z You are not eligible for this route
+error: 2023-12-10T10:27:37.402Z You are not eligible for this route
+error: 2023-12-10T10:28:14.435Z You are not eligible for this route
+error: 2023-12-10T10:29:31.532Z Please login/signup.
+error: 2023-12-10T10:29:31.532Z Please login/signup.
+error: 2023-12-10T10:29:45.806Z Cannot read properties of undefined (reading 'role')
+error: 2023-12-10T10:30:46.291Z Please login/signup.
+error: 2023-12-10T10:30:46.291Z Please login/signup.
+error: 2023-12-10T10:30:46.591Z Please login/signup.
+error: 2023-12-10T10:30:46.591Z Please login/signup.
+error: 2023-12-10T10:31:33.261Z Please login/signup.
+error: 2023-12-10T10:31:33.261Z Please login/signup.
+error: 2023-12-10T10:31:33.587Z Please login/signup.
+error: 2023-12-10T10:31:33.587Z Please login/signup.
+error: 2023-12-10T10:31:37.729Z Cannot read properties of undefined (reading 'role')
+error: 2023-12-10T10:32:05.183Z You are not eligible for this route
+error: 2023-12-10T10:32:13.962Z You are not eligible for this route
+error: 2023-12-10T10:34:23.379Z Please login/signup.
+error: 2023-12-10T10:34:23.379Z Please login/signup.
+error: 2023-12-10T10:34:54.718Z Please login/signup.
+error: 2023-12-10T10:34:54.718Z Please login/signup.
+error: 2023-12-10T10:45:15.940Z Please login/signup.
+error: 2023-12-10T10:45:15.940Z Please login/signup.
+error: 2023-12-10T10:45:41.175Z Please login/signup.
+error: 2023-12-10T10:45:41.175Z Please login/signup.
+error: 2023-12-10T10:45:41.479Z Please login/signup.
+error: 2023-12-10T10:45:41.479Z Please login/signup.
+error: 2023-12-10T10:45:50.898Z Please login/signup.
+error: 2023-12-10T10:45:50.898Z Please login/signup.
+error: 2023-12-10T10:45:51.006Z Please login/signup.
+error: 2023-12-10T10:45:51.006Z Please login/signup.
+error: 2023-12-10T10:45:54.462Z Please login/signup.
+error: 2023-12-10T10:45:54.462Z Please login/signup.
+error: 2023-12-10T10:45:54.611Z Please login/signup.
+error: 2023-12-10T10:45:54.611Z Please login/signup.
+error: 2023-12-10T10:46:09.474Z Please login/signup.
+error: 2023-12-10T10:46:09.474Z Please login/signup.
+error: 2023-12-10T10:46:09.739Z Please login/signup.
+error: 2023-12-10T10:46:09.739Z Please login/signup.
+error: 2023-12-10T10:46:12.511Z Please login/signup.
+error: 2023-12-10T10:46:12.511Z Please login/signup.
+error: 2023-12-10T10:46:12.805Z Please login/signup.
+error: 2023-12-10T10:46:12.805Z Please login/signup.
+error: 2023-12-10T10:49:32.680Z Please login/signup.
+error: 2023-12-10T10:49:32.680Z Please login/signup.
+error: 2023-12-10T10:50:08.419Z Please login/signup.
+error: 2023-12-10T10:50:08.419Z Please login/signup.
+error: 2023-12-10T10:50:43.901Z Please login/signup.
+error: 2023-12-10T10:50:43.901Z Please login/signup.
+error: 2023-12-10T10:50:48.593Z Please login/signup.
+error: 2023-12-10T10:50:48.593Z Please login/signup.
+error: 2023-12-10T10:51:05.350Z Please login/signup.
+error: 2023-12-10T10:51:05.350Z Please login/signup.
+error: 2023-12-10T10:51:47.613Z Please login/signup.
+error: 2023-12-10T10:51:47.613Z Please login/signup.
+error: 2023-12-10T10:51:53.142Z Please login/signup.
+error: 2023-12-10T10:51:53.142Z Please login/signup.
+error: 2023-12-10T10:51:57.040Z Please login/signup.
+error: 2023-12-10T10:51:57.040Z Please login/signup.
+error: 2023-12-10T10:54:07.934Z Please login/signup.
+error: 2023-12-10T10:54:07.934Z Please login/signup.
+error: 2023-12-10T10:54:22.351Z Please login/signup.
+error: 2023-12-10T10:54:22.351Z Please login/signup.
+error: 2023-12-10T10:55:12.802Z Please login/signup.
+error: 2023-12-10T10:55:12.802Z Please login/signup.
+error: 2023-12-10T10:55:30.416Z Please login/signup.
+error: 2023-12-10T10:55:30.416Z Please login/signup.
+error: 2023-12-10T10:58:44.582Z Please login/signup.
+error: 2023-12-10T10:58:44.582Z Please login/signup.
+error: 2023-12-10T10:58:46.464Z Please login/signup.
+error: 2023-12-10T10:58:46.464Z Please login/signup.
+error: 2023-12-10T10:59:16.807Z Please login/signup.
+error: 2023-12-10T10:59:16.807Z Please login/signup.
+error: 2023-12-10T11:00:22.800Z Please login/signup.
+error: 2023-12-10T11:00:22.800Z Please login/signup.
+error: 2023-12-10T11:00:27.558Z Please login/signup.
+error: 2023-12-10T11:00:27.558Z Please login/signup.
+error: 2023-12-10T11:01:32.066Z Please login/signup.
+error: 2023-12-10T11:01:32.066Z Please login/signup.
+error: 2023-12-10T11:01:41.730Z Please login/signup.
+error: 2023-12-10T11:01:41.730Z Please login/signup.
+error: 2023-12-10T11:01:51.920Z Please login/signup.
+error: 2023-12-10T11:01:51.920Z Please login/signup.
+error: 2023-12-10T11:02:07.275Z Please login/signup.
+error: 2023-12-10T11:02:07.275Z Please login/signup.
+error: 2023-12-10T11:02:41.337Z Please login/signup.
+error: 2023-12-10T11:02:41.337Z Please login/signup.
+error: 2023-12-10T11:04:21.466Z Please login/signup.
+error: 2023-12-10T11:04:21.466Z Please login/signup.
+error: 2023-12-10T11:04:25.753Z Please login/signup.
+error: 2023-12-10T11:04:25.753Z Please login/signup.
+error: 2023-12-10T11:06:32.557Z Please login/signup.
+error: 2023-12-10T11:06:32.557Z Please login/signup.
+error: 2023-12-10T11:06:38.586Z Please login/signup.
+error: 2023-12-10T11:06:38.586Z Please login/signup.
+error: 2023-12-10T11:06:52.862Z Please login/signup.
+error: 2023-12-10T11:06:52.862Z Please login/signup.
+error: 2023-12-10T11:07:04.245Z Please login/signup.
+error: 2023-12-10T11:07:04.245Z Please login/signup.
+error: 2023-12-10T11:07:17.377Z Please login/signup.
+error: 2023-12-10T11:07:17.377Z Please login/signup.
+error: 2023-12-10T11:09:48.066Z Please login/signup.
+error: 2023-12-10T11:09:48.066Z Please login/signup.
+error: 2023-12-10T11:09:55.201Z Please login/signup.
+error: 2023-12-10T11:09:55.201Z Please login/signup.
+error: 2023-12-10T11:10:25.286Z Please login/signup.
+error: 2023-12-10T11:10:25.286Z Please login/signup.
+error: 2023-12-10T11:10:44.949Z Please login/signup.
+error: 2023-12-10T11:10:44.949Z Please login/signup.
+error: 2023-12-10T11:10:53.649Z Please login/signup.
+error: 2023-12-10T11:10:53.649Z Please login/signup.
+error: 2023-12-10T11:11:00.606Z Please login/signup.
+error: 2023-12-10T11:11:00.606Z Please login/signup.
+error: 2023-12-10T11:11:38.994Z Please login/signup.
+error: 2023-12-10T11:11:38.994Z Please login/signup.
+error: 2023-12-10T11:12:37.918Z Please login/signup.
+error: 2023-12-10T11:12:37.918Z Please login/signup.
+error: 2023-12-10T11:12:38.240Z Please login/signup.
+error: 2023-12-10T11:12:38.240Z Please login/signup.
+error: 2023-12-10T11:12:41.168Z Please login/signup.
+error: 2023-12-10T11:12:41.168Z Please login/signup.
+error: 2023-12-10T11:12:41.251Z Please login/signup.
+error: 2023-12-10T11:12:41.251Z Please login/signup.
+error: 2023-12-10T11:14:53.451Z Please login/signup.
+error: 2023-12-10T11:14:53.451Z Please login/signup.
+error: 2023-12-10T11:14:53.927Z Please login/signup.
+error: 2023-12-10T11:14:53.927Z Please login/signup.
+error: 2023-12-10T11:14:54.404Z Please login/signup.
+error: 2023-12-10T11:14:54.404Z Please login/signup.
+error: 2023-12-10T11:15:02.490Z Please login/signup.
+error: 2023-12-10T11:15:02.490Z Please login/signup.
+error: 2023-12-10T11:15:02.618Z Please login/signup.
+error: 2023-12-10T11:15:02.618Z Please login/signup.
+error: 2023-12-10T11:15:03.351Z Please login/signup.
+error: 2023-12-10T11:15:03.351Z Please login/signup.
+error: 2023-12-10T11:15:53.736Z Please login/signup.
+error: 2023-12-10T11:15:53.736Z Please login/signup.
+error: 2023-12-10T11:16:00.652Z Please login/signup.
+error: 2023-12-10T11:16:00.652Z Please login/signup.
+error: 2023-12-10T11:16:03.568Z Please login/signup.
+error: 2023-12-10T11:16:03.568Z Please login/signup.
+error: 2023-12-10T11:17:22.856Z Please login/signup.
+error: 2023-12-10T11:17:22.856Z Please login/signup.
+error: 2023-12-10T11:17:31.253Z Please login/signup.
+error: 2023-12-10T11:17:31.253Z Please login/signup.
+error: 2023-12-10T11:17:31.643Z Please login/signup.
+error: 2023-12-10T11:17:31.643Z Please login/signup.
+error: 2023-12-10T11:17:32.550Z Please login/signup.
+error: 2023-12-10T11:17:32.550Z Please login/signup.
+error: 2023-12-10T11:17:54.196Z Please login/signup.
+error: 2023-12-10T11:17:54.196Z Please login/signup.
+error: 2023-12-10T11:17:54.301Z Please login/signup.
+error: 2023-12-10T11:17:54.301Z Please login/signup.
+error: 2023-12-10T11:17:55.795Z Please login/signup.
+error: 2023-12-10T11:17:55.795Z Please login/signup.
+error: 2023-12-10T11:18:03.019Z Please login/signup.
+error: 2023-12-10T11:18:03.019Z Please login/signup.
+error: 2023-12-10T11:18:03.585Z Please login/signup.
+error: 2023-12-10T11:18:03.585Z Please login/signup.
+error: 2023-12-10T11:18:03.893Z Please login/signup.
+error: 2023-12-10T11:18:03.893Z Please login/signup.
+error: 2023-12-10T11:18:08.161Z Please login/signup.
+error: 2023-12-10T11:18:08.161Z Please login/signup.
+error: 2023-12-10T11:18:08.364Z Please login/signup.
+error: 2023-12-10T11:18:08.364Z Please login/signup.
+error: 2023-12-10T11:18:09.639Z Please login/signup.
+error: 2023-12-10T11:18:09.639Z Please login/signup.
+error: 2023-12-10T11:18:37.221Z Please login/signup.
+error: 2023-12-10T11:18:37.221Z Please login/signup.
+error: 2023-12-10T11:18:37.467Z Please login/signup.
+error: 2023-12-10T11:18:37.467Z Please login/signup.
+error: 2023-12-10T11:18:38.433Z Please login/signup.
+error: 2023-12-10T11:18:38.433Z Please login/signup.
+error: 2023-12-10T11:19:20.554Z Please login/signup.
+error: 2023-12-10T11:19:20.554Z Please login/signup.
+error: 2023-12-10T11:19:20.839Z Please login/signup.
+error: 2023-12-10T11:19:20.839Z Please login/signup.
+error: 2023-12-10T11:19:22.390Z Please login/signup.
+error: 2023-12-10T11:19:22.390Z Please login/signup.
+error: 2023-12-10T11:19:36.349Z Please login/signup.
+error: 2023-12-10T11:19:36.349Z Please login/signup.
+error: 2023-12-10T11:19:36.641Z Please login/signup.
+error: 2023-12-10T11:19:36.641Z Please login/signup.
+error: 2023-12-10T11:19:37.547Z Please login/signup.
+error: 2023-12-10T11:19:37.547Z Please login/signup.
+error: 2023-12-10T11:19:42.228Z Please login/signup.
+error: 2023-12-10T11:19:42.228Z Please login/signup.
+error: 2023-12-10T11:19:42.279Z Please login/signup.
+error: 2023-12-10T11:19:42.279Z Please login/signup.
+error: 2023-12-10T11:19:43.592Z Please login/signup.
+error: 2023-12-10T11:19:43.592Z Please login/signup.
+error: 2023-12-10T13:11:30.902Z 404
+error: 2023-12-10T13:11:31.833Z 404
+error: 2023-12-10T13:11:32.873Z 404
+error: 2023-12-10T15:31:25.326Z Please login/signup.
+error: 2023-12-10T15:31:25.326Z Please login/signup.
+error: 2023-12-10T17:20:17.194Z 404
+error: 2023-12-10T17:20:18.896Z 404
+error: 2023-12-10T17:20:19.694Z 404

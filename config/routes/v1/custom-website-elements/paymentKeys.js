@@ -15,4 +15,6 @@ router.post('/delete', AdminVerify , paymentKeys.deletePaymentKeys);
 router.get('/decrypt/:index', AdminVerify , paymentKeys.getDecryptedPaymentKeysViaIndex);
 router.get('/decrypt', AdminVerify , paymentKeys.getDecryptedPaymentKeys);
 
+router.post('/verify', jwtVerify , paymentKeys.verifyPassword );
+
 module.exports = router;

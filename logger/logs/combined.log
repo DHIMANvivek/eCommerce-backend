@@ -636,6 +636,3 @@ error: 2023-12-09T08:29:10.664Z wishlister.save is not a function
 error: 2023-12-09T08:29:22.606Z wishlister.save is not a function
 error: 2023-12-09T08:33:49.445Z The positional operator did not find the match needed from the query.
 error: 2023-12-09T10:01:43.798Z The positional operator did not find the match needed from the query.
-error: 2023-12-11T06:08:31.488Z Floral Embroidered Kurti is out of stock
-error: 2023-12-11T06:34:46.521Z orders validation failed: address: Cast to Embedded failed for value "true" (type boolean) at path "address" because of "ObjectExpectedError"
-error: 2023-12-11T06:39:02.579Z orders validation failed: address.area: Cast to string failed for value "[ 'dugri' ]" (type Array) at path "area"

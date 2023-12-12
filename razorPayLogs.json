@@ -1946,5 +1946,215 @@
             }
         },
         "created_at": 1702119926
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.authorized",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_NAvE7AYGOnCiCT",
+                    "entity": "payment",
+                    "amount": 4800000,
+                    "currency": "INR",
+                    "status": "authorized",
+                    "order_id": "order_NAvDCHD9RO0354",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "upi",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": false,
+                    "description": "ORDER-d681-12",
+                    "card_id": null,
+                    "bank": null,
+                    "wallet": null,
+                    "vpa": "success@razorpay",
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916284164462",
+                    "notes": {
+                        "description": "ORDER-d681-12"
+                    },
+                    "fee": null,
+                    "tax": null,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "rrn": "901097889339",
+                        "upi_transaction_id": "0CC638C0B9A9FF9B37A5CEB8A794E1A6"
+                    },
+                    "created_at": 1702272325,
+                    "upi": {
+                        "vpa": "success@razorpay"
+                    }
+                }
+            }
+        },
+        "created_at": 1702272326
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.captured",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_NAvE7AYGOnCiCT",
+                    "entity": "payment",
+                    "amount": 4800000,
+                    "currency": "INR",
+                    "status": "captured",
+                    "order_id": "order_NAvDCHD9RO0354",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "upi",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": true,
+                    "description": "ORDER-d681-12",
+                    "card_id": null,
+                    "bank": null,
+                    "wallet": null,
+                    "vpa": "success@razorpay",
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916284164462",
+                    "notes": {
+                        "description": "ORDER-d681-12"
+                    },
+                    "fee": 113280,
+                    "tax": 17280,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "rrn": "901097889339",
+                        "upi_transaction_id": "0CC638C0B9A9FF9B37A5CEB8A794E1A6"
+                    },
+                    "created_at": 1702272325,
+                    "upi": {
+                        "vpa": "success@razorpay"
+                    },
+                    "base_amount": 4800000
+                }
+            }
+        },
+        "created_at": 1702272326
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.authorized",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_NBMb31ADxTiJ25",
+                    "entity": "payment",
+                    "amount": 895000,
+                    "currency": "INR",
+                    "status": "authorized",
+                    "order_id": "order_NBManvyT3QNXJD",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "upi",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": false,
+                    "description": "ORDER-d681-112",
+                    "card_id": null,
+                    "bank": null,
+                    "wallet": null,
+                    "vpa": "6283415102@paytm",
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916284164462",
+                    "notes": {
+                        "description": "ORDER-d681-112"
+                    },
+                    "fee": null,
+                    "tax": null,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "rrn": "472246272696",
+                        "upi_transaction_id": "CA5D939E9A3143EBB13445AB8C600D97"
+                    },
+                    "created_at": 1702368711,
+                    "upi": {
+                        "vpa": "6283415102@paytm"
+                    }
+                }
+            }
+        },
+        "created_at": 1702368712
+    },
+    {
+        "entity": "event",
+        "account_id": "acc_HfuNCgQHkXlDXD",
+        "event": "payment.captured",
+        "contains": [
+            "payment"
+        ],
+        "payload": {
+            "payment": {
+                "entity": {
+                    "id": "pay_NBMb31ADxTiJ25",
+                    "entity": "payment",
+                    "amount": 895000,
+                    "currency": "INR",
+                    "status": "captured",
+                    "order_id": "order_NBManvyT3QNXJD",
+                    "invoice_id": null,
+                    "international": false,
+                    "method": "upi",
+                    "amount_refunded": 0,
+                    "refund_status": null,
+                    "captured": true,
+                    "description": "ORDER-d681-112",
+                    "card_id": null,
+                    "bank": null,
+                    "wallet": null,
+                    "vpa": "6283415102@paytm",
+                    "email": "googlydhiman.4236@gmail.com",
+                    "contact": "+916284164462",
+                    "notes": {
+                        "description": "ORDER-d681-112"
+                    },
+                    "fee": 21122,
+                    "tax": 3222,
+                    "error_code": null,
+                    "error_description": null,
+                    "error_source": null,
+                    "error_step": null,
+                    "error_reason": null,
+                    "acquirer_data": {
+                        "rrn": "472246272696",
+                        "upi_transaction_id": "CA5D939E9A3143EBB13445AB8C600D97"
+                    },
+                    "created_at": 1702368711,
+                    "upi": {
+                        "vpa": "6283415102@paytm"
+                    },
+                    "base_amount": 895000
+                }
+            }
+        },
+        "created_at": 1702368712
     }
 ]
