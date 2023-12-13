@@ -10,20 +10,14 @@ async function showWishlists(req, res) {
             userId: user.id
         });
         if (wishlister) {
-            const wishlists = wishlister.wishlists.filter((item) => item.active == true)
+            const wishlists = wishlister.wishlists
             const count = (await wishlist.aggregate([
                 {
-                    $match: { 'userId': new mongoose.Types.ObjectId(user.id)},
+                    $match: { 'userId': new mongoose.Types.ObjectId(user.id) }
                 },
                 {
                     $unwind: '$wishlists'
                 },
-                {
-                    $match:
-                      {
-                        "wishlists.active": true,
-                      },
-                  },
                 {
                     $unwind: {
                         path: "$wishlists.products",
@@ -39,7 +33,6 @@ async function showWishlists(req, res) {
         }
     }
     catch (error) {
-        console.log('erorr is ',error);
         logger.error(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
@@ -50,10 +43,9 @@ async function showWishlists(req, res) {
 
 async function addToWishlist(req, res) {
     try {
-        const input = req.body;8
-        console.log(input, "inputttt");
+        const input = req.body;
         const user = req.tokenData;
-        console.log('addtowishlist called');
+
         const wishlister = await wishlist.findOne({
             userId: user.id,
             'wishlists.wishlistName': input.wishlistName.trim().toLowerCase()
@@ -107,6 +99,7 @@ async function addToWishlist(req, res) {
         }
 
         const itemAlreadyExists = await wishlist.findOne({ userId: user.id, 'wishlists.wishlistName': input.wishlistName, 'wishlists.products': { $in: [input.productId] } });
+
         if (itemAlreadyExists) {
             res.status(200).json({
                 message: "Item already exists in " + input.wishlistName + '!'
@@ -127,11 +120,8 @@ async function addToWishlist(req, res) {
             message: "Added to " + (input.wishlistName).charAt(0).toUpperCase() + (input.wishlistName).slice(1) + '!'
         })
     }
-
     catch (error) {
-
         logger.error(error);
-        console.log(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
             message: 'Internal Server Error'
@@ -142,16 +132,16 @@ async function addToWishlist(req, res) {
 async function deleteWishlist(req, res) {
     try {
         const input = req.body;
-        console.log(input, "inputtt");
         const user = req.tokenData;
-        const wishlister = await wishlist.updateOne({
-            userId: user.id,
-            'wishlists.wishlistName': input.id
-        },
-        {$set:{'wishlists.$.active':false}})
-        // if (wishlister) {
-        //     await wishlister.wishlists;
-        // }
+
+        const wishlister = await wishlist.findOne({
+            userId: user.id
+        })
+        if (wishlister) {
+            await wishlister.wishlists.splice(input.index, 1);
+        }
+
+        wishlister.save();
         return res.status(200).json({
             message: "Wishlist deleted!"
         })
@@ -170,65 +160,59 @@ async function showWishlistedData(req, res, next, controller = false) {
         const controller = req.controller ? true : false;
         const user = req.tokenData;
 
-        console.log('------->');
-        let products = await wishlist.aggregate(
-            [
-                {
-                  $match: {
+        let products = await wishlist.aggregate([
+            {
+                $match: {
                     userId: new mongoose.Types.ObjectId(user.id),
-                  },
-                },
-                {
-                  $unwind: {
+                }
+            },
+            {
+                $unwind: {
                     path: "$wishlists",
                     includeArrayIndex: "string",
                     preserveNullAndEmptyArrays: true,
-                  },
                 },
-                {
-                  $match:
-                    {
-                      "wishlists.active": true,
-                    },
-                },
-                {
-                  $unwind: {
+            },
+            {
+                $unwind: {
                     path: "$wishlists.products",
+                    includeArrayIndex: "string",
                     preserveNullAndEmptyArrays: true,
-                  },
                 },
-                {
-                  $lookup: {
+            },
+            {
+                $lookup: {
                     from: "products",
                     localField: "wishlists.products",
                     foreignField: "_id",
                     as: "productDetails",
-                  },
                 },
-                {
-                  $unwind: {
+            },
+            {
+                $unwind: {
                     path: "$productDetails",
+                    includeArrayIndex: "string",
                     preserveNullAndEmptyArrays: true,
-                  },
                 },
-                {
-                  $group: {
+            },
+            {
+                $group: {
                     _id: "$wishlists.wishlistName",
                     time: {
-                      $first: "$wishlists.createdAt",
+                        $first: "$wishlists.createdAt",
                     },
                     productinfo: {
-                      $push: "$productDetails",
+                        $push: "$productDetails",
                     },
-                  },
                 },
-                {
-                  $sort: {
+            },
+            {
+                $sort: {
                     time: 1,
-                  },
                 },
-                {
-                  $project: {
+            },
+            {
+                $project: {
                     "productinfo.sku": 1,
                     "productinfo.name": 1,
                     "productinfo.assets": 1,
@@ -237,9 +221,9 @@ async function showWishlistedData(req, res, next, controller = false) {
                     "productinfo._id": 1,
                     "productinfo.status": 1,
                     wishlists: 1,
-                  },
                 },
-              ]);
+            },
+        ]);
 
         if (controller) {
             return products;
@@ -248,7 +232,6 @@ async function showWishlistedData(req, res, next, controller = false) {
     }
     catch (error) {
         logger.error(error);
-        console.log(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
             message: 'Internal Server Error'
@@ -308,7 +291,6 @@ async function removeFromWishlist(req, res) {
 async function createDefault(req, res) {
     // try {
     //     const getAllusers = await UserModel.find({}, { _id: 1 });
-    //     // console.log('get all user si ', getAllusers);
     //     getAllusers.forEach(async (el) => {
     //         const defaultWishlist = {
     //             wishlistName: 'my wishlist',

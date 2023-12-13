@@ -5,7 +5,6 @@ const wishlistSchema = mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',
-            // required: true,
         },
         wishlists: [
             {
@@ -19,21 +18,10 @@ const wishlistSchema = mongoose.Schema(
                 },
                 products: [
                     {
-
                         type: mongoose.Schema.Types.ObjectId,
                         ref: 'products',
-                        // active:{
-                        //     type:Boolean,
-                        //     default:true
-                        // }
                     },
-                    
                 ],
-                active: {
-                    type: Boolean,
-                    default: true,
-                },
-        
             },
         ],
         active: {

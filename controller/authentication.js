@@ -26,30 +26,36 @@ async function login(req, res) {
 
         let userFound = await usersModel.findOne({
             email: input.email
-        },{email:1,name:1,password:1,role:1})
+        }, {
+            email: 1,
+            name: 1,
+            password: 1,
+            role: 1
+        })
 
         let firstName;
         // PURE GOOGLE LOGIN
         if (input.token) {
-
+            console.log("inside");
             // NORMAL USER USER TRYING TO LOGIN WITH GOOGLE.
             if (userFound?.provider == 'direct') {
+                console.log("coming???");
                 throw ({ message: 'Try to login manually.' });
             }
 
             if (!userFound) {
                 const userCreated = usersModel(req.body);
                 await userCreated.save();
-                userFound=await usersModel.findOne({email:input.email},{email:1,role:1,name:1});
+                userFound = await usersModel.findOne({ email: input.email }, { email: 1, role: 1, name: 1 });
             }
 
 
 
             const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
-            console.log('tokendata is ',tokenData);
+            console.log('tokendata is ', tokenData);
             const token = createToken(tokenData);
 
-             firstName = userFound.name.firstname
+            firstName = userFound.name.firstname
             res.status(200).json({ token, firstName });
             return;
         }
@@ -71,7 +77,7 @@ async function login(req, res) {
         }
 
 
-        const tokenData = {email: userFound.email ,id: userFound._id, role: userFound.role }
+        const tokenData = { email: userFound.email, id: userFound._id, role: userFound.role }
 
         const token = createToken(tokenData);
         firstName = userFound.name.firstname
@@ -79,7 +85,7 @@ async function login(req, res) {
             token, firstName
         })
     } catch (error) {
-        console.log('error is ',error);
+        console.log('error is ', error);
         logger.error(error);
         if (error.message) return res.status(500).json(error);
         res.status(500).json({
@@ -103,9 +109,9 @@ async function signup(req, res) {
                 lastname: ticket.getPayload().family_name
             }
         }
-      
 
-        let user = await usersModel.findOne({ email: req.body.email },{email:1,_id:0});
+
+        let user = await usersModel.findOne({ email: req.body.email }, { email: 1, _id: 0 });
         const firstName = req.body.name.firstname;
 
         //google signup/login
@@ -113,14 +119,14 @@ async function signup(req, res) {
             if (!user) {
                 const userCreated = usersModel(req.body);
                 await userCreated.save();
-                user=await usersModel.findOne({email:req.body.email},{email:1,role:1});
+                user = await usersModel.findOne({ email: req.body.email }, { email: 1, role: 1 });
             }
-            else{
-                if(user?.provider=='direct') throw({message:'Try to login manually'});
+            else {
+                if (user?.provider == 'direct') throw ({ message: 'Try to login manually' });
             }
             const tokenData = { email: user.email, id: user._id, role: user.role }
             const token = createToken(tokenData);
-          
+
             res.status(200).json({ token, firstName });
             return;
         }
@@ -260,8 +266,8 @@ async function changePassword(req, res) {
         const input = req.body;
         const user = await usersModel.findById(req.tokenData.id)
 
-        if (user.provider == 'GOOGLE'){
-            throw ({message: "Cannot change password since you are a Google user!"})
+        if (user.provider == 'GOOGLE') {
+            throw ({ message: "Cannot change password since you are a Google user!" })
         }
 
         const compareOldPassword = await bcryptjs.compare(input.oldPassword, user.password)
@@ -280,7 +286,7 @@ async function changePassword(req, res) {
             })
         }
         else {
-            throw ({ message: 'Your Password is incorrect' })
+            throw ({ message: 'Current password is incorrect!' })
         }
     }
     catch (error) {
