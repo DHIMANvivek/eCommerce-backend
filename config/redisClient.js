@@ -1,7 +1,7 @@
 const { createClient } = require("redis")
 
 const redisClient = createClient({
-    url: "rediss://default:31f65167c5264c6294190242a6ad6b37@strong-eel-43513.upstash.io:43513"
+    url: "rediss://default:AbZ3AAIjcDFkNjhhNjE3Y2JjNWM0MjE0OWZlODJlYjhiZjQwNGZmNHAxMA@cute-sailfish-46711.upstash.io:6379"
 });
 
 redisClient.on("connect", function (err, data) {
