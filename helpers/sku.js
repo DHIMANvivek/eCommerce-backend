@@ -1,5 +1,7 @@
 const productModel = require('../models/products');
 
+// nice
+
 async function generateSKU(product){
 
     const data = await productModel.findOne({
